@@ -300,6 +300,36 @@ def next_pose(pose: Pose, move: Move) -> Pose:
     return replace(pose, states=apply_detent(pose.states, move.joint, move.delta))
 
 
+def replay_tracked(start: Pose, moves: Iterable[Move]) -> Pose:
+    """Replay ``moves`` from ``start`` and keep the world-tracked base.
+
+    ``in`` moves rotate the base side, so the finished shape's world
+    orientation is a consequence of the recorded sides rather than of the
+    nominal goal.  This is the pose the simulation should expect.
+    """
+
+    pose = start
+    for move in moves:
+        pose = next_pose(pose, move)
+    return pose
+
+
+def lattice_span(pose: Pose) -> tuple[int, int, int]:
+    """Extent of the rest cells along each world lattice axis."""
+
+    cells = pose_cells(pose)
+    return tuple(  # type: ignore[return-value]
+        max(cell[axis] for cell in cells) - min(cell[axis] for cell in cells)
+        for axis in range(3)
+    )
+
+
+def ends_flat_on_table(pose: Pose) -> bool:
+    """True when the tracked rest pose lies in a single horizontal layer."""
+
+    return lattice_span(pose)[2] == 0
+
+
 def check_move(
     pose: Pose,
     move: Move,
@@ -973,11 +1003,13 @@ __all__ = [
     "SideSelector",
     "aggregate_reports",
     "check_move",
+    "ends_flat_on_table",
     "escape_probe",
     "fold",
     "goal_distance",
     "goal_progress",
     "goal_reached",
+    "lattice_span",
     "load_heart_certificate",
     "merge_reports",
     "next_pose",
@@ -986,4 +1018,5 @@ __all__ = [
     "replay_direct_goal",
     "replay_forward",
     "replay_heart",
+    "replay_tracked",
 ]

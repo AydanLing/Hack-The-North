@@ -41,5 +41,17 @@ handed to the MuJoCo sim owner. See `handoff/README.md` for the conventions and
 `handoff/PATHS.md` for the move lists. Regenerate it with
 `uv run python tools/export_handoff.py` after a new planner run.
 
-MuJoCo, hardware drivers, voice, LLM generation, and vision judging are
-deliberately not dependencies of this project.
+New shapes are discovered with `tools/discover_glyphs.py`: a glyph atlas
+(letters, digits, symbols, icons) is expanded into tens of thousands of exact
+27-cell masks by four generators (parametric thick strokes, bitmap size
+ladders, compass-run templates, boundary perturbation), every mask is solved
+for an exact shipped-roll threading, the threadable ones are ranked offline
+by recognition distance and legibility, and a shortlist is folded through the
+standard pipeline within a wall-clock budget. See `docs/DISCOVERY.md` for the
+latest sweep and `uv run python tools/discover_glyphs.py --help` for the
+stages. Recognizability is still decided by a human blind pick.
+
+MuJoCo, hardware drivers, voice, and LLM generation are deliberately not
+dependencies of this project. The optional `judge` extra
+(`uv sync --extra judge`) enables a Claude blind-naming annotation on the
+discovery summary; it never ranks or picks.

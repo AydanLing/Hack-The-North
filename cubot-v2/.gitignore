@@ -7,4 +7,3 @@ out/
 data/family/*.npz
 data/harvest/*.json
 
-docs/FINDINGS.md
