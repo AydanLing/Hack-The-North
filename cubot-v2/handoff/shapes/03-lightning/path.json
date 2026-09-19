@@ -7632,6 +7632,7 @@
     "source_hash": "6dbbdc9ff1ce6161eabfd9edf6504e0d378b0a3fd5c30a6090f848e33f97b6b3",
     "profile": "loose",
     "seed": 0,
+    "mask_variant": null,
     "exporter": "tools/export_handoff.py"
   }
 }
