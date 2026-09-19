@@ -1,0 +1,9 @@
+// shallow corrugated screen 3 tall: 2-step square wave 9-cell plan profile
+#.###.
+###.##
+---
+#.###.
+###.##
+---
+#.###.
+###.##

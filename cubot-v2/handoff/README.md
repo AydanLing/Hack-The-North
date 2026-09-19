@@ -219,8 +219,8 @@ Each entry of `moves[]`:
 | `duration_s` | nominal move time (2.0 s) |
 | `state_before`, `state_after`, `angle_after_deg` | that joint only |
 | `states_after[26]`, `base_after`, `cells_after[27]` | the full rest pose after the move |
-| `hard_ok` | all four hard checks passed on this move under `loose` |
-| `checks.hard` | `cad_penetration`, `ground`, `rest_cell_overlap`, `torque_stall` → `[passed, reason]` |
+| `hard_ok` | every hard check passed on this move under the accepting profile |
+| `checks.hard` | `cad_penetration`, `ground`, `rest_cell_overlap`, `torque_stall`, plus the wire-bundle rules `tether_table`, `tether_cell`, `tether_down` (a 20 × 40 mm wire leaves module 0 through its free face; nothing may collide with it) → `[passed, reason]` |
 | `checks.soft` | `balance`, `ground`, `holding_load`, `moving_side`, `near_contact`, `pivot_dip`, `torque` → `[score 0–1, reason]` |
 | `checks.measurements` | raw numbers: `peak_demand_nm` (static + inertial over the eased profile), `static_peak_nm`, `holding_peak_nm`, `max_penetration_mm`, `max_ground_depth_mm`, `max_pivot_dip_mm`, `balance_margin_mm`, `first_contact_angle_deg`, `peak_angle_deg`, `arc` (`up`/`down`/`hump`/`mixed`/`flat`), `moving_side`, `side_ambiguous`, `samples` |
 

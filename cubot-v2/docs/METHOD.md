@@ -60,6 +60,15 @@ atlas' 1.6 %:
 - Any two-thick *block* is impossible regardless of drawing
   (`docs/CUBE_FEASIBILITY.md`); only one-deep plates, frames and standing
   shapes fold.
+- **A 1-wide stroke cannot enter a 3-wide block at the middle of an edge**: the
+  two adjacent block corners become degree-2 cells that force a branch, so the
+  gate reports a parity or Hamiltonian failure. Join a stem to a block at a
+  block *corner*, or make the block ≥5 wide. This kills symmetric necks and
+  stems on 3-wide caps, collars, crossguards and pencil points (the 2026-09-19
+  backfill sweep: sword, chess pawn, CN tower, wine glass all failed on it). A
+  5×3 block traversed middle-in/middle-out is Hamiltonian but roll-UNSAT in
+  every length combination tried; a 5×3 block only threads as a chain *end*
+  reached by a straight 1-wide lead (hammer, bottle).
 - A concept usually needs 4–8 variants to land one threadable form. Vary
   stroke width, box (5×7 up to 9×9 is typical; a 9×19 staircase also worked),
   which corner is open, and where the two chain ends sit. The finishing
@@ -160,7 +169,8 @@ refused rather than silently renumbered.
 | A concept you drew is `UNSAT` in every variant (x, diamond, crown, star, house…) | Boundary perturbation from `cubot/generate/glyph_atlas.py` as a **repair** step around your drawing, then gate the results. This is what the arrow contour search did by hand (15,099 variants → 68 threadable). |
 | You want breadth you cannot draw (a whole alphabet in one sweep) | `tools/discover_glyphs.py` — but treat its ranking as a threadability filter, not a recognizability ranking, and blind-pick before folding. |
 | The demo seven need re-folding after a kinematics or profile change | `uv run cubot pipeline <name>` on the registered icon, then `tools/export_handoff.py` with the default run dir. |
-| A 3-D or two-thick target | Don't. See `docs/CUBE_FEASIBILITY.md`; only one-deep plates, frames and standing shapes fold. |
+| A two-thick target (any filled 2×2×2 block) | Don't. See `docs/CUBE_FEASIBILITY.md`; the 22 mm hinge-corner sweep locks every one of them. |
+| A one-deep 3-D shell (tray, bench, tube, L-corner…) | The 3-D variant below: layered masks, `tools/repair_shell.py`, `tools/explore_shape3d.py`, two acceptance tiers. |
 
 ## Why this method won (2026-09-19)
 
@@ -178,3 +188,44 @@ exploration, 250 were table incursions, 30 CAD penetrations and 24 rest-cell
 overlaps. Table awareness in the folder and lattice-only pre-screening of the
 up-to-64 threadings per mask are the two improvements that would move that
 number; neither changes this workflow.
+
+## The 3-D variant — one-deep shells
+
+Solid volumes are impossible, but *hollow one-thick shells* — perpendicular
+plates joined along edges (L-corner, tray, U-channel cradle, bench = top plate
+plus two legs, standing square tube, arch) — thread under the shipped roll at
+about the same rate as flat drawings (~30 % first draw) and some of them fold
+on a flat table. The workflow is the mask-first loop with three additions.
+
+```
+data/candidates/volumetric/<concept>-vN.txt    1. draw   layered mask (z-slices, TOP layer first, `---` between)
+        │
+        ▼  tools/repair_shell.py gate --iso    2. gate   screen + threading + 2x2x2 screen + dense count + voxel PNG
+        │  tools/repair_shell.py repair        2b. repair single-cell perturbation of an UNSAT base (20–40 s)
+        ▼  tools/explore_shape3d.py            3. fold   exact threadings; loose first (tier 1), then platform (tier 2)
+        ▼  tools/explore_summary.py            4. summarize   tier column, voxel contact sheet, manifest with tier/profile
+        ▼  blind pick on the voxel sheet       5. judge
+        ▼  tools/export_handoff.py --manifest  6. hand off   layered silhouette, accept_profile/tier recorded
+```
+
+- **Draw** plates 1 or 3 cubes wide; put chain ends at plate corners; exactly
+  two legs (a four-leg table is a tree). For stools and benches, inset a leg one
+  row from the end of the top plate — flush legs were roll-UNSAT or parity-fail
+  in every variant tried. Never draw a filled 2×2×2 block: a "shell" containing
+  one is a solid in disguise (a cube-outline-plus-column variant completed and
+  then measured exactly 22.004 mm on its last move). `has_2x2x2_block` is exact
+  and free, and both tools reject on it.
+- **Two tiers.** `loose` on a flat table is tier 1 (the L-corner passes it: 18
+  moves, no violations). `config/profiles/platform.toml` is `loose` with the
+  table removed — the robot folds on a raised platform — and is tier 2. Both
+  verdicts are recorded on every row and in the handoff (`status.accept_profile`,
+  `status.tier`, `loose_hard_ok`, `platform_hard_ok`); a tier-2 pass never
+  replaces the loose verdict.
+- **Orientation is an outcome.** `goal_reached` compares joint states only, so a
+  forward fold may finish with the drawn +z pointing sideways
+  (`final_up_axis`, reported never failed). `--backward` folds from the goal to
+  the straight chain and certifies the reversed route with a forward
+  `replay()` — CAD is time-symmetric, gravity is not — which fixes the finishing
+  orientation by construction.
+- Judge from `renders/iso.png` (solid voxels, `cubot.viz.render_voxels`); the
+  top view of a shell is only a projection.

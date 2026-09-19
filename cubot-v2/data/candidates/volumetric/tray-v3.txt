@@ -1,0 +1,10 @@
+// tray v3: 4x4 floor + full rim with one mid-edge gap on the front (16 + 11 = 27)
+####
+#..#
+#..#
+#.##
+---
+####
+####
+####
+####

@@ -1,0 +1,16 @@
+// arch 3 wide: 3x4 lintel + posts 3 tall and 2 tall (short post hangs)
+####
+####
+####
+---
+#..#
+#..#
+#..#
+---
+#..#
+#..#
+#..#
+---
+#...
+#...
+#...

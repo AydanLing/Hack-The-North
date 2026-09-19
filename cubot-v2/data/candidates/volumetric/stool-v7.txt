@@ -1,0 +1,16 @@
+// stool: 4x3 top at z=3, 3-wide x3 leg along col0, 2-wide x3 leg along col3 rows0-1
+####
+####
+####
+---
+#..#
+#..#
+#...
+---
+#..#
+#..#
+#...
+---
+#..#
+#..#
+#...

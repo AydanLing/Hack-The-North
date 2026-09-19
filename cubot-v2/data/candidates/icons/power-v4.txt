@@ -1,0 +1,9 @@
+// power: 7x7 ring, gap top-middle, stem 1 above + 3 through/inside (27)
+...#...
+#######
+#..#..#
+#..#..#
+#.....#
+#.....#
+#.....#
+#######

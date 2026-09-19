@@ -1,0 +1,12 @@
+// accordion wall 3 tall: S-zigzag 9-cell plan profile
+##..#
+.#..#
+.####
+---
+##..#
+.#..#
+.####
+---
+##..#
+.#..#
+.####

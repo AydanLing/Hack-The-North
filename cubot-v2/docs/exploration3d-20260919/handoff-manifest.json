@@ -1,0 +1,114 @@
+{
+  "schema": "cubot.handoff.manifest.v1",
+  "source": "out/explore3d-20260919",
+  "shapes": [
+    {
+      "name": "paperclip",
+      "variant": "paperclip-v3",
+      "run": "w1/runs/paperclip-v3/paperclip",
+      "moves": 4,
+      "ends_flat": true
+    },
+    {
+      "name": "hammer",
+      "variant": "hammer-v3",
+      "run": "w1/runs/hammer-v3/hammer",
+      "moves": 14,
+      "ends_flat": true
+    },
+    {
+      "name": "stool",
+      "variant": "stool-r1",
+      "run": "w1/runs/stool-r1/stool",
+      "moves": 17,
+      "ends_flat": false,
+      "tier": 1,
+      "profile": "loose",
+      "final_upright": false,
+      "volumetric": true
+    },
+    {
+      "name": "low-bench",
+      "variant": "low-bench-v3",
+      "run": "w1/runs/low-bench-v3/low-bench",
+      "moves": 28,
+      "ends_flat": false,
+      "tier": 1,
+      "profile": "loose",
+      "final_upright": false,
+      "volumetric": true
+    },
+    {
+      "name": "half-cube",
+      "variant": "half-cube-v1",
+      "run": "w2/runs/half-cube-v1/half-cube",
+      "moves": 16,
+      "ends_flat": false,
+      "tier": 1,
+      "profile": "loose",
+      "final_upright": false,
+      "volumetric": true
+    },
+    {
+      "name": "side-table",
+      "variant": "side-table-v3",
+      "run": "w1/runs/side-table-v3/side-table",
+      "moves": 16,
+      "ends_flat": false,
+      "tier": 1,
+      "profile": "loose",
+      "final_upright": false,
+      "volumetric": true
+    },
+    {
+      "name": "lounge",
+      "variant": "lounge-r1",
+      "run": "w1/runs/lounge-r1/lounge",
+      "moves": 26,
+      "ends_flat": false,
+      "tier": 1,
+      "profile": "loose",
+      "final_upright": false,
+      "volumetric": true
+    },
+    {
+      "name": "pencil",
+      "variant": "pencil-v2",
+      "run": "w1/runs/pencil-v2/pencil",
+      "moves": 5,
+      "ends_flat": true
+    },
+    {
+      "name": "magnifier",
+      "variant": "magnifier-v2",
+      "run": "w1/runs/magnifier-v2/magnifier",
+      "moves": 6,
+      "ends_flat": true
+    },
+    {
+      "name": "bench",
+      "variant": "bench-v1",
+      "run": "w1/runs/bench-v1/bench",
+      "moves": 7,
+      "ends_flat": false,
+      "tier": 2,
+      "profile": "platform",
+      "final_upright": true,
+      "volumetric": true
+    },
+    {
+      "name": "bottle",
+      "variant": "bottle-v4",
+      "run": "w1/runs/bottle-v4/bottle",
+      "moves": 11,
+      "ends_flat": true
+    },
+    {
+      "name": "power",
+      "variant": "power-v1",
+      "run": "w1/runs/power-v1/power",
+      "moves": 6,
+      "ends_flat": false
+    }
+  ]
+}

@@ -35,3 +35,19 @@ Search results preserve three separate facts:
 A goal-side escape probe is diagnostic because gravity-based moving-side and
 table rules can make the graph directed. Only exhaustive forward closure from
 the start may be labelled `UNSAT`.
+
+`platform` (``loose`` with the table removed) is the tier-2 acceptance gate for
+one-deep 3-D shells only. It is always recorded beside the `loose` verdict for
+the same route and never replaces it; a shape accepted under `platform` is a
+shape that needs a raised platform or table-edge lay-down. A drawing containing
+a filled 2×2×2 block is rejected before threading (`docs/CUBE_FEASIBILITY.md`).
+
+A 20 mm × 40 mm wire bundle leaves module 0 through its free (−x) face and
+rides with its still half. It is a collision body: nothing may sweep through
+it (counted as CAD penetration), it may not be driven into the table where a
+table exists (`tether_table`, at the CAD tolerance), the lattice cell behind
+module 0 must be empty at rest (`tether_cell`), and module 0 may not rest on
+the lowest layer with the wire pointing down (`tether_down`). Paths recorded
+before 2026-09-19 that open with `(0, ±1, 'in')` violate this and were
+re-folded; `tools/recheck_paths.py` replays any recorded path under the
+current rules.

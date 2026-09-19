@@ -1,0 +1,20 @@
+# ``loose`` with the table removed.  Tier-2 acceptance for one-deep 3D shells:
+# the robot folds on a raised platform / table-edge lay-down, so moving modules
+# may swing below the base plane (3D intermediates dip up to one pitch, 82 mm).
+# CAD, torque and balance rules are identical to ``loose``; ``ground_soft_mm``
+# stays finite so the dip depth is still measured and reported in ``scores``.
+# See docs/CUBE_FEASIBILITY.md §4 ("loosenings considered").
+[profile]
+sweep_step_deg = 4.0
+hard_penetration_mm = 6.0
+soft_penetration_mm = 1.0
+pivot_dip_exempt_mm = 1000000000.0
+ground_soft_mm = 3.0
+ground_hard_mm = 1000000000.0
+torque_cap_nm = 5.8
+torque_stall_nm = 10.6
+balance_margin_mm = -20.0
+fold_budget_s = 30.0
+node_budget = 200000
+detour_budget = 8
+side_ambiguity_ratio = 0.85

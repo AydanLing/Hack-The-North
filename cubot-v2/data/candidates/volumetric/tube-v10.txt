@@ -1,0 +1,16 @@
+// standing can: bottom corner notch, 2-cell foot from opposite corner, 2-cell lip on top
+##...
+.....
+.....
+---
+###..
+#.#..
+###..
+---
+###..
+#.#..
+###..
+---
+#####
+#.#..
+##...

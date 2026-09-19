@@ -557,6 +557,126 @@ def parse_ascii(
 from_ascii = parse_ascii
 
 
+def parse_layers(text: str | Sequence[str], *, order: str = "top-first") -> tuple[Cell, ...]:
+    """Parse a layered ASCII mask (z-slices) into 3D cells.
+
+    Slices are separated by a blank line or a line starting with ``---``;
+    ``//`` lines are comments.  Within a slice rows are top-first (``y`` grows
+    upward) exactly like :func:`parse_ascii`; with ``order="top-first"`` the
+    first slice is the *highest* layer, so every axis reads high→low down the
+    file and a flat 2D mask is a valid one-layer file.  ``order="bottom-first"``
+    reverses the slice order.  All slices must share one height and width.
+    """
+
+    if order not in {"top-first", "bottom-first"}:
+        raise ValueError("order must be 'top-first' or 'bottom-first'")
+    lines = text.splitlines() if isinstance(text, str) else [str(line) for line in text]
+    slices: list[list[str]] = [[]]
+    for raw in lines:
+        line = raw.strip().replace(" ", "")
+        if line.startswith("//"):
+            continue
+        if not line or line.startswith("---"):
+            if slices[-1]:
+                slices.append([])
+            continue
+        slices[-1].append(line)
+    slices = [s for s in slices if s]
+    if not slices:
+        raise ValueError("layered mask is empty")
+    height = len(slices[0])
+    width = len(slices[0][0])
+    for index, rows in enumerate(slices):
+        if len(rows) != height or any(len(row) != width for row in rows):
+            raise ValueError(f"layer {index} is not {width}x{height}; all layers must share one box")
+        if any(ch not in ".#" for row in rows for ch in row):
+            raise ValueError("layered masks use only '.' and '#'")
+    if order == "bottom-first":
+        slices = slices[::-1]
+    depth = len(slices)
+    cells: list[Cell] = []
+    for layer_index, rows in enumerate(slices):
+        z = depth - 1 - layer_index
+        for row_index, row in enumerate(rows):
+            y = height - 1 - row_index
+            for x, ch in enumerate(row):
+                if ch == "#":
+                    cells.append((x, y, z))
+    return tuple(cells)
+
+
+def to_layers(
+    cells: Iterable[Sequence[int]], *, filled: str = "#", empty: str = "."
+) -> list[list[str]]:
+    """Inverse of :func:`parse_layers`: one row list per z-slice, top layer first."""
+
+    pts = [(int(c[0]), int(c[1]), int(c[2])) for c in cells]
+    if not pts:
+        return []
+    xs, ys, zs = zip(*pts)
+    occupied = set(pts)
+    layers: list[list[str]] = []
+    for z in range(max(zs), min(zs) - 1, -1):
+        rows = []
+        for y in range(max(ys), min(ys) - 1, -1):
+            rows.append("".join(filled if (x, y, z) in occupied else empty for x in range(min(xs), max(xs) + 1)))
+        layers.append(rows)
+    return layers
+
+
+def rotations_3d(cells: Iterable[Sequence[int]]) -> Iterator[tuple[Cell, ...]]:
+    """The cell set under each of the 24 proper lattice rotations, moved to the origin corner."""
+
+    from .lattice import ORIENTS
+
+    arr = np.asarray([tuple(int(v) for v in c) for c in cells], dtype=int)
+    if arr.size == 0:
+        yield ()
+        return
+    for matrix in ORIENTS:
+        rotated = (matrix @ arr.T).T
+        rotated -= rotated.min(axis=0)
+        yield tuple(sorted(tuple(int(v) for v in row) for row in rotated))
+
+
+def canonical_3d(cells: Iterable[Sequence[int]], *, reflect: bool = False) -> tuple[Cell, ...]:
+    """Canonical translation/rotation-invariant key for a 3D cell set (24 rotations; 48 with ``reflect``)."""
+
+    pts = [tuple(int(v) for v in c) for c in cells]
+    views = list(rotations_3d(pts))
+    if reflect:
+        views.extend(rotations_3d([(-x, y, z) for x, y, z in pts]))
+    return min(views, default=())
+
+
+def has_2x2x2_block(cells: Iterable[Sequence[int]]) -> bool:
+    """True when any filled 2x2x2 block exists — a two-thick solid in disguise (docs/CUBE_FEASIBILITY.md)."""
+
+    occupied = {tuple(int(v) for v in c) for c in cells}
+    for x, y, z in occupied:
+        if all((x + dx, y + dy, z + dz) in occupied for dx in (0, 1) for dy in (0, 1) for dz in (0, 1)):
+            return True
+    return False
+
+
+def dense_cell_count(cells: Iterable[Sequence[int]]) -> int:
+    """Cells with no axis along which both face-neighbours are empty (report only, not a gate)."""
+
+    occupied = {tuple(int(v) for v in c) for c in cells}
+    count = 0
+    for x, y, z in occupied:
+        ridge = False
+        for axis in range(3):
+            plus = [x, y, z]; minus = [x, y, z]
+            plus[axis] += 1; minus[axis] -= 1
+            if tuple(plus) not in occupied and tuple(minus) not in occupied:
+                ridge = True
+                break
+        if not ridge:
+            count += 1
+    return count
+
+
 def _plane_axes(cells: Sequence[Cell], plane: str = "auto") -> tuple[int, int, int]:
     if plane != "auto":
         mapping = {"xy": (0, 1, 2), "xz": (0, 2, 1), "yz": (1, 2, 0)}

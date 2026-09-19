@@ -1,0 +1,16 @@
+// can retainer v4: 1-tall rim all round, 2-tall on three sides (U), 3-cell lip along the back top (9 + 8 + 7 + 3 = 27)
+###
+...
+...
+---
+###
+#.#
+#.#
+---
+###
+#.#
+###
+---
+###
+###
+###
