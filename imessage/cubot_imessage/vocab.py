@@ -39,7 +39,9 @@ VARIANT_SUFFIX = re.compile(r"-v\d+$")
 # Mirrors cubot/generate/parametric.py (DEMO_NAMES / EXPLORED_NAMES / REJECTED_NAMES).
 CUBOT_DEMO = ("heart", "arrow", "lightning", "plus", "h", "t", "n")
 CUBOT_PLANNABLE = (
-    "a", "c", "e", "f", "i", "j", "k", "l", "m", "s", "u", "v", "w", "y",
+    # mask-first exploration winners, plus the single-letter glyph-atlas candidates (docs/DISCOVERY.md
+    # lists b c d f h j l n o q t u y z; g, p, r and x have no cubot shape at all)
+    "a", "b", "c", "d", "e", "f", "i", "j", "k", "l", "m", "q", "s", "u", "v", "w", "y", "z",
     "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9",
     "square", "ring", "square-wave", "spiral", "staircase", "checkmark", "triangle", "hourglass",
     "anchor", "dumbbell", "flag", "mug", "umbrella", "bell", "boat", "rocket", "tree",
@@ -77,6 +79,8 @@ LABEL_OVERRIDES: dict[str, str] = {
     "check": "checkmark",
     "zigzag": "square-wave",
 }
+
+OUT_OF_SCOPE = "none"          # the classifier's explicit chitchat class; never names a shape
 
 STATUS_PLAYABLE = "playable"
 STATUS_PLANNABLE = "plannable"
@@ -244,9 +248,14 @@ class Vocabulary:
             near_shape = (nearest_label_map or {}).get(near_label, "") or \
                 self.shape_for_icon(label_to_icon(near_label)) or ""
 
-        if not accepted:
+        if label == OUT_OF_SCOPE or not accepted:
+            # The classifier's out-of-scope class is a decision, not a missing mapping. The head
+            # already refuses to accept it, but say so here too so the semantics hold however
+            # resolve() is called.
+            detail = ("That did not look like a shape request."
+                      if label == OUT_OF_SCOPE else "I could not tell which shape that meant.")
             return Resolution(STATUS_UNSURE, label, nearest_playable=near_shape,
-                              nearest_score=near_score, detail="I could not tell which shape that meant.")
+                              nearest_score=near_score, detail=detail)
 
         icon = label_to_icon(label)
         shape = self.shape_for_icon(icon)
