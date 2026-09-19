@@ -37,6 +37,6 @@ Worst module-to-module overlap during the fold: 1.6 mm. Finished height: about 2
   half swings.
 - The route was **not** found with the planner's full `check_move` (table/torque) during the search. Physics was the
   check instead.
-- Wiring: both chain ends face the outside in the finished lantern (clear line out of each end face). The route itself
-  was **not** constrained to keep a wired end still or unenclosed. A wire-safe route search was started but not
-  finished (see the discussion that produced this file).
+- **Not wire-safe.** If wires leave module 27 through its outer face, this route fails. Modules enter an
+  80 × 50 × 50 mm keep-out zone off that face by 23.5 mm, and the wires end pressed into the table. Use
+  `../lantern-4x4-2-wiresafe/` instead: same lantern, a different 15-move route, validated in MuJoCo.
