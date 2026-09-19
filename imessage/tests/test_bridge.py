@@ -1,4 +1,4 @@
-"""Bridge tests. Everything here runs without snake_pipeline and without a network: the classifier is
+"""Bridge tests. Everything here runs without a network and without a trained head: the classifier is
 faked, and the handoff folder is a small fixture (plus the real one when it is present)."""
 from __future__ import annotations
 
@@ -123,6 +123,12 @@ def test_label_to_icon_mechanical_and_aliased():
     assert label_to_icon("check") == "checkmark"
     assert label_to_icon("arrow_right") == "arrow"
     assert label_to_icon("wave") == "square-wave"
+
+
+def test_out_of_scope_label_names_no_shape(handoff):
+    """'none' is the classifier's explicit chitchat class; it must never reach a fold path."""
+    assert label_to_icon("none") == ""
+    assert Vocabulary(handoff).shape_for_icon("") is None
 
 
 def test_variants_collapse_to_one_concept(handoff):

@@ -1,0 +1,388 @@
+{"text": "hey", "label": "none"}
+{"text": "hi", "label": "none"}
+{"text": "hello", "label": "none"}
+{"text": "yo", "label": "none"}
+{"text": "yo whats good", "label": "none"}
+{"text": "sup", "label": "none"}
+{"text": "hey there", "label": "none"}
+{"text": "howdy", "label": "none"}
+{"text": "hey buddy", "label": "none"}
+{"text": "good morning", "label": "none"}
+{"text": "gm", "label": "none"}
+{"text": "good evening", "label": "none"}
+{"text": "whats up", "label": "none"}
+{"text": "wyd", "label": "none"}
+{"text": "how are you", "label": "none"}
+{"text": "how are u", "label": "none"}
+{"text": "you good", "label": "none"}
+{"text": "hows it going", "label": "none"}
+{"text": "hows your day going", "label": "none"}
+{"text": "nice to meet you", "label": "none"}
+{"text": "lol", "label": "none"}
+{"text": "lmao", "label": "none"}
+{"text": "haha", "label": "none"}
+{"text": "ok cool", "label": "none"}
+{"text": "thanks", "label": "none"}
+{"text": "thank you", "label": "none"}
+{"text": "ty", "label": "none"}
+{"text": "thx", "label": "none"}
+{"text": "appreciate it", "label": "none"}
+{"text": "bye", "label": "none"}
+{"text": "goodbye", "label": "none"}
+{"text": "see ya", "label": "none"}
+{"text": "later", "label": "none"}
+{"text": "goodnight", "label": "none"}
+{"text": "have a good one", "label": "none"}
+{"text": "take care", "label": "none"}
+{"text": "hey whats new", "label": "none"}
+{"text": "anyone there", "label": "none"}
+{"text": "you there", "label": "none"}
+{"text": "what are you", "label": "none"}
+{"text": "who are you", "label": "none"}
+{"text": "what is this", "label": "none"}
+{"text": "are you a robot", "label": "none"}
+{"text": "are you a real robot", "label": "none"}
+{"text": "are u a robot", "label": "none"}
+{"text": "are you alive", "label": "none"}
+{"text": "how many cubes do you have", "label": "none"}
+{"text": "how many cubes are there", "label": "none"}
+{"text": "how many pieces are you made of", "label": "none"}
+{"text": "whats inside you", "label": "none"}
+{"text": "what are you made of", "label": "none"}
+{"text": "who built you", "label": "none"}
+{"text": "who made you", "label": "none"}
+{"text": "who programmed you", "label": "none"}
+{"text": "how do you work", "label": "none"}
+{"text": "how does this work", "label": "none"}
+{"text": "how do u work", "label": "none"}
+{"text": "how long does it take", "label": "none"}
+{"text": "how long did this take to build", "label": "none"}
+{"text": "how long have you been working on this", "label": "none"}
+{"text": "how heavy are you", "label": "none"}
+{"text": "how big are you", "label": "none"}
+{"text": "how tall are you", "label": "none"}
+{"text": "how fast are you", "label": "none"}
+{"text": "is this an ai", "label": "none"}
+{"text": "are you an ai", "label": "none"}
+{"text": "are you chatgpt", "label": "none"}
+{"text": "is there a person typing this", "label": "none"}
+{"text": "is someone controlling you", "label": "none"}
+{"text": "is this remote controlled", "label": "none"}
+{"text": "do you have a camera", "label": "none"}
+{"text": "can you see me", "label": "none"}
+{"text": "do you have a battery", "label": "none"}
+{"text": "whats your battery life", "label": "none"}
+{"text": "whats your name", "label": "none"}
+{"text": "do you have a name", "label": "none"}
+{"text": "are you expensive", "label": "none"}
+{"text": "how much did you cost", "label": "none"}
+{"text": "what language are you coded in", "label": "none"}
+{"text": "do you run on a laptop", "label": "none"}
+{"text": "are you connected to wifi", "label": "none"}
+{"text": "whats your motor setup", "label": "none"}
+{"text": "do you use servos", "label": "none"}
+{"text": "where do the motors go", "label": "none"}
+{"text": "are the joints 3d printed", "label": "none"}
+{"text": "is it heavy to carry", "label": "none"}
+{"text": "does it break easily", "label": "none"}
+{"text": "did you have to solder anything", "label": "none"}
+{"text": "what can you do", "label": "none"}
+{"text": "what can u do", "label": "none"}
+{"text": "what do you do", "label": "none"}
+{"text": "what else can you do", "label": "none"}
+{"text": "whats your deal", "label": "none"}
+{"text": "what are your options", "label": "none"}
+{"text": "show me the list", "label": "none"}
+{"text": "whats on the menu", "label": "none"}
+{"text": "give me the menu", "label": "none"}
+{"text": "what are my choices", "label": "none"}
+{"text": "what should i ask for", "label": "none"}
+{"text": "what am i supposed to say", "label": "none"}
+{"text": "how do i use this", "label": "none"}
+{"text": "what do i text you", "label": "none"}
+{"text": "what kind of things can you make", "label": "none"}
+{"text": "what do you know how to do", "label": "none"}
+{"text": "whats the full list", "label": "none"}
+{"text": "is there a list somewhere", "label": "none"}
+{"text": "options?", "label": "none"}
+{"text": "what are the possibilities", "label": "none"}
+{"text": "anything else", "label": "none"}
+{"text": "is that all", "label": "none"}
+{"text": "what are your limits", "label": "none"}
+{"text": "what cant you do", "label": "none"}
+{"text": "do you take requests", "label": "none"}
+{"text": "can i request something", "label": "none"}
+{"text": "whats the coolest thing you do", "label": "none"}
+{"text": "what do most people ask you", "label": "none"}
+{"text": "whats your best trick", "label": "none"}
+{"text": "any suggestions", "label": "none"}
+{"text": "can you explain yourself", "label": "none"}
+{"text": "what happens if i text you something random", "label": "none"}
+{"text": "do you understand english", "label": "none"}
+{"text": "are you at hack the north", "label": "none"}
+{"text": "is this hack the north", "label": "none"}
+{"text": "are u at htn", "label": "none"}
+{"text": "what floor are you on", "label": "none"}
+{"text": "where are you set up", "label": "none"}
+{"text": "where can i find you", "label": "none"}
+{"text": "which booth are you at", "label": "none"}
+{"text": "whats your booth number", "label": "none"}
+{"text": "can i see a demo", "label": "none"}
+{"text": "can i come see it in person", "label": "none"}
+{"text": "are you demoing today", "label": "none"}
+{"text": "when is your demo", "label": "none"}
+{"text": "what time do you present", "label": "none"}
+{"text": "who is on your team", "label": "none"}
+{"text": "how many people on your team", "label": "none"}
+{"text": "did you win", "label": "none"}
+{"text": "did you guys win anything", "label": "none"}
+{"text": "are you in the running", "label": "none"}
+{"text": "what track are you in", "label": "none"}
+{"text": "did you submit already", "label": "none"}
+{"text": "whats your devpost", "label": "none"}
+{"text": "is this yours", "label": "none"}
+{"text": "is this your project", "label": "none"}
+{"text": "how many hours did you have", "label": "none"}
+{"text": "did you sleep at all", "label": "none"}
+{"text": "have you slept", "label": "none"}
+{"text": "is there any free food", "label": "none"}
+{"text": "where is the coffee", "label": "none"}
+{"text": "is the swag line long", "label": "none"}
+{"text": "are the judges coming by", "label": "none"}
+{"text": "did the judges see you yet", "label": "none"}
+{"text": "hows judging going", "label": "none"}
+{"text": "are you nervous", "label": "none"}
+{"text": "good luck with judging", "label": "none"}
+{"text": "are you hiring", "label": "none"}
+{"text": "can i join your team", "label": "none"}
+{"text": "can i help", "label": "none"}
+{"text": "is there a github", "label": "none"}
+{"text": "can i see the code", "label": "none"}
+{"text": "is the repo public", "label": "none"}
+{"text": "whats your tech stack", "label": "none"}
+{"text": "are you open source", "label": "none"}
+{"text": "can i build one of these", "label": "none"}
+{"text": "where did you buy the parts", "label": "none"}
+{"text": "is this a school project", "label": "none"}
+{"text": "is this your first hackathon", "label": "none"}
+{"text": "how many hackathons have you done", "label": "none"}
+{"text": "thats sick", "label": "none"}
+{"text": "thats so sick", "label": "none"}
+{"text": "sick", "label": "none"}
+{"text": "woah", "label": "none"}
+{"text": "whoa", "label": "none"}
+{"text": "wow", "label": "none"}
+{"text": "amazing", "label": "none"}
+{"text": "so cool", "label": "none"}
+{"text": "thats so cool", "label": "none"}
+{"text": "super cool", "label": "none"}
+{"text": "incredible", "label": "none"}
+{"text": "insane", "label": "none"}
+{"text": "thats insane", "label": "none"}
+{"text": "no way", "label": "none"}
+{"text": "unreal", "label": "none"}
+{"text": "love this", "label": "none"}
+{"text": "i love it", "label": "none"}
+{"text": "so awesome", "label": "none"}
+{"text": "awesome", "label": "none"}
+{"text": "cute", "label": "none"}
+{"text": "thats adorable", "label": "none"}
+{"text": "nice", "label": "none"}
+{"text": "very nice", "label": "none"}
+{"text": "nice work", "label": "none"}
+{"text": "good job", "label": "none"}
+{"text": "well done", "label": "none"}
+{"text": "impressive", "label": "none"}
+{"text": "very impressive", "label": "none"}
+{"text": "youre cool", "label": "none"}
+{"text": "ur cool", "label": "none"}
+{"text": "best demo here", "label": "none"}
+{"text": "this is the best one", "label": "none"}
+{"text": "best one here", "label": "none"}
+{"text": "goated", "label": "none"}
+{"text": "fire", "label": "none"}
+{"text": "thats fire", "label": "none"}
+{"text": "that slaps", "label": "none"}
+{"text": "lmaooo", "label": "none"}
+{"text": "im dead", "label": "none"}
+{"text": "im crying", "label": "none"}
+{"text": "no shot", "label": "none"}
+{"text": "bruh", "label": "none"}
+{"text": "yooo", "label": "none"}
+{"text": "hype", "label": "none"}
+{"text": "lets goooo", "label": "none"}
+{"text": "that was fast", "label": "none"}
+{"text": "dance", "label": "none"}
+{"text": "do a dance", "label": "none"}
+{"text": "dance for me", "label": "none"}
+{"text": "walk over here", "label": "none"}
+{"text": "walk to me", "label": "none"}
+{"text": "come here", "label": "none"}
+{"text": "come over", "label": "none"}
+{"text": "follow me", "label": "none"}
+{"text": "jump", "label": "none"}
+{"text": "hop", "label": "none"}
+{"text": "do a flip", "label": "none"}
+{"text": "backflip", "label": "none"}
+{"text": "spin around", "label": "none"}
+{"text": "spin", "label": "none"}
+{"text": "twirl", "label": "none"}
+{"text": "roll over", "label": "none"}
+{"text": "sit", "label": "none"}
+{"text": "stand up", "label": "none"}
+{"text": "shake my hand", "label": "none"}
+{"text": "say hi back", "label": "none"}
+{"text": "do a trick", "label": "none"}
+{"text": "can you talk", "label": "none"}
+{"text": "talk to me", "label": "none"}
+{"text": "say something", "label": "none"}
+{"text": "sing", "label": "none"}
+{"text": "sing me a song", "label": "none"}
+{"text": "beatbox", "label": "none"}
+{"text": "tell me a joke", "label": "none"}
+{"text": "tell me a story", "label": "none"}
+{"text": "whistle", "label": "none"}
+{"text": "laugh", "label": "none"}
+{"text": "clap", "label": "none"}
+{"text": "nod", "label": "none"}
+{"text": "blink", "label": "none"}
+{"text": "bark", "label": "none"}
+{"text": "meow", "label": "none"}
+{"text": "fetch", "label": "none"}
+{"text": "fly", "label": "none"}
+{"text": "swim", "label": "none"}
+{"text": "climb the wall", "label": "none"}
+{"text": "go get me a drink", "label": "none"}
+{"text": "bring me food", "label": "none"}
+{"text": "open the door", "label": "none"}
+{"text": "turn off the lights", "label": "none"}
+{"text": "call my mom", "label": "none"}
+{"text": "text my friend", "label": "none"}
+{"text": "order pizza", "label": "none"}
+{"text": "take a photo of me", "label": "none"}
+{"text": "record a video", "label": "none"}
+{"text": "play rock paper scissors", "label": "none"}
+{"text": "give me a hug", "label": "none"}
+{"text": "fight me", "label": "none"}
+{"text": "race me", "label": "none"}
+{"text": "do my homework", "label": "none"}
+{"text": "write my pitch for me", "label": "none"}
+{"text": "solve this for me", "label": "none"}
+{"text": "is this dominos", "label": "none"}
+{"text": "is this pizza hut", "label": "none"}
+{"text": "wrong number", "label": "none"}
+{"text": "sorry wrong number", "label": "none"}
+{"text": "who is this", "label": "none"}
+{"text": "who dis", "label": "none"}
+{"text": "new phone who is this", "label": "none"}
+{"text": "do i know you", "label": "none"}
+{"text": "how did you get my number", "label": "none"}
+{"text": "STOP", "label": "none"}
+{"text": "unsubscribe", "label": "none"}
+{"text": "remove me from this list", "label": "none"}
+{"text": "leave me alone", "label": "none"}
+{"text": "quit texting me", "label": "none"}
+{"text": "stop texting me", "label": "none"}
+{"text": "do not text me again", "label": "none"}
+{"text": "this is spam", "label": "none"}
+{"text": "is this a scam", "label": "none"}
+{"text": "im not interested", "label": "none"}
+{"text": "no thanks", "label": "none"}
+{"text": "please stop", "label": "none"}
+{"text": "you have the wrong person", "label": "none"}
+{"text": "i didnt sign up for this", "label": "none"}
+{"text": "is my package here", "label": "none"}
+{"text": "where is my order", "label": "none"}
+{"text": "can i speak to a manager", "label": "none"}
+{"text": "is this customer service", "label": "none"}
+{"text": "did you get my email", "label": "none"}
+{"text": "call me", "label": "none"}
+{"text": "what time is my appointment", "label": "none"}
+{"text": "mom?", "label": "none"}
+{"text": "babe?", "label": "none"}
+{"text": "asdfgh", "label": "none"}
+{"text": "asdf", "label": "none"}
+{"text": "asdfghjkl", "label": "none"}
+{"text": "qwerty", "label": "none"}
+{"text": "sdkjfhsdkf", "label": "none"}
+{"text": "aaaaaa", "label": "none"}
+{"text": "zzz", "label": "none"}
+{"text": ".", "label": "none"}
+{"text": "..", "label": "none"}
+{"text": "...", "label": "none"}
+{"text": "??", "label": "none"}
+{"text": "???", "label": "none"}
+{"text": "!", "label": "none"}
+{"text": "!!", "label": "none"}
+{"text": "?", "label": "none"}
+{"text": "sent from my iphone", "label": "none"}
+{"text": "oops", "label": "none"}
+{"text": "oops wrong chat", "label": "none"}
+{"text": "ignore that", "label": "none"}
+{"text": "disregard", "label": "none"}
+{"text": "sorry that was an accident", "label": "none"}
+{"text": "my bad", "label": "none"}
+{"text": "wrong chat", "label": "none"}
+{"text": "autocorrect got me", "label": "none"}
+{"text": "kk", "label": "none"}
+{"text": "ok", "label": "none"}
+{"text": "okay", "label": "none"}
+{"text": "sure", "label": "none"}
+{"text": "yeah", "label": "none"}
+{"text": "nah", "label": "none"}
+{"text": "yep", "label": "none"}
+{"text": "nope", "label": "none"}
+{"text": "maybe", "label": "none"}
+{"text": "idk", "label": "none"}
+{"text": "hmm", "label": "none"}
+{"text": "uh", "label": "none"}
+{"text": "um", "label": "none"}
+{"text": "wait", "label": "none"}
+{"text": "wait what", "label": "none"}
+{"text": "huh", "label": "none"}
+{"text": "nvm", "label": "none"}
+{"text": "nevermind", "label": "none"}
+{"text": "ugh", "label": "none"}
+{"text": "test", "label": "none"}
+{"text": "testing", "label": "none"}
+{"text": "is this thing on", "label": "none"}
+{"text": "make something cool", "label": "none"}
+{"text": "surprise me", "label": "none"}
+{"text": "do your best one", "label": "none"}
+{"text": "whatever you want", "label": "none"}
+{"text": "the usual", "label": "none"}
+{"text": "your choice", "label": "none"}
+{"text": "you pick", "label": "none"}
+{"text": "pick something", "label": "none"}
+{"text": "anything", "label": "none"}
+{"text": "do anything", "label": "none"}
+{"text": "something random", "label": "none"}
+{"text": "random", "label": "none"}
+{"text": "do something", "label": "none"}
+{"text": "do something cool", "label": "none"}
+{"text": "do something fun", "label": "none"}
+{"text": "do the cool one", "label": "none"}
+{"text": "do that thing", "label": "none"}
+{"text": "do it again", "label": "none"}
+{"text": "again", "label": "none"}
+{"text": "keep going", "label": "none"}
+{"text": "another one", "label": "none"}
+{"text": "do the same thing", "label": "none"}
+{"text": "whatever", "label": "none"}
+{"text": "show me something", "label": "none"}
+{"text": "show me something cool", "label": "none"}
+{"text": "show me your favorite", "label": "none"}
+{"text": "whats your favorite one", "label": "none"}
+{"text": "do the best one", "label": "none"}
+{"text": "impress me", "label": "none"}
+{"text": "wow me", "label": "none"}
+{"text": "go crazy", "label": "none"}
+{"text": "freestyle", "label": "none"}
+{"text": "dealers choice", "label": "none"}
+{"text": "you decide", "label": "none"}
+{"text": "whatever looks best", "label": "none"}
+{"text": "something impressive", "label": "none"}
+{"text": "something weird", "label": "none"}
+{"text": "something new", "label": "none"}
+{"text": "something different", "label": "none"}
+{"text": "do the hard one", "label": "none"}

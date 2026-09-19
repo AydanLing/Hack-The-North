@@ -4,33 +4,39 @@ Someone texts the CuBot demo number "show hackthenorth some love". The robot fol
 texts back.
 
 ```
-iMessage ──► Linq webhook ──► MiniLM intent head ──► CuBot handoff path ──► executor
-   ▲                            (snake_pipeline)        (cubot-v2)
-   └──────────────── reply ───────────────────────────────────────────────┘
+iMessage ──► Linq webhook ──► shape-intent model ──► CuBot handoff path ──► executor
+   ▲                            (this repo)             (cubot-v2)
+   └──────────────── reply ──────────────────────────────────────────────┘
 ```
 
-This folder is the seam between three things that already existed: Linq's iMessage API, the sentence
-classifier in `snake_pipeline`, and the finalized fold paths in `cubot-v2/handoff/`. It adds no model
-and no planner of its own.
+This folder holds two things: the seam to Linq's iMessage API and to `cubot-v2/handoff/`'s finalized
+fold paths, and the shape-intent model itself — corpus, encoder, head and training, all in this repo.
+It is self-contained: clone, train once, run.
 
 ## What each piece does
 
 | Piece | Where it lives | What it contributes |
 |---|---|---|
 | Linq | `linq.py` | inbound webhook parsing, outbound replies, dedupe, rate limit |
-| Intent | `intent.py` → `snake_pipeline/snakeshape/local_model.py` | utterance → one of 139 labels, offline, ~2 ms |
-| Vocabulary | `vocab.py` | 139 labels → CuBot shape names, variant collapsing, reachability |
+| Corpus | `data/utterances.jsonl` | the training set, authored for CuBot's own shape vocabulary |
+| Encoder | `model/encoder.py` | frozen sentence-transformer (ONNX, CPU) + numpy TF-IDF |
+| Head | `model/head.py` | class-balanced multinomial softmax, fitted in numpy |
+| Intent | `intent.py` | utterance → one label, offline, ~2 ms |
+| Captions | `captions.py` | who is addressed, and what to say back |
+| Vocabulary | `vocab.py` | labels → CuBot shape names, variant collapsing, reachability |
 | Fold paths | `robot.py` → `cubot-v2/handoff/` | `path.json` → ordered moves, warnings |
 | Orchestration | `bridge.py` | decide, plan, reply |
 | Transport | `server.py` | stdlib HTTP, auth, queueing |
 
-No dependencies outside the standard library. The classifier's numpy/onnxruntime come from the
-`snake_pipeline` checkout it borrows.
+The bridge itself is standard library only. The model needs `numpy`, `onnxruntime`, `tokenizers` and
+`huggingface_hub` — and only at training time and for the semantic half of the encoder; the TF-IDF
+encoder (`--encoder tfidf`) is pure numpy and needs no download at all.
 
 ## Setup
 
 ```bash
 cp imessage/.env.example imessage/.env      # then fill in LINQ_API_KEY and LINQ_WEBHOOK_TOKEN
+python3 -m cubot_imessage.model.train       # ~1 minute, CPU only
 python3 -m cubot_imessage doctor
 ```
 
@@ -40,18 +46,26 @@ own goal from its move deltas, loads the intent model, and probes it with the he
 The Linq key comes from the free Hack the North sandbox (`dashboard.linqapp.com/sandbox-signup`, or
 the event portal), which also provisions the phone number people will text.
 
-### Pointing at the two repos
-
-Both are found automatically when the layout is the usual one; override if not:
+### Training the model
 
 ```bash
-export CUBOT_HANDOFF_DIR=/path/to/Hack-The-North/cubot-v2/handoff
-export SNAKE_PIPELINE_DIR=/path/to/snake_pipeline
+python3 -m cubot_imessage.model.train                   # evaluate, then fit and write the head
+python3 -m cubot_imessage.model.train --eval-only       # report without writing anything
+python3 -m cubot_imessage.model.train --encoder tfidf   # no download, no network
+python3 -m cubot_imessage.model.train --model bge-small # a different frozen encoder
 ```
 
-`snake_pipeline` must already have a trained head at `data/intent_head.npz`. If it does not, run
-`python3 train_intent.py --no-llm` there first — about 90 seconds on CPU. Do not let it retrain
-during the demo.
+It reports held-out accuracy over three seeds, accuracy among *accepted* predictions, what fraction
+of in-scope requests are accepted, how much chitchat the out-of-scope class catches, the weakest
+classes and the most frequent confusions. Thresholds are then chosen on held-out data to hit a
+precision target rather than guessed. Only then is the head refitted on everything and saved.
+
+**There is no GPU anywhere in this.** The encoder is frozen — inference only, never fine-tuned — and
+all that is fitted is a linear head on top of fixed embeddings. That is a convex problem over a few
+thousand rows and it finishes on a laptop CPU in about a minute.
+
+`doctor` warns when the corpus has changed since the head was fitted. Retrain then — not during a
+demo.
 
 ## Running it
 
@@ -65,7 +79,7 @@ python3 -m cubot_imessage classify "point at the judges" --top 8
 # what a shape actually folds
 python3 -m cubot_imessage plan heart
 
-# the vocabulary, and where all 139 labels route
+# the vocabulary, and where every label routes
 python3 -m cubot_imessage vocab --labels
 
 # serve
@@ -83,9 +97,10 @@ python3 -m cubot_imessage subscribe --url https://<your-tunnel>/linq/webhook --s
 ## What it does with a message
 
 1. **Help words** (`help`, `shapes`, `what can you do`) short-circuit to the shape list.
-2. **Classify.** The hybrid encoder (frozen MiniLM ONNX + TF-IDF) and the trained head give a label,
-   a confidence and a top-two margin. Below `margin 0.15 / confidence 0.3` the head declines rather
-   than guessing — which is why "yo whats good" does not fold anything.
+2. **Classify.** The hybrid encoder (frozen sentence-transformer + TF-IDF) and the trained head give
+   a label, a confidence and a top-two margin. Two independent things make it decline rather than
+   guess: an explicit `none` class trained on real chitchat, and the margin/confidence thresholds
+   chosen on held-out data. That is why "yo whats good" folds nothing.
 3. **Resolve** the label to a CuBot shape. Four outcomes, and the reply distinguishes them:
    - **playable** — a fold path exists. Go.
    - **plannable** — `cubot-v2` has a verified plan but it was never exported to `handoff/`.
@@ -94,9 +109,8 @@ python3 -m cubot_imessage subscribe --url https://<your-tunnel>/linq/webhook --s
    - **unsure / unmapped** — offers the nearest shape it *can* fold, found by re-ranking the
      classifier's scores over only the playable labels.
 4. **Load the path** from `handoff/shapes/<nn>-<name>/path.json` and hand it to the executor.
-5. **Reply** into the originating chat, using `snake_pipeline`'s caption template — which fills in the
-   greeted entity, so "show hack the north some love" comes back as *"Showing Hack the North some love
-   with a heart."*
+5. **Reply** into the originating chat with a caption template that names whoever was addressed, so
+   "show hack the north some love" comes back as *"Showing Hack the North some love with a heart."*
 
 Warnings from the handoff travel all the way to the text. Ask for lightning and the reply says it has
 six table-incursion violations and is expected to fail physically, because `index.json` says so.
@@ -145,6 +159,7 @@ treat the token as a credential. If Linq documents an HMAC header, verify that i
 python3 -m pytest imessage/tests -q
 ```
 
-28 tests, no network and no `snake_pipeline` needed — the classifier is faked and the handoff folder
-is a fixture. The last test additionally verifies the *real* `cubot-v2/handoff/` when present: every
-shipped path must re-derive its recorded goal from its move deltas.
+65 tests, none of which touch the network or need a trained head: the classifier is faked for the
+bridge tests, the handoff folder is a fixture, and the model tests run on the pure-numpy TF-IDF
+encoder. Two of them check the real artifacts when present — every shipped fold path must re-derive
+its recorded goal from its move deltas, and every playable concept must resolve to a real directory.

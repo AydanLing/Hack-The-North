@@ -12,16 +12,9 @@ from typing import Optional
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DEFAULT_BASE_URL = "https://api.linqapp.com/api/partner/v3"
 DEFAULT_HANDOFF = os.path.join(REPO_ROOT, "cubot-v2", "handoff")
-
-# Candidate locations for Jerry's snake_pipeline checkout (the MiniLM head lives there). Tried in
-# order; the first one holding snakeshape/local_model.py wins.
-_SNAKE_CANDIDATES = (
-    os.path.join(REPO_ROOT, "snake_pipeline"),
-    os.path.join(os.path.dirname(REPO_ROOT), "snake_pipeline"),
-    os.path.expanduser("~/Downloads/snake_pipeline"),
-    os.path.expanduser("~/snake_pipeline"),
-    os.path.expanduser("~/Documents/GitHub/snake_pipeline"),
-)
+DEFAULT_DATA = os.path.join(REPO_ROOT, "imessage", "data")
+DEFAULT_HEAD = os.path.join(DEFAULT_DATA, "intent_head.npz")
+DEFAULT_CORPUS = os.path.join(DEFAULT_DATA, "utterances.jsonl")
 
 
 def _env(name: str, default: str = "") -> str:
@@ -47,14 +40,6 @@ def _env_bool(name: str, default: bool) -> bool:
 
 def _env_list(name: str) -> list[str]:
     return [p.strip() for p in _env(name).split(",") if p.strip()]
-
-
-def find_snake_pipeline(explicit: str = "") -> Optional[str]:
-    """Directory of the snake_pipeline checkout, or None. `explicit` (env/flag) is honoured as given."""
-    for cand in ([explicit] if explicit else []) + list(_SNAKE_CANDIDATES):
-        if cand and os.path.isfile(os.path.join(cand, "snakeshape", "local_model.py")):
-            return os.path.abspath(cand)
-    return None
 
 
 def load_dotenv(path: str = "") -> None:
@@ -86,7 +71,8 @@ class Settings:
     webhook_path: str = "/linq/webhook"
     allowed_senders: list[str] = field(default_factory=list)
     handoff_dir: str = DEFAULT_HANDOFF
-    snake_pipeline_dir: Optional[str] = None
+    head_path: str = DEFAULT_HEAD
+    corpus_path: str = DEFAULT_CORPUS
     host: str = "127.0.0.1"
     port: int = 8787
     executor: str = "dryrun"
@@ -108,7 +94,8 @@ class Settings:
             webhook_path=_env("BRIDGE_WEBHOOK_PATH", "/linq/webhook"),
             allowed_senders=_env_list("LINQ_ALLOWED_SENDERS"),
             handoff_dir=_env("CUBOT_HANDOFF_DIR", DEFAULT_HANDOFF),
-            snake_pipeline_dir=find_snake_pipeline(_env("SNAKE_PIPELINE_DIR")),
+            head_path=_env("CUBOT_INTENT_HEAD", DEFAULT_HEAD),
+            corpus_path=_env("CUBOT_INTENT_CORPUS", DEFAULT_CORPUS),
             host=_env("BRIDGE_HOST", "127.0.0.1"),
             port=int(_env("BRIDGE_PORT", "8787")),
             executor=_env("BRIDGE_EXECUTOR", "dryrun"),
@@ -130,7 +117,9 @@ class Settings:
             ("webhook path", self.webhook_path),
             ("allowed senders", ", ".join(self.allowed_senders) or "(any)"),
             ("handoff dir", self.handoff_dir),
-            ("snake_pipeline", self.snake_pipeline_dir or "NOT FOUND (set SNAKE_PIPELINE_DIR)"),
+            ("intent head", self.head_path if os.path.exists(self.head_path)
+             else f"{self.head_path} (MISSING — run python3 -m cubot_imessage.model.train)"),
+            ("corpus", self.corpus_path),
             ("listen", f"{self.host}:{self.port}"),
             ("executor", self.executor),
             ("auto-reply", "on" if self.auto_reply else "off"),

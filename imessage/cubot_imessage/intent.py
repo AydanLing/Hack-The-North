@@ -1,32 +1,30 @@
-"""The semantic layer: an utterance in, a shape label out, using snake_pipeline's MiniLM head.
+"""The semantic layer: an utterance in, a shape label out.
 
-This module deliberately owns no model of its own. `snake_pipeline/snakeshape/local_model.py` already
-holds the trained classifier — a hybrid encoder (all-MiniLM-L6-v2 through onnxruntime, concatenated
-with a numpy TF-IDF) over class centroids plus a one-vs-rest linear head, fitted on
-`snake_pipeline/data/utterances.jsonl` and cached in `data/intent_head.npz`. It is the thing that
-already knows "show hack the north some love" means a heart, and it runs offline in ~20 ms.
+The model is this repo's own (`model/`): a frozen sentence encoder plus a linear head, trained on
+`data/utterances.jsonl` and cached in `data/intent_head.npz`. Loading is lazy, inference is offline,
+and nothing here needs a network or an API key once the encoder weights are in the Hugging Face
+cache.
 
-We add three things on top of it:
-
-* locating that checkout (it is not a package on PyPI and not vendored here),
-* full per-class scores, so a request the robot cannot fold can still be answered with the nearest
-  shape it *can* fold (`restricted_best`),
-* a hard rule that the utterance is only ever data: the single value that escapes this module is a
-  label from the head's own class list.
+The utterance is data, not instruction. The only value that leaves this module is one label from the
+head's own fixed class list — including `none`, the explicit out-of-scope class that lets the robot
+decline chitchat instead of folding something at random.
 """
 from __future__ import annotations
 
 import os
-import sys
 import time
 from dataclasses import dataclass, field
 from typing import Optional, Sequence
 
-from .config import Settings, find_snake_pipeline
+from .captions import caption, extract_who
+from .config import Settings
+from .model.dataset import CORPUS_PATH, HEAD_PATH, load_corpus
+from .model.encoder import build_encoder, restore_encoder
+from .model.head import NONE_LABEL, IntentHead
 
 
 class IntentUnavailable(RuntimeError):
-    """snake_pipeline (or its cached head) could not be loaded."""
+    """The trained head could not be loaded."""
 
 
 @dataclass
@@ -34,151 +32,132 @@ class IntentResult:
     """What the classifier made of one utterance, before the handoff vocabulary is consulted."""
 
     text: str
-    label: str                      # e.g. "heart", "letter_H" — always one of the head's classes
+    label: str
     confidence: float
     margin: float
-    accepted: bool                  # cleared the head's margin/confidence thresholds
-    caption: str = ""               # snake_pipeline's template caption, with the greeted entity filled in
-    who: Optional[str] = None       # "Hack the North" for "show hack the north some love"
+    accepted: bool
+    caption: str = ""
+    who: Optional[str] = None
     latency_ms: float = 0.0
-    ranked: list[tuple[str, float]] = field(default_factory=list)   # top labels, best first
+    ranked: list[tuple[str, float]] = field(default_factory=list)
 
     @property
     def runner_up(self) -> Optional[str]:
         return self.ranked[1][0] if len(self.ranked) > 1 else None
 
+    @property
+    def out_of_scope(self) -> bool:
+        return self.label == NONE_LABEL
+
 
 class Classifier:
-    """Lazy wrapper around `snakeshape.local_model.LocalInterpreter`.
+    """Lazy wrapper around the trained head.
 
-    Construction is free; the model loads on the first `classify` (or an explicit `warmup`, which is
-    what the server does at boot so the first text of the demo is not the one that pays for it).
+    Construction is free; the encoder and head load on the first `classify`, or on an explicit
+    `warmup` — which the server calls at boot so the first text of the demo is not the one that pays
+    for it.
     """
 
-    def __init__(self, snake_pipeline_dir: Optional[str] = None, min_margin: Optional[float] = None,
-                 min_confidence: Optional[float] = None, encoder: str = "auto"):
-        self.dir = snake_pipeline_dir or find_snake_pipeline()
+    def __init__(self, head_path: str = HEAD_PATH, corpus_path: str = CORPUS_PATH,
+                 min_margin: Optional[float] = None, min_confidence: Optional[float] = None,
+                 allow_download: bool = True):
+        self.head_path = head_path
+        self.corpus_path = corpus_path
         self.min_margin = min_margin
         self.min_confidence = min_confidence
-        self.encoder_kind = encoder
-        self._lm = None                                    # the snakeshape.local_model module
-        self._interp = None                                # LocalInterpreter
+        self.allow_download = allow_download
+        self.head: Optional[IntentHead] = None
+        self.encoder = None
         self.load_seconds = 0.0
 
     @classmethod
     def from_settings(cls, settings: Settings) -> "Classifier":
-        return cls(settings.snake_pipeline_dir, settings.min_margin, settings.min_confidence)
+        return cls(head_path=settings.head_path or HEAD_PATH,
+                   min_margin=settings.min_margin, min_confidence=settings.min_confidence)
 
     # -- setup -------------------------------------------------------------------------------
-    def _ensure(self):
-        if self._interp is not None:
-            return self._interp
-        if not self.dir:
+    def _ensure(self) -> IntentHead:
+        if self.head is not None:
+            return self.head
+        if not os.path.exists(self.head_path):
             raise IntentUnavailable(
-                "snake_pipeline not found. Set SNAKE_PIPELINE_DIR to the checkout holding "
-                "snakeshape/local_model.py (the MiniLM intent head lives there)."
+                f"no trained head at {self.head_path}. Train one first:\n"
+                f"    python3 -m cubot_imessage.model.train\n"
+                f"It takes about a minute on CPU. Do not let it run during a demo."
             )
-        t0 = time.perf_counter()
-        if self.dir not in sys.path:
-            sys.path.insert(0, self.dir)
+        started = time.perf_counter()
         try:
-            from snakeshape import local_model as lm            # noqa: PLC0415  (deliberately lazy)
+            head = IntentHead.load(self.head_path)
+            encoder = restore_encoder(head.encoder_state, allow_download=self.allow_download)
         except Exception as e:
-            raise IntentUnavailable(f"cannot import snakeshape.local_model from {self.dir}: {e}") from None
-
-        head_path = os.path.join(self.dir, "data", "intent_head.npz")
-        if not os.path.exists(head_path):
-            raise IntentUnavailable(
-                f"no trained head at {head_path}. Run `python3 train_intent.py --no-llm` in "
-                f"{self.dir} first — training at demo time takes minutes."
-            )
-        kw = {"auto_train": False, "encoder": self.encoder_kind,
-              "dataset_path": os.path.join(self.dir, "data", "utterances.jsonl"),
-              "head_path": head_path}
+            raise IntentUnavailable(f"cannot load {self.head_path}: {type(e).__name__}: {e}") from None
         if self.min_margin is not None:
-            kw["margin_threshold"] = self.min_margin
+            head.margin_threshold = self.min_margin
         if self.min_confidence is not None:
-            kw["min_confidence"] = self.min_confidence
-        try:
-            interp = lm.LocalInterpreter(**kw)
-            interp._ensure_ready()
-        except Exception as e:
-            raise IntentUnavailable(f"cannot load the intent head at {head_path}: {e}") from None
-        self._lm, self._interp = lm, interp
-        self.load_seconds = time.perf_counter() - t0
-        return interp
+            head.confidence_threshold = self.min_confidence
+        self.head, self.encoder = head, encoder
+        self.load_seconds = time.perf_counter() - started
+        return head
 
     def warmup(self) -> "Classifier":
         self._ensure()
         self.classify("warm up")
         return self
 
+    def is_stale(self) -> bool:
+        """True when the corpus has changed since the head was fitted, so a retrain is due."""
+        head = self._ensure()
+        if not head.corpus_hash or not os.path.exists(self.corpus_path):
+            return False
+        try:
+            return load_corpus(self.corpus_path).hash() != head.corpus_hash
+        except (OSError, ValueError):
+            return False
+
     # -- introspection -----------------------------------------------------------------------
     @property
     def labels(self) -> list[str]:
-        """Every class the head can emit (139 at the time of writing)."""
-        return list(self._ensure().head.classes)
+        return list(self._ensure().classes)
 
     @property
     def encoder_name(self) -> str:
-        return str(self._ensure().encoder.name)
+        self._ensure()
+        return str(getattr(self.encoder, "name", "unknown"))
 
     @property
     def thresholds(self) -> tuple[float, float]:
-        interp = self._ensure()
-        return float(interp.margin_threshold), float(interp.min_confidence)
+        head = self._ensure()
+        return head.margin_threshold, head.confidence_threshold
 
     def extract_who(self, text: str) -> Optional[str]:
-        """The greeted entity, via snake_pipeline's own patterns ('show hack the north some love' ->
-        'Hack the North'). Returns None when nobody is addressed."""
-        self._ensure()
-        assert self._lm is not None
-        who = self._lm.extract_who(text)
-        return str(who)[:40] if who else None
+        return extract_who(text)
 
     def caption_for(self, label: str, text: str = "") -> str:
-        """snake_pipeline's template caption for a label, with the greeted entity from `text`."""
-        self._ensure()
-        assert self._lm is not None
-        return str(self._lm.caption_for(label, self.extract_who(text) if text else None))
+        return caption(label, text)
 
     # -- inference ---------------------------------------------------------------------------
-    def _scores(self, text: str):
-        interp = self._ensure()
-        return interp.head.scores(interp.encoder.encode([text]))[0]
-
     def classify(self, text: str, top_k: int = 5) -> IntentResult:
         """Classify one utterance. Always returns a result; `accepted` says whether the head cleared
-        its own margin and confidence thresholds (it does not for chitchat)."""
-        interp = self._ensure()
-        t0 = time.perf_counter()
-        row = self._scores(text)
-        classes = interp.head.classes
-        order = sorted(range(len(classes)), key=lambda i: -row[i])
-        top = order[0]
-        confidence = float(row[top])
-        margin = confidence - (float(row[order[1]]) if len(order) > 1 else 0.0)
-        accepted = margin >= interp.margin_threshold and confidence >= interp.min_confidence
-        label = str(classes[top])
+        its thresholds and did not land on the out-of-scope class."""
+        head = self._ensure()
+        started = time.perf_counter()
+        decision = head.decide(self.encoder.encode([text]), top_k=top_k)[0]
         return IntentResult(
             text=text,
-            label=label,
-            confidence=confidence,
-            margin=margin,
-            accepted=accepted,
-            caption=self.caption_for(label, text),
-            who=self.extract_who(text),
-            latency_ms=(time.perf_counter() - t0) * 1000.0,
-            ranked=[(str(classes[i]), float(row[i])) for i in order[:max(1, top_k)]],
+            label=decision.label,
+            confidence=decision.confidence,
+            margin=decision.margin,
+            accepted=decision.accepted,
+            caption=caption(decision.label, text),
+            who=extract_who(text),
+            latency_ms=(time.perf_counter() - started) * 1000.0,
+            ranked=decision.ranked,
         )
 
     def restricted_best(self, text: str, allowed: Sequence[str]) -> Optional[tuple[str, float]]:
-        """Best-scoring label restricted to `allowed` — the nearest shape the robot can actually fold.
-        Returns None when none of `allowed` is a class of the head."""
-        interp = self._ensure()
-        row = self._scores(text)
-        index = {str(c): i for i, c in enumerate(interp.head.classes)}
-        pairs = [(a, float(row[index[a]])) for a in allowed if a in index]
-        if not pairs:
-            return None
-        return max(pairs, key=lambda p: p[1])
+        """Best-scoring label restricted to `allowed` — the nearest shape the robot can actually
+        fold. Returns None when none of `allowed` is a class of the head."""
+        head = self._ensure()
+        ranked = head.scores_for(self.encoder.encode([text]),
+                                 [a for a in allowed if a != NONE_LABEL])
+        return ranked[0] if ranked else None

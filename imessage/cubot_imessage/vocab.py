@@ -1,13 +1,13 @@
-"""Bridging two vocabularies: the MiniLM head's 139 labels and CuBot V2's shape names.
+"""Bridging two vocabularies: the classifier's labels and CuBot V2's shape names.
 
 Three things have to be reconciled.
 
-**Spelling.** The repos name shapes differently, mostly mechanically::
+**Spelling.** The classifier and the planner name shapes differently, mostly mechanically::
 
-    head       heart  arrow  lightning  plus  letter_H  digit_0  circle  wave         check
-    cubot-v2   heart  arrow  lightning  plus  h         d0 / 0   ring    square-wave  checkmark
+    classifier   heart  lightning  plus  letter_h  digit_0  square_wave  arrow_up   checkmark
+    cubot-v2     heart  lightning  plus  h         d0       square-wave  up-arrow   checkmark
 
-`letter_H -> letter-h -> h` is a rule; the rest is an alias table mirroring
+`letter_h -> letter-h -> h` is a rule; the rest is an alias table mirroring
 `cubot/generate/parametric.py::_ALIASES`. It is duplicated here rather than imported because
 `handoff/` is a dependency-free folder by design — the bridge must run without the planner installed.
 
@@ -42,7 +42,8 @@ CUBOT_PLANNABLE = (
     "a", "c", "e", "f", "i", "j", "k", "l", "m", "s", "u", "v", "w", "y",
     "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9",
     "square", "ring", "square-wave", "spiral", "staircase", "checkmark", "triangle", "hourglass",
-    "anchor", "dumbbell", "flag", "mug", "umbrella", "bell", "boat", "rocket", "tree", "up-arrow",
+    "anchor", "dumbbell", "flag", "mug", "umbrella", "bell", "boat", "rocket", "tree",
+    "up-arrow", "arrow-down", "arrow-left", "hook", "crown", "diamond", "mushroom", "table", "chair",
 )
 CUBOT_REJECTED = ("house", "fish", "star", "music-note", "key", "question-mark", "smiley")
 
@@ -62,17 +63,19 @@ CUBOT_ALIASES: dict[str, str] = {
         ("zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"))},
 }
 
-# MiniLM labels the mechanical rules would miss or get wrong.
+# Classifier labels the mechanical `_`->`-` rule would miss or send to the wrong concept.
+# The rule handles most of the namespace on its own: letter_h -> letter-h -> h, digit_0 -> digit-0
+# -> d0, square_wave -> square-wave, music_note -> music-note.
 LABEL_OVERRIDES: dict[str, str] = {
+    "arrow_up": "up-arrow",          # cubot's exploration export calls it up-arrow
+    "none": "",                      # the out-of-scope class names no shape at all
+    # tolerated spellings, in case a head trained elsewhere is loaded
     "arrow_right": "arrow",
-    "wave": "square-wave",
-    "wave3d": "square-wave",
-    "zigzag": "square-wave",
     "circle": "ring",
     "box": "square",
     "cup": "mug",
     "check": "checkmark",
-    "aeroplane": "plane",
+    "zigzag": "square-wave",
 }
 
 STATUS_PLAYABLE = "playable"
@@ -88,14 +91,20 @@ def strip_variant(name: str) -> str:
 
 
 def normalize_label(label: str) -> str:
-    """MiniLM label -> cubot alias spelling: 'letter_H' -> 'letter-h', 'digit_0' -> 'digit-0'."""
+    """Classifier label -> cubot alias spelling: 'letter_h' -> 'letter-h', 'digit_0' -> 'digit-0'."""
     return str(label).strip().lower().replace("_", "-")
 
 
 def label_to_icon(label: str) -> str:
-    """Best cubot concept name for a MiniLM label. Returns the normalized label unchanged when there
-    is no alias for it — the caller then sees STATUS_UNMAPPED."""
-    candidate = LABEL_OVERRIDES.get(label) or normalize_label(label)
+    """Best cubot concept name for a classifier label. Returns the normalized label unchanged when
+    there is no alias for it — the caller then sees STATUS_UNMAPPED. The out-of-scope class names no
+    shape and maps to the empty string."""
+    if label in LABEL_OVERRIDES:
+        candidate = LABEL_OVERRIDES[label]
+        if not candidate:                       # 'none' -> no shape at all
+            return ""
+    else:
+        candidate = normalize_label(label)
     return CUBOT_ALIASES.get(candidate, candidate)
 
 
@@ -262,11 +271,11 @@ class Vocabulary:
 # Labels the head is known to emit; only used to precompute `playable_labels()` when the caller has
 # no classifier handy. An unknown label still resolves correctly through `label_to_icon`.
 _ALL_KNOWN_LABELS: tuple[str, ...] = (
-    "heart", "star", "circle", "square", "spiral", "zigzag", "wave", "arrow", "lightning", "house",
-    "smiley", "infinity", "snake", "straight", "hairpin", "plus", "minus", "check", "x_cross",
-    "arrow_right", "ring", "staircase", "cube", "flag", "boat", "umbrella", "cup", "box",
-    "rectangle", "diamond", "rocket", "tree", "cat", "chair", "table", "wave3d", "spiral_3d",
-    "bridge", "ramp", "cobra", "arch", "helix", "tower", "block",
-    *(f"letter_{c}" for c in "ABCDEFGHIJKLMNOPQRSTUVWXYZ"),
+    "heart", "arrow", "arrow_up", "arrow_down", "arrow_left", "lightning", "plus",
+    *(f"letter_{c}" for c in "abcdefghijklmnopqrstuvwxyz"),
     *(f"digit_{d}" for d in range(10)),
+    "square", "ring", "triangle", "diamond", "spiral", "staircase", "square_wave", "hourglass",
+    "checkmark", "hook", "crown",
+    "anchor", "bell", "boat", "dumbbell", "flag", "mug", "umbrella", "rocket", "tree", "mushroom",
+    "table", "chair", "music_note",
 )

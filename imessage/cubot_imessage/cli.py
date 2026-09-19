@@ -70,8 +70,9 @@ def cmd_doctor(args, settings: Settings) -> int:
         clf = Classifier.from_settings(settings)
         clf.warmup()
         margin, conf = clf.thresholds
-        print(f"  source           {clf.dir}")
+        print(f"  head             {clf.head_path}")
         print(f"  encoder          {clf.encoder_name}")
+        print(f"  stale            {'YES — retrain' if clf.is_stale() else 'no'}")
         print(f"  labels           {len(clf.labels)}")
         print(f"  thresholds       margin >= {margin}, confidence >= {conf}")
         print(f"  load time        {clf.load_seconds:.2f}s")
@@ -259,7 +260,7 @@ def cmd_subscribe(args, settings: Settings) -> int:
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog=PROG, description="iMessage (Linq) -> MiniLM -> CuBot V2 fold paths.")
     p.add_argument("--handoff", help="override CUBOT_HANDOFF_DIR")
-    p.add_argument("--snake-pipeline", help="override SNAKE_PIPELINE_DIR")
+    p.add_argument("--head", help="override the trained head path")
     sub = p.add_subparsers(dest="command", required=True)
 
     sub.add_parser("doctor", help="check config, handoff paths and the intent model").set_defaults(
@@ -312,9 +313,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     settings = Settings.load()
     if args.handoff:
         settings.handoff_dir = args.handoff
-    if args.snake_pipeline:
-        from .config import find_snake_pipeline                       # noqa: PLC0415
-        settings.snake_pipeline_dir = find_snake_pipeline(args.snake_pipeline)
+    if getattr(args, "head", None):
+        settings.head_path = args.head
     try:
         return int(args.func(args, settings) or 0)
     except FileNotFoundError as e:
