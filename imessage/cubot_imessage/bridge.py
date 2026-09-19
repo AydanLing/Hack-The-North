@@ -78,11 +78,22 @@ class Bridge:
         self.executor = executor or build_executor(settings.executor, log=log)
         self.client = client
         self._playable_labels: Optional[dict[str, str]] = None
+        self.react_on_receive = bool(getattr(settings, "react_on_receive", True))
 
     def warmup(self) -> "Bridge":
         self.classifier.warmup()
         _ = self.playable_labels                  # precompute the label -> shape routing
         return self
+
+    def acknowledge(self, inbound: InboundMessage) -> None:
+        """Thumbs-up the inbound message as soon as we have it — before classify/fold."""
+        if not (self.react_on_receive and self.client and inbound.message_id):
+            return
+        try:
+            self.client.react(inbound.message_id, "like")
+            self.log(f"[react] like on {inbound.message_id}")
+        except LinqError as e:
+            self.log(f"[warn] react failed: {e}")
 
     @property
     def playable_labels(self) -> dict[str, str]:
@@ -136,6 +147,7 @@ class Bridge:
         `Outcome.error` so the webhook can still 200 and the sender still gets a reply."""
         t0 = time.perf_counter()
         out = Outcome(inbound=inbound)
+        self.acknowledge(inbound)
         text = inbound.text.strip()
 
         if text.lower().strip("!?. ") in HELP_WORDS:

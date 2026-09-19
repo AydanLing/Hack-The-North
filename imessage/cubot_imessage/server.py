@@ -26,18 +26,22 @@ from __future__ import annotations
 
 import hmac
 import json
+import mimetypes
+import os
 import queue
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from typing import Optional
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 from .bridge import Bridge, Outcome
-from .config import Settings
+from .config import Settings, REPO_ROOT
 from .linq import RateLimiter, SeenEvents, parse_inbound, verify_signature
 
 MAX_BODY_BYTES = 256 * 1024
+DEFAULT_SIM_DIR = os.path.join(REPO_ROOT, "cubot_urdf")
+SIM_PREFIX = "/sim"
 
 
 class _Worker(threading.Thread):
@@ -125,9 +129,44 @@ class WebhookHandler(BaseHTTPRequestHandler):
             return False, "LINQ_WEBHOOK_SECRET is set but the delivery had no signature header"
         return (True, "") if self._token_ok(query) else (False, "bad token")
 
+    def _file(self, path: str, content_type: str = "") -> None:
+        try:
+            with open(path, "rb") as f:
+                body = f.read()
+        except OSError:
+            self._json(404, {"ok": False, "error": "not found"})
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", content_type or mimetypes.guess_type(path)[0]
+                         or "application/octet-stream")
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _serve_sim(self, route: str) -> None:
+        """Serve cubot_urdf/ under /sim/ so the viewer executor can open a localhost URL."""
+        sim_dir = getattr(self.server, "sim_dir", DEFAULT_SIM_DIR)  # type: ignore[attr-defined]
+        rel = unquote(route[len(SIM_PREFIX):]).lstrip("/") or "fold_viewer.html"
+        # no path traversal
+        candidate = os.path.realpath(os.path.join(sim_dir, rel))
+        if not candidate.startswith(os.path.realpath(sim_dir) + os.sep) and \
+           candidate != os.path.realpath(sim_dir):
+            self._json(403, {"ok": False, "error": "forbidden"})
+            return
+        if os.path.isdir(candidate):
+            candidate = os.path.join(candidate, "fold_viewer.html")
+        if not os.path.isfile(candidate):
+            self._json(404, {"ok": False, "error": f"no such file under /sim: {rel}"})
+            return
+        self._file(candidate)
+
     # -- routes ------------------------------------------------------------------------------
     def do_GET(self) -> None:                                        # noqa: N802
         route = urlparse(self.path).path.rstrip("/") or "/"
+        if route.startswith(SIM_PREFIX):
+            self._serve_sim(urlparse(self.path).path)
+            return
         if route in ("/healthz", "/health", "/"):
             bridge: Bridge = self.server.bridge                      # type: ignore[attr-defined]
             self._json(200, {
@@ -136,6 +175,7 @@ class WebhookHandler(BaseHTTPRequestHandler):
                 "handoff_dir": bridge.settings.handoff_dir,
                 "executor": bridge.executor.name,
                 "auto_reply": bridge.settings.auto_reply,
+                "react_on_receive": bridge.settings.react_on_receive,
                 "queued": self.server.worker.q.qsize(),              # type: ignore[attr-defined]
                 "handled": len(self.server.worker.outcomes),         # type: ignore[attr-defined]
             })
@@ -197,11 +237,13 @@ class BridgeServer(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = True
 
-    def __init__(self, settings: Settings, bridge: Bridge, log=print):
+    def __init__(self, settings: Settings, bridge: Bridge, log=print,
+                 sim_dir: str = DEFAULT_SIM_DIR):
         super().__init__((settings.host, settings.port), WebhookHandler)
         self.settings = settings
         self.bridge = bridge
         self.bridge_log = log
+        self.sim_dir = sim_dir if os.path.isdir(sim_dir) else DEFAULT_SIM_DIR
         self.seen = SeenEvents()
         self.limiter = RateLimiter(settings.rate_limit_per_minute)
         self.worker = _Worker(bridge, log=log)
@@ -226,7 +268,9 @@ def serve(settings: Settings, bridge: Optional[Bridge] = None, log=print) -> Non
     except Exception as e:
         log(f"[boot] WARNING: intent model not ready: {e}")
     log(f"[boot] playable shapes: {', '.join(bridge.vocab.playable)}")
-    log(f"[boot] executor={bridge.executor.name} auto_reply={settings.auto_reply}")
+    log(f"[boot] executor={bridge.executor.name} auto_reply={settings.auto_reply} "
+        f"react={'like' if settings.react_on_receive else 'off'}")
+    log(f"[boot] fold viewer at http://{settings.host}:{settings.port}{SIM_PREFIX}/fold_viewer.html")
     if settings.webhook_secret:
         log("[boot] webhook signatures will be verified (LINQ_WEBHOOK_SECRET is set)")
     elif settings.webhook_token:

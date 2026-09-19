@@ -283,6 +283,16 @@ class LinqClient:
             raise LinqError("reply() needs a chat_id")
         return self._post(f"/chats/{chat_id}/messages", {"message": {"parts": self._parts(text)}})
 
+    def react(self, message_id: str, reaction: str = "like", operation: str = "add") -> dict:
+        """Tapback on an inbound message. `like` is the iMessage thumbs-up.
+
+        Docs: POST /v3/messages/{messageId}/reactions with operation add|remove and type like|love|…
+        """
+        if not message_id:
+            raise LinqError("react() needs a message_id")
+        return self._post(f"/messages/{message_id}/reactions",
+                          {"operation": operation, "type": reaction})
+
     # -- webhooks ----------------------------------------------------------------------------
     def create_subscription(self, target_url: str, events: tuple[str, ...] = DEFAULT_EVENTS,
                             version: str = WEBHOOK_VERSION) -> dict:

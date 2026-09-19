@@ -574,7 +574,25 @@ addEventListener('resize', resize);
   el.textContent = report.length ? `✗ ${report.length} of ${SHAPES.length} shapes disagree with the planner` : `✓ ${SHAPES.length}/${SHAPES.length} shapes · ${poses} rest poses reproduce cells_after / base_after`;
   el.title = report.join('\n') || `URDF pitch ${PITCH} mm`;
   console.log('[fold-viewer]', el.textContent, report);
-  resize(); selectShape(0); camera.position.copy(view.pos); controls.target.copy(view.target);
+  // Deep link: fold_viewer.html?shape=heart&play=1 — used by the iMessage bridge to jump
+  // straight into the requested fold and start the animation.
+  const params = new URLSearchParams(location.search);
+  const want = (params.get('shape') || params.get('s') || '').toLowerCase();
+  let idx = 0;
+  if (want) {
+    const strip = n => n.replace(/-v\d+$/, '');
+    idx = SHAPES.findIndex(s => {
+      const name = String(s.name || '').toLowerCase();
+      const aliases = (s.aliases || []).map(a => String(a).toLowerCase());
+      return name === want || aliases.includes(want)
+          || strip(name) === want || aliases.some(a => strip(a) === want);
+    });
+    if (idx < 0) idx = 0;
+  }
+  resize(); selectShape(idx); camera.position.copy(view.pos); controls.target.copy(view.target);
+  if (params.get('play') === '1' || params.get('autoplay') === '1') {
+    playing = true; updateTransport();
+  }
 })();
 
 let tPrev = performance.now();

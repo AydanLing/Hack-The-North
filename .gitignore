@@ -19,3 +19,7 @@ MUJOCO_LOG.TXT
 
 # Local planning notes
 CUBOT_V2_PLAN.md
+
+# Secrets — never commit
+.env
+**/.env

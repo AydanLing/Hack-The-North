@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import threading
 import time
 from dataclasses import dataclass, field
@@ -227,15 +228,149 @@ class NullExecutor:
         return {"executor": self.name, "accepted": True}
 
 
-def build_executor(kind: str, spool_path: str = "", log=print) -> Executor:
+class ViewerExecutor:
+    """Opens the CuBot fold viewer in the default browser on this machine and autoplays the shape.
+
+    The bridge HTTP server mounts `cubot_urdf/` at `/sim/`, so the URL is always local even when
+    Linq reaches the webhook through a tunnel. Falls back to a `file://` open if no `viewer_base`
+    is configured.
+    """
+
+    name = "viewer"
+
+    def __init__(self, viewer_base: str = "", viewer_html: str = "", log=print):
+        self.viewer_base = (viewer_base or "http://127.0.0.1:8787/sim").rstrip("/")
+        self.viewer_html = viewer_html
+        self.log = log
+        self.submitted: list[FoldPlan] = []
+
+    def submit(self, plan: FoldPlan, context: dict) -> dict:
+        from urllib.parse import urlencode
+        import subprocess
+        import webbrowser
+
+        self.submitted.append(plan)
+        query = urlencode({"shape": plan.shape, "play": "1"})
+        if self.viewer_html and os.path.isfile(self.viewer_html) and not self.viewer_base:
+            from pathlib import Path
+            url = Path(self.viewer_html).resolve().as_uri() + "?" + query
+        else:
+            url = f"{self.viewer_base}/fold_viewer.html?{query}"
+        self.log(f"[viewer] opening {url}")
+        opened = False
+        try:
+            # Prefer macOS `open` so a new tab lands in the frontmost browser.
+            if sys.platform == "darwin":
+                subprocess.Popen(["open", url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                opened = True
+            else:
+                opened = bool(webbrowser.open(url, new=2))
+        except Exception as e:
+            self.log(f"[viewer] open failed: {type(e).__name__}: {e}")
+        return {"executor": self.name, "accepted": True, "url": url, "opened": opened,
+                "moves": len(plan.moves)}
+
+
+class MujocoExecutor:
+    """Spawns the interactive MuJoCo viewer replaying the shape's handoff path.
+
+    On macOS this *must* go through `mjpython` or no window appears. Only one replay runs at a
+    time: a new text kills the previous viewer so the laptop is not buried in windows.
+    """
+
+    name = "mujoco"
+    _pid_path = os.path.join(os.path.expanduser("~"), ".cache", "cubot-mujoco.pid")
+
+    def __init__(self, scene_xml: str = "", python_exe: str = "", speed: float = 1.0, log=print):
+        from .config import REPO_ROOT
+        self.scene_xml = scene_xml or os.path.join(REPO_ROOT, "cubot_urdf", "scene.xml")
+        self.python_exe = python_exe or self._pick_python()
+        self.speed = speed
+        self.log = log
+        self.submitted: list[FoldPlan] = []
+
+    @staticmethod
+    def _pick_python() -> str:
+        """Prefer the sibling mjpython next to the current interpreter."""
+        here = os.path.dirname(os.path.abspath(sys.executable))
+        for name in ("mjpython", "mjpython.exe"):
+            candidate = os.path.join(here, name)
+            if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+                return candidate
+        import shutil
+        found = shutil.which("mjpython")
+        return found or sys.executable
+
+    def _stop_previous(self) -> None:
+        import signal
+        try:
+            with open(self._pid_path, encoding="utf-8") as f:
+                old = int(f.read().strip() or 0)
+        except (OSError, ValueError):
+            return
+        if old <= 0:
+            return
+        try:
+            os.kill(old, signal.SIGTERM)
+            self.log(f"[mujoco] stopped previous viewer (pid {old})")
+        except ProcessLookupError:
+            pass
+        except OSError as e:
+            self.log(f"[mujoco] could not stop pid {old}: {e}")
+
+    def submit(self, plan: FoldPlan, context: dict) -> dict:
+        import subprocess
+
+        self.submitted.append(plan)
+        if not plan.path_json or not os.path.isfile(plan.path_json):
+            raise FileNotFoundError(f"no path.json for {plan.shape}")
+        if not os.path.isfile(self.scene_xml):
+            raise FileNotFoundError(f"MuJoCo scene missing: {self.scene_xml}")
+
+        self._stop_previous()
+        env = os.environ.copy()
+        # so `python -m cubot_imessage.mujoco_replay` resolves regardless of cwd
+        pkg_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        env["PYTHONPATH"] = pkg_root + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
+        env["PYTHONUNBUFFERED"] = "1"
+
+        cmd = [
+            self.python_exe, "-u", "-m", "cubot_imessage.mujoco_replay",
+            "--path", plan.path_json,
+            "--scene", self.scene_xml,
+            "--speed", str(self.speed),
+            "--title", f"CuBot · {plan.shape}",
+        ]
+        self.log(f"[mujoco] launching {' '.join(cmd)}")
+        log_path = os.path.join(os.path.dirname(self._pid_path), "cubot-mujoco.log")
+        log_f = open(log_path, "w", encoding="utf-8")
+        # Detach from the bridge so a viewer crash cannot kill the webhook server.
+        proc = subprocess.Popen(
+            cmd, env=env, stdout=log_f, stderr=subprocess.STDOUT,
+            start_new_session=True,
+        )
+        os.makedirs(os.path.dirname(self._pid_path), exist_ok=True)
+        with open(self._pid_path, "w", encoding="utf-8") as f:
+            f.write(str(proc.pid))
+        return {"executor": self.name, "accepted": True, "pid": proc.pid,
+                "path": plan.path_json, "moves": len(plan.moves), "log": log_path}
+
+
+def build_executor(kind: str, spool_path: str = "", log=print,
+                   viewer_base: str = "", viewer_html: str = "",
+                   scene_xml: str = "") -> Executor:
     kind = (kind or "dryrun").lower()
     if kind == "none":
         return NullExecutor()
     if kind == "spool":
         return SpoolExecutor(spool_path or "out/imessage-queue.jsonl", log=log)
+    if kind == "viewer":
+        return ViewerExecutor(viewer_base=viewer_base, viewer_html=viewer_html, log=log)
+    if kind == "mujoco":
+        return MujocoExecutor(scene_xml=scene_xml, log=log)
     if kind == "dryrun":
         return DryRunExecutor(log=log)
-    raise ValueError(f"unknown executor {kind!r} (dryrun | spool | none)")
+    raise ValueError(f"unknown executor {kind!r} (dryrun | spool | viewer | mujoco | none)")
 
 
 def load_any(path: str) -> FoldPlan:

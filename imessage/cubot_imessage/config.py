@@ -78,6 +78,8 @@ class Settings:
     port: int = 8787
     executor: str = "dryrun"
     auto_reply: bool = True
+    react_on_receive: bool = True
+    viewer_base: str = ""
     min_margin: Optional[float] = None
     min_confidence: Optional[float] = None
     rate_limit_per_minute: int = 6
@@ -102,6 +104,8 @@ class Settings:
             port=int(_env("BRIDGE_PORT", "8787")),
             executor=_env("BRIDGE_EXECUTOR", "dryrun"),
             auto_reply=_env_bool("BRIDGE_AUTO_REPLY", True),
+            react_on_receive=_env_bool("BRIDGE_REACT_ON_RECEIVE", True),
+            viewer_base=_env("BRIDGE_VIEWER_BASE", ""),
             min_margin=_env_float("BRIDGE_MIN_MARGIN", None),
             min_confidence=_env_float("BRIDGE_MIN_CONFIDENCE", None),
             rate_limit_per_minute=int(_env("BRIDGE_RATE_LIMIT_PER_MINUTE", "6")),
@@ -129,5 +133,6 @@ class Settings:
             ("listen", f"{self.host}:{self.port}"),
             ("executor", self.executor),
             ("auto-reply", "on" if self.auto_reply else "off"),
+            ("react on receive", "👍 like" if self.react_on_receive else "off"),
             ("rate limit", f"{self.rate_limit_per_minute}/min per sender"),
         ]

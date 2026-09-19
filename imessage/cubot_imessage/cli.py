@@ -31,10 +31,12 @@ PROG = "cubot-imessage"
 
 def _bridge(settings: Settings, execute: bool = True, log=print) -> Bridge:
     client = None
-    if settings.api_key and settings.auto_reply:
+    if settings.api_key and (settings.auto_reply or settings.react_on_receive):
         client = LinqClient(settings.api_key, settings.base_url, settings.timeout_s,
                             settings.from_number)
-    return Bridge(settings, client=client, log=log)
+    viewer_base = settings.viewer_base or f"http://127.0.0.1:{settings.port}/sim"
+    executor = build_executor(settings.executor, viewer_base=viewer_base, log=log)
+    return Bridge(settings, executor=executor, client=client, log=log)
 
 
 # ------------------------------------------------------------------------------------ commands
@@ -304,7 +306,7 @@ def build_parser() -> argparse.ArgumentParser:
     sv = sub.add_parser("serve", help="run the webhook server")
     sv.add_argument("--host")
     sv.add_argument("--port", type=int)
-    sv.add_argument("--executor", choices=("dryrun", "spool", "none"))
+    sv.add_argument("--executor", choices=("dryrun", "spool", "viewer", "mujoco", "none"))
     sv.add_argument("--spool", help="JSONL queue file (implies --executor spool)")
     sv.add_argument("--no-reply", action="store_true", help="never send an iMessage back")
     sv.set_defaults(func=cmd_serve)

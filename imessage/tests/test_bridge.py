@@ -232,6 +232,35 @@ def test_client_dry_run_records_without_sending():
     assert client.sent[0]["body"] == {"message": {"parts": [{"type": "text", "value": "hello"}]}}
 
 
+def test_client_react_posts_a_like_tapback():
+    client = LinqClient("key", "https://example.invalid/v3", dry_run=True)
+    client.react("msg-99", "like")
+    assert client.sent[0]["url"].endswith("/messages/msg-99/reactions")
+    assert client.sent[0]["body"] == {"operation": "add", "type": "like"}
+
+
+def test_acknowledge_thumbs_up_on_receive(handoff):
+    client = LinqClient("key", "https://example.invalid/v3", dry_run=True)
+    bridge = Bridge(_settings(handoff), classifier=FakeClassifier(),
+                    executor=DryRunExecutor(log=lambda *a: None), client=client,
+                    log=lambda *a: None)
+    inbound = _inbound("show hackthenorth some love")
+    inbound.message_id = "msg-heart"
+    bridge.handle(inbound)
+    assert any(c["url"].endswith("/messages/msg-heart/reactions") for c in client.sent)
+
+
+def test_viewer_executor_builds_a_deep_link(handoff, monkeypatch):
+    opened: list[str] = []
+    monkeypatch.setattr("subprocess.Popen", lambda args, **kw: opened.append(args[-1]) or type("P", (), {"pid": 0})())
+    from cubot_imessage.robot import ViewerExecutor, ShapeLibrary
+    plan = ShapeLibrary(handoff).plan("heart")
+    result = ViewerExecutor(viewer_base="http://127.0.0.1:8787/sim", log=lambda *a: None).submit(plan, {})
+    assert result["opened"] is True
+    assert "shape=heart" in result["url"] and "play=1" in result["url"]
+    assert opened and "shape=heart" in opened[0]
+
+
 def test_parse_inbound_reads_the_2025_payload_layout():
     """A subscription created before 2026-02-03 nests the message and flattens the handles. Reading
     only the newer layout would drop every one of these silently."""
@@ -389,9 +418,11 @@ def test_reply_goes_only_to_the_originating_chat(handoff):
     bridge = Bridge(settings, classifier=FakeClassifier(), client=client,
                     executor=DryRunExecutor(log=lambda *a: None), log=lambda *a: None)
     bridge.send_reply(bridge.handle(_inbound("make a heart")))
-    assert len(client.sent) == 1
-    assert client.sent[0]["url"].endswith("/chats/c1/messages")
-
+    # thumbs-up on the inbound message, then a text reply into the same chat — nowhere else
+    assert len(client.sent) == 2
+    assert client.sent[0]["url"].endswith("/messages/m1/reactions")
+    assert client.sent[1]["url"].endswith("/chats/c1/messages")
+    assert "+15555550123" not in json.dumps(client.sent)
 
 # ------------------------------------------------------------------------------- the real handoff
 
