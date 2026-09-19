@@ -1,0 +1,8 @@
+step,joint,delta,side,duration_s,state_before,state_after,angle_after_deg,hard_ok,peak_demand_nm,max_penetration_mm,max_ground_depth_mm
+1,0,-1,in,2.0,0,-1,-120.0,True,0.0,0.3984,0.0
+2,17,-1,out,2.0,0,-1,-120.0,True,5.4022,0.3984,0.0
+3,13,1,out,2.0,0,1,120.0,True,11.0832,0.3984,0.0
+4,18,-1,out,2.0,0,-1,-120.0,True,4.5981,0.3984,0.0
+5,5,1,in,2.0,0,1,120.0,True,1.8709,0.3984,0.0
+6,1,1,in,2.0,0,1,120.0,True,0.1211,0.3984,0.0
+7,19,-1,out,2.0,0,-1,-120.0,True,3.5483,0.3984,0.0

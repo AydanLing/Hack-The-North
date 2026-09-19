@@ -5810,6 +5810,7 @@
     "source_hash": "e6be5dc28b4e9cf7521398e46b5628a84944ea25023061726e22f315aa0bb766",
     "profile": "loose",
     "seed": 0,
+    "mask_variant": null,
     "exporter": "tools/export_handoff.py"
   }
 }
