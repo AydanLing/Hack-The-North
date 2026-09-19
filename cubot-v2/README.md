@@ -41,10 +41,11 @@ handed to the MuJoCo sim owner. See `handoff/README.md` for the conventions and
 `handoff/PATHS.md` for the move lists. Regenerate it with
 `uv run python tools/export_handoff.py` after a new planner run; add
 exploration winners with `--manifest` or `--shape NAME=RUN_DIR`. The
-committed `handoff/` currently carries 84 paths — the demo seven, the 42
-exploration winners and the 35 loose-passing glyph-atlas candidates
+committed `handoff/` currently carries 135 paths — the demo seven, the 42
+exploration winners, the 35 loose-passing glyph-atlas candidates
 (`tools/discovery_manifest.py` turns a discovery `summary.json` into the same
-manifest form) — and `../cubot_urdf/make_fold_viewer.py` bundles all of them
+manifest form), 15 one-deep 3-D shells and backfill icons, and the 36
+icon-library winners — and `../cubot_urdf/make_fold_viewer.py` bundles all of them
 into the interactive fold viewer.
 
 New shapes are found with the **mask-first method** (`docs/METHOD.md`), the
