@@ -269,3 +269,44 @@ should stay an offline cache-building operation.
   are the hardest width; 1-wide and 3-wide thread far more often.
 - Human picks remain unset; `docs/exploration-20260919/contact-sheet-blind.png`
   is the blind sheet for the 37 registered winners.
+
+## 2026-09-19 — one-deep 3-D shells, two-tier acceptance, and the wire bundle
+
+- Tooling (branch `explore-volumetric-20260919`): `config/profiles/platform.toml`
+  (loose with the table removed, tier 2), `cubot.shapes.parse_layers` /
+  `canonical_3d` / `has_2x2x2_block`, `tools/repair_shell.py` (gate + single-cell
+  perturbation repair), `tools/explore_shape3d.py` (screen → thread → escape
+  probe → forward fold loose-then-platform, `--backward` certificate),
+  `cubot.viz.render_voxels`, tier/layer support in `explore_summary.py` and
+  `export_handoff.py`, `tools/recheck_paths.py`.
+- Commands: `uv run python tools/repair_shell.py gate data/candidates/volumetric/<c>-v*.txt --iso`;
+  `uv run python tools/explore_shape3d.py --name <c> <mask> --out out/explore3d-20260919/<w> --time-budget 300 -k 2 [--probe] [--backward]`;
+  `uv run python tools/explore_summary.py --out out/explore3d-20260919`;
+  `uv run python tools/export_handoff.py --no-demo --manifest out/explore3d-20260919/handoff-manifest.json --out <scratch>`.
+- Threading: first-draw shells thread ~30 % (four designers, 100+ masks);
+  single-cell repair turns most UNSAT shells threadable in 20–40 s. For
+  stools/benches/side tables, insetting a leg one row from the plate end is
+  what makes the roll thread; flush legs were UNSAT/parity-fail throughout. A
+  1-wide stroke cannot enter a 3-wide block at a mid-edge cell (two degree-2
+  corners force a branch), which killed sword, pawn, CN tower and wine glass.
+- Two-thick trap: a cube-outline-plus-column variant completed and measured
+  exactly 22.004 mm on its last move; `has_2x2x2_block` now rejects such
+  drawings before threading.
+- Folding: 12 new shapes validated (7 volumetric: stool, low-bench, half-cube,
+  side-table, lounge at tier 1; bench at tier 2 — plus 6 flat backfill), table
+  in `docs/EXPLORATION-3D-20260919.md`. The L-corner passes loose in a probe
+  (18 moves) and half-cube passes loose in 88 s. Dense-floor containers (tray
+  5×3, retainer, cube outline, U-channel, tube) all reach the goal and fail the
+  final entry move; tube-r1 is proven closed (backward search `UNSAT`).
+- Wire bundle: at the user's instruction a Ø20 × 40 mm wire leaving module 0's
+  free face is now a collision body (`tether_table`, `tether_cell`,
+  `tether_down`; `docs/RULES.md`). Re-checking the demo seven: heart, plus, h,
+  t, n still pass; arrow and lightning opened with `(0, +1, 'in')` (wire into
+  the table) and were re-folded clean (23 and 16 moves, loose). Of the campaign
+  rows folded before the rule, 7 of 10 passes were invalidated; re-folds with
+  the goal-side wire-cell filter recovered low-bench and bench. **The 84
+  shapes exported by the parallel session (08–84) have not been re-checked**
+  — run `tools/recheck_paths.py handoff/shapes/*/path.json` after merging.
+- Compute: the whole run shared the machine with another session's searches
+  (load average 30–160 on 8 cores); every fold budget here is wall-clock, so
+  the yield is a lower bound. Two fold slots were used, one process each.

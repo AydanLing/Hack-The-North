@@ -1,0 +1,13 @@
+// tunnel-v2: bridge: 3-wide, legs 2 high, span 5
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+#...#
+#...#
+#...#
+
+#...#
+#...#
+#...#
+
+#####
+#####
+#####

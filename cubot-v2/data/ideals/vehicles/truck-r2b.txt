@@ -1,0 +1,6 @@
+// truck round 2 (b): cargo box 3 rows tall (4-5 wide), cab 2 rows, chassis, wheels; interiors negotiable
+?###?.....
+#???#?.?..
+#???#?.##?
+##########
+##?....?##

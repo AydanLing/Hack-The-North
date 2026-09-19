@@ -1,0 +1,16 @@
+// standing can: ring x3 + raised back wall (3-cell lip on top of one wall)
+###
+...
+...
+---
+###
+#.#
+###
+---
+###
+#.#
+###
+---
+###
+#.#
+###

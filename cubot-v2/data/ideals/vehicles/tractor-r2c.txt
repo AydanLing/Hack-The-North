@@ -1,0 +1,8 @@
+// tractor round 2 (c): ring wheel + front wheel required, cab/hood preferred, stack negotiable
+?++..??..
+?++..??..
+?++..?...
+?+++++++.
+###+++##.
+#.#...##.
+###......

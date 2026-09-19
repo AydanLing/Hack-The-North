@@ -1,0 +1,7 @@
+// cactus: 3x6 trunk, left arm row 5 len 4, right arm row 2 len 3 (27)
+..###.#
+..###.#
+#.#####
+#.###..
+#.###..
+#####..

@@ -120,7 +120,8 @@ def test_harvest_is_seeded_and_resumes_completed_icons(tmp_path: Path) -> None:
 def test_partial_only_pipeline_is_planned_not_checked(tmp_path: Path) -> None:
     machine = load_machine()
     states = [0] * machine.joints
-    states[:4] = [1, 1, 1, 1]
+    # Tail joints: their moves swing the tail side, so the wire rules on module 0 never fire.
+    states[22:26] = [1, 1, 1, 1]
     goal = Pose(tuple(states), machine.roll)
     matched = MatchResult(goal, tuple(pose_cells(goal)), 0.0, "fixture", "identity")
     run = run_pipeline(
@@ -131,6 +132,7 @@ def test_partial_only_pipeline_is_planned_not_checked(tmp_path: Path) -> None:
         include_heart_certificate=False,
         time_budget_s=0.01,
         node_budget=1,
+        detour_budget=0,  # direct moves only: no exploratory base rotation that the wire rule would flag
         max_candidates=2,
     )
     assert run.record.plans
@@ -206,7 +208,8 @@ def test_pipeline_geometry_tracks_ranked_primary_and_preserves_pick(tmp_path: Pa
 def test_harvest_does_not_count_partial_artifacts_as_completed(tmp_path: Path) -> None:
     machine = load_machine()
     states = [0] * machine.joints
-    states[:4] = [1, 1, 1, 1]
+    # Tail joints: their moves swing the tail side, so the wire rules on module 0 never fire.
+    states[22:26] = [1, 1, 1, 1]
     goal = Pose(tuple(states), machine.roll)
     matched = MatchResult(goal, tuple(pose_cells(goal)), 0.0, "fixture", "identity")
 
@@ -219,6 +222,7 @@ def test_harvest_does_not_count_partial_artifacts_as_completed(tmp_path: Path) -
             include_heart_certificate=False,
             time_budget_s=0.01,
             node_budget=1,
+                detour_budget=0,
             max_candidates=2,
         )
 

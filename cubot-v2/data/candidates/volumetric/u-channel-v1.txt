@@ -1,0 +1,18 @@
+// U-channel / cradle: 3x5 floor + two 1-tall side walls + 2 nubs on one end of the left wall (15 + 10 + 2 = 27)
+#..
+#..
+...
+...
+...
+---
+#.#
+#.#
+#.#
+#.#
+#.#
+---
+###
+###
+###
+###
+###

@@ -1,0 +1,4 @@
+// glasses: 5x3 rings, bridge 3, one arm? no - 5x3 + 4x3 rings (12+10) + bridge 5
+#####.....####
+#...#######..#
+#####.....####

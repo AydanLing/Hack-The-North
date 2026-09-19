@@ -157,6 +157,64 @@ def render_iso(
     return target
 
 
+def render_voxels(
+    cells: Sequence[Cell],
+    out_path: str | Path,
+    *,
+    scale: int = 28,
+    margin: int = 40,
+    yaw_quarter_turns: int = 0,
+) -> Path:
+    """Solid isometric voxel render (touching cubes, painter's order) for 3D shells.
+
+    :func:`render_iso` draws exploded module icons, which is right for a flat
+    drawing's engineering view but unreadable for a one-deep 3D shell.  Here
+    the viewer looks down the (+1, +1, +1) direction: the +x, +y and +z faces
+    are visible, cubes are drawn back to front, and the whole thing is one
+    two-tone body (alternating modules) so the silhouette reads first.
+    ``yaw_quarter_turns`` rotates the shape about +z before projecting.
+    """
+
+    if not cells:
+        raise ValueError("cannot render an empty path")
+    pts = [tuple(int(v) for v in cell) for cell in cells]
+    for _ in range(yaw_quarter_turns % 4):
+        pts = [(-y, x, z) for x, y, z in pts]
+    min_corner = tuple(min(p[i] for p in pts) for i in range(3))
+    pts = [(x - min_corner[0], y - min_corner[1], z - min_corner[2]) for x, y, z in pts]
+    a, b, c = scale * 0.866, scale * 0.5, float(scale)
+
+    def project(x: float, y: float, z: float) -> tuple[float, float]:
+        return ((x - y) * a, (x + y) * b - z * c)
+
+    corners = [project(x + dx, y + dy, z + dz) for x, y, z in pts for dx in (0, 1) for dy in (0, 1) for dz in (0, 1)]
+    min_x = min(px for px, _ in corners)
+    min_y = min(py for _, py in corners)
+    max_x = max(px for px, _ in corners)
+    max_y = max(py for _, py in corners)
+    image = Image.new("RGB", (int(max_x - min_x + 2 * margin), int(max_y - min_y + 2 * margin)), (248, 247, 243))
+    draw = ImageDraw.Draw(image)
+
+    def screen(x: float, y: float, z: float) -> tuple[float, float]:
+        px, py = project(x, y, z)
+        return (px - min_x + margin, py - min_y + margin)
+
+    order = sorted(range(len(pts)), key=lambda index: sum(pts[index]))
+    for index in order:
+        x, y, z = pts[index]
+        base = COLORS[index % 2]
+        top = [screen(x, y, z + 1), screen(x + 1, y, z + 1), screen(x + 1, y + 1, z + 1), screen(x, y + 1, z + 1)]
+        face_x = [screen(x + 1, y, z), screen(x + 1, y + 1, z), screen(x + 1, y + 1, z + 1), screen(x + 1, y, z + 1)]
+        face_y = [screen(x, y + 1, z), screen(x + 1, y + 1, z), screen(x + 1, y + 1, z + 1), screen(x, y + 1, z + 1)]
+        draw.polygon(face_y, fill=tuple(max(0, v - 60) for v in base), outline=(30, 30, 30))
+        draw.polygon(face_x, fill=tuple(max(0, v - 25) for v in base), outline=(30, 30, 30))
+        draw.polygon(top, fill=base, outline=(30, 30, 30))
+    target = Path(out_path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    image.save(target)
+    return target
+
+
 def contact_sheet(
     entries: Iterable[tuple[str, str | Path]],
     out_path: str | Path,

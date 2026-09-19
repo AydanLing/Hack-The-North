@@ -1,0 +1,9 @@
+// rocket round 2: nose negotiable, 4-wide body, fin tips at the bottom corners required, nozzle below preferred
+..??..
+.?++?.
+.####.
+.####.
+.####.
+#?##?#
+######
+.?++?.

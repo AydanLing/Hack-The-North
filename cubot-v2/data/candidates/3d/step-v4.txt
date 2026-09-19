@@ -1,0 +1,13 @@
+// step-v4: step: 5 bottom, riser 2, 3 top, 3 wide
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+#####..
+#####..
+#####..
+
+....#..
+....#..
+....#..
+
+....###
+....###
+....###

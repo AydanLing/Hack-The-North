@@ -461,9 +461,12 @@ def match(
     found: list[MatchResult] = []
     if len(target.cells) == 27:
         try:
+            from .config import load_machine
             from .solver import solve
 
-            solved = solve(target.cells, roll, all_solutions=True, budget_nodes=250_000)
+            solved = solve(
+                target.cells, roll, all_solutions=True, budget_nodes=250_000, tether=load_machine().has_tether
+            )
             for pose in solved.poses[:k]:
                 from .lattice import fk
 

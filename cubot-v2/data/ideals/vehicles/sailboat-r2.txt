@@ -1,0 +1,9 @@
+// sailboat round 2: mast column + sail (stepped right triangle) preferred, link optional, hull two rows tapering; edges negotiable
+..#?....
+..#+?...
+..#++?..
+..#+++?.
+..#++++?
+..?.....
+?+++++++
+??+++++?

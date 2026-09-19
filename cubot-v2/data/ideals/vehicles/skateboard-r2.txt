@@ -1,0 +1,7 @@
+// skateboard round 2: side view, 1-wide deck with 2-3 tall kick tails, 2x2 wheel blocks under the deck
+#...........#
+#...........#
+?...........?
+#############
+.??.......??.
+.??.......??.

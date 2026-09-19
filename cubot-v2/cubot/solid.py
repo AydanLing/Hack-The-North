@@ -251,10 +251,44 @@ def analytic_module_solid(side_mm: float = 80.0, chamfer_mm: float = 8.0) -> Mod
 MODULE_SOLID = load_module_solid()
 
 
+def tether_piece(side_mm: float = 80.0, length_mm: float = 40.0, width_mm: float = 20.0, facets: int = 4) -> ConvexPiece:
+    """Rigid keep-out for the cable bundle leaving module 0 through its mount face.
+
+    Module-local millimetres.  The piece is a convex ``facets``-gon prism of
+    ``width_mm`` across flats, running from the ``-x`` face plane
+    (``x = -side/2``, where a preceding module would mount) outward to
+    ``x = -side/2 - length``, centred on the face.  ``facets=4`` is a square
+    box of side ``width_mm`` (the shipped ``machine.toml`` model); ``facets=8``
+    approximates a round bundle (the 3-D shell campaign's Ø20 × 40 mm model).
+    It rides with module 0's still half and nothing may sweep through it,
+    rest in the lattice cell it occupies, or drive it into the table.
+    """
+
+    if length_mm <= 0.0 or width_mm <= 0.0:
+        raise ValueError("tether needs positive length and width")
+    if facets < 3:
+        raise ValueError("tether needs at least 3 facets")
+    half = side_mm / 2.0
+    normals: list[tuple[float, float, float]] = [(1.0, 0.0, 0.0), (-1.0, 0.0, 0.0)]
+    offsets: list[float] = [-half, half + length_mm]
+    for index in range(facets):
+        angle = 2.0 * np.pi * index / facets
+        normals.append((0.0, float(np.cos(angle)), float(np.sin(angle))))
+        offsets.append(width_mm / 2.0)
+    return _piece_from_halfspaces("tether", _unit_rows(normals), np.asarray(offsets, dtype=float))
+
+
+TETHER_PIECE = tether_piece(facets=8)  # the 3-D campaign's Ø20 × 40 mm bundle; the engine uses machine.tether_* instead
+TETHER_MODULE = -1  # module id the tether carries in collision / ground reports
+
+
 __all__ = [
     "ConvexPiece",
     "DEFAULT_SOLID_PATH",
     "JOINT_AXIS",
+    "TETHER_MODULE",
+    "TETHER_PIECE",
+    "tether_piece",
     "MODULE_SOLID",
     "ModuleSolid",
     "analytic_module_solid",

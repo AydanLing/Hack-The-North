@@ -1,0 +1,7 @@
+// ufo round 2 (g): dome + disc required-ish, a widening light beam below preferred
+...+++...
+.+++++++.
+#########
+?..+++..?
+?.+++++.?
+?+++++++?

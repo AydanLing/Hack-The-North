@@ -1,0 +1,7 @@
+// helix-v4: coil spring: 2x2 helix, pitch 2 (two advances per side)
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+###.....###.....##
+#.....###.....###.
+
+..###.....###.....
+....###.....###...

@@ -11,6 +11,9 @@
   "joint_angle_deg": 120.0,
   "joint_min_position": -1,
   "joint_max_position": 1,
+  "tether_length_mm": 82.0,
+  "tether_width_mm": 40.0,
+  "tether_facets": 4,
   "pitch_mm": 82.0,
   "joints": 26,
   "joint_positions": [

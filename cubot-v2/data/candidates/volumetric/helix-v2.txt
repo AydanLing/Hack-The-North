@@ -1,0 +1,12 @@
+// helix on 4x3 footprint: 9 cells per lap, gap rotates, 3 laps
+####
+#..#
+###.
+---
+####
+#..#
+#.##
+---
+####
+...#
+####

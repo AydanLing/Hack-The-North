@@ -1,0 +1,5 @@
+// tank round 2: long 1-wide gun barrel required (4 cells past the turret), turret preferred, hull + rounded track slab preferred
+.?+++?.....
+.?+++######
+?+++++++++?
+?+++++++++?

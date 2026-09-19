@@ -1,0 +1,6 @@
+// design_search: from mountain.txt, distance 7, 3 threadings
+..##.....
+..#####..
+..###.#..
+#######..
+#########

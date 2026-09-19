@@ -1,0 +1,9 @@
+// ramp-v1: overpass: ramp up, 4-long deck, ramp down, 3 wide
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+##...##
+##...##
+##...##
+
+.#####.
+.#####.
+.#####.

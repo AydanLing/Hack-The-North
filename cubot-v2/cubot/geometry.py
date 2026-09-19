@@ -7,6 +7,8 @@ convex SAT penetration, and table clearance.
 
 from __future__ import annotations
 
+import functools
+
 from dataclasses import dataclass, field
 import math
 from typing import Iterable
@@ -16,7 +18,7 @@ from numpy.typing import NDArray
 
 from .config import Machine, Profile
 from .records import CheckReport, Move, Pose, Side
-from .solid import ConvexPiece, JOINT_AXIS, MODULE_SOLID, ModuleSolid
+from .solid import ConvexPiece, JOINT_AXIS, MODULE_SOLID, TETHER_MODULE, ModuleSolid
 
 FloatArray = NDArray[np.float64]
 DETENT_RAD = 2.0 * math.pi / 3.0
@@ -67,6 +69,8 @@ class SweepReport:
     first_contact_angle_deg: float | None = None
     max_ground_depth_mm: float = 0.0
     max_pivot_dip_mm: float = 0.0
+    max_tether_depth_mm: float = 0.0
+    max_tether_ground_mm: float = 0.0
 
     @property
     def samples(self) -> int:
@@ -313,6 +317,40 @@ def _rotate_positions(points: FloatArray, pivot: FloatArray, rotation: FloatArra
     return (points - pivot) @ rotation.T + pivot
 
 
+@functools.lru_cache(maxsize=8)
+def _tether_piece(side_mm: float, length_mm: float, width_mm: float, facets: int) -> ConvexPiece:
+    from .solid import tether_piece
+
+    return tether_piece(side_mm, length_mm, width_mm, facets)
+
+
+def machine_tether(machine: Machine) -> ConvexPiece | None:
+    """The tether keep-out piece ``machine`` describes (module-local frame), or ``None`` without one."""
+
+    if not machine.has_tether:
+        return None
+    return _tether_piece(machine.side_mm, machine.tether_length_mm, machine.tether_width_mm, machine.tether_facets)
+
+
+def tether_transform(pose: Pose, machine: Machine, *, base_frames: tuple[FloatArray, FloatArray] | None = None) -> Transform | None:
+    """World placement of the tether keep-out at rest (module 0's still-half frame), or ``None``."""
+
+    if not machine.has_tether:
+        return None
+    centers, rotations = base_frames if base_frames is not None else _pose_frames(pose, machine)
+    return Transform(np.asarray(rotations[0], dtype=float), np.asarray(centers[0], dtype=float))
+
+
+def tether_rest_depth(pose: Pose, machine: Machine) -> float:
+    """Table incursion of the tether keep-out in the settled rest pose, mm."""
+
+    transform = tether_transform(pose, machine)
+    piece = machine_tether(machine)
+    if transform is None or piece is None:
+        return 0.0
+    return ground_depth(piece, transform)
+
+
 def _sample_placements(
     pose: Pose,
     machine: Machine,
@@ -333,11 +371,19 @@ def _sample_placements(
 
     static: list[_PlacedPiece] = []
     moving: list[_PlacedPiece] = []
+    # The cable bundle leaves module 0 through its mount (-x) face, which belongs
+    # to the still half, so it rides with whichever group module 0's still half
+    # is in: static on ``out`` moves, swinging with the base side on ``in`` moves.
+    # Nothing may sweep through it (docs/RULES.md, docs/TETHER.md).  Its size
+    # comes from ``machine.tether_*``; a machine without one places nothing.
+    tether = machine_tether(machine)
     if side == "out":
         world_rotation = rotation_about_axis(axis, progress_rad)
         for module in range(joint):
             static.append(_PlacedPiece(module, "full", solid.full, Transform(rotations[module], centers[module])))
         static.append(_PlacedPiece(joint, "still", solid.still, Transform(rotations[joint], pivot), True))
+        if tether is not None:
+            static.append(_PlacedPiece(TETHER_MODULE, "tether", tether, Transform(rotations[0], centers[0])))
         moving.append(
             _PlacedPiece(
                 joint,
@@ -358,6 +404,11 @@ def _sample_placements(
         moving.append(
             _PlacedPiece(joint, "still", solid.still, Transform(world_rotation @ rotations[joint], pivot), True)
         )
+        if tether is not None:
+            tether_center = _rotate_positions(centers[:1], pivot, world_rotation)[0]
+            moving.append(
+                _PlacedPiece(TETHER_MODULE, "tether", tether, Transform(world_rotation @ rotations[0], tether_center))
+            )
         static.append(_PlacedPiece(joint, "moving", solid.moving, Transform(start_moving_rotation, pivot), True))
         if joint:
             moved_centers = _rotate_positions(centers[:joint], pivot, world_rotation)
@@ -406,9 +457,18 @@ def _evaluate_sample(
                         depth_mm=depth,
                     )
                 )
+        if mover.module == TETHER_MODULE:
+            continue  # the wire's table contact is a collision, not a dip (below)
         depth = ground_depth(mover.piece, mover.transform)
         if depth > 0.0:
             ground_hits.append(GroundHit(mover.module, angle_deg, depth, mover.pivot_piece))
+    # The wire's own table contact is reported separately (module -1) whichever
+    # group it rides in; ``score_sweep`` turns it into the ``tether_table`` rule.
+    for body in (*static, *moving):
+        if body.module == TETHER_MODULE:
+            depth = ground_depth(body.piece, body.transform)
+            if depth > 0.0:
+                ground_hits.append(GroundHit(TETHER_MODULE, angle_deg, depth, False))
     return collisions, ground_hits
 
 
@@ -473,8 +533,10 @@ def sweep(
         all_collisions.extend(collisions)
         all_ground.extend(ground_hits)
     worst = max(all_collisions, key=lambda hit: hit.depth_mm, default=None)
-    nonpivot = [hit for hit in all_ground if not hit.pivot_piece]
+    nonpivot = [hit for hit in all_ground if not hit.pivot_piece and hit.module != TETHER_MODULE]
     pivot = [hit for hit in all_ground if hit.pivot_piece]
+    tether_ground = [hit for hit in all_ground if hit.module == TETHER_MODULE]
+    tether_hits = [hit for hit in all_collisions if TETHER_MODULE in hit.pair]
     return SweepReport(
         joint=move.joint,
         delta=move.delta,
@@ -487,6 +549,8 @@ def sweep(
         first_contact_angle_deg=min((hit.angle_deg for hit in all_collisions), default=None),
         max_ground_depth_mm=max((hit.depth_mm for hit in nonpivot), default=0.0),
         max_pivot_dip_mm=max((hit.depth_mm for hit in pivot), default=0.0),
+        max_tether_depth_mm=max((hit.depth_mm for hit in tether_hits), default=0.0),
+        max_tether_ground_mm=max((hit.depth_mm for hit in tether_ground), default=0.0),
     )
 
 
@@ -513,10 +577,22 @@ def score_sweep(report: SweepReport, profile: Profile) -> CheckReport:
         f"max non-pivot table incursion {report.max_ground_depth_mm:.3f} mm "
         f"(limit {profile.ground_hard_mm:.3f} mm)"
     )
+    # The cable bundle on module 0: a module sweeping through it is already
+    # inside ``max_depth_mm`` (CAD rule); its own table contact is reported
+    # separately and obeys the table rule, ``ground_hard_mm``, the same limit a
+    # module gets -- the keep-out is a rigid stand-in for a cable that bends
+    # (docs/TETHER.md).  With the table removed the rule is moot.
+    table_present = profile.ground_hard_mm < 1e8
+    tether_ok = (not table_present) or report.max_tether_ground_mm <= profile.ground_hard_mm + epsilon
+    tether_reason = (
+        f"tether keep-out table incursion {report.max_tether_ground_mm:.3f} mm"
+        + (f" (limit {profile.ground_hard_mm:.3f} mm)" if table_present else " (table removed)")
+    )
     return CheckReport(
         hard={
             "cad_penetration": (collision_ok, collision_reason),
             "ground": (ground_ok, ground_reason),
+            "tether_table": (tether_ok, tether_reason),
         },
         soft={
             "near_contact": (
@@ -537,6 +613,8 @@ def score_sweep(report: SweepReport, profile: Profile) -> CheckReport:
             "max_penetration_mm": report.max_depth_mm,
             "max_ground_depth_mm": report.max_ground_depth_mm,
             "max_pivot_dip_mm": report.max_pivot_dip_mm,
+            "max_tether_depth_mm": report.max_tether_depth_mm,
+            "max_tether_ground_mm": report.max_tether_ground_mm,
             "first_contact_angle_deg": (
                 report.first_contact_angle_deg if report.first_contact_angle_deg is not None else "none"
             ),
@@ -552,11 +630,14 @@ __all__ = [
     "advance_pose",
     "balance_margin",
     "ground_depth",
+    "machine_tether",
     "overlap_depth",
     "pose_frames",
     "rotation_about_axis",
     "score_balance",
     "score_sweep",
     "sweep",
+    "tether_rest_depth",
+    "tether_transform",
     "transform_points",
 ]

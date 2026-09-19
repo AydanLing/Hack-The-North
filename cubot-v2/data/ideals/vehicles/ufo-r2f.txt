@@ -1,0 +1,5 @@
+// ufo round 2 (f): ufo-h neighbourhood: 2-row stepped dome preferred, 10-wide disc required, underside row negotiable
+..??+++??..
+.?+++++++?.
+###########
+?+++++++++?

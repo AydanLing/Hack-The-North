@@ -1,0 +1,9 @@
+// helix-v2: coil spring: helix around a 3x2 core, axis along x
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+##..##..##.
+#...#...#..
+#..##..##..
+
+.##..##..##
+..#...#...#
+..##..##...

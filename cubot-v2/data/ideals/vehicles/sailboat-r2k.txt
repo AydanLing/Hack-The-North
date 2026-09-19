@@ -1,0 +1,8 @@
+// sailboat round 2 (k): tapered hull 9 over 7 over 5 (corners are the chain ends), sail region negotiable
+...?+?...
+...?++?..
+...?+++?.
+...?+....
+#########
+.#######.
+..#####..

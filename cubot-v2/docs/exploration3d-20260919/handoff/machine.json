@@ -1,0 +1,74 @@
+{
+  "schema": "cubot.handoff.machine.v1",
+  "modules": 27,
+  "side_mm": 80.0,
+  "gap_mm": 2.0,
+  "chamfer_mm": 8.0,
+  "roll": "12001300133101230333233210",
+  "mass_kg": 0.223,
+  "stall_torque_nm": 10.6,
+  "move_time_s": 2.0,
+  "joint_angle_deg": 120.0,
+  "joint_min_position": -1,
+  "joint_max_position": 1,
+  "pitch_mm": 82.0,
+  "joints": 26,
+  "joint_positions": [
+    -1,
+    0,
+    1
+  ],
+  "joint_angles_deg": [
+    -120.0,
+    0.0,
+    120.0
+  ],
+  "module_solid": "module_solid.json",
+  "check_profiles": {
+    "loose": {
+      "sweep_step_deg": 4.0,
+      "hard_penetration_mm": 6.0,
+      "soft_penetration_mm": 1.0,
+      "pivot_dip_exempt_mm": 3.0,
+      "ground_soft_mm": 3.0,
+      "ground_hard_mm": 40.0,
+      "torque_cap_nm": 5.8,
+      "torque_stall_nm": 10.6,
+      "balance_margin_mm": -20.0,
+      "fold_budget_s": 30.0,
+      "node_budget": 200000,
+      "detour_budget": 8,
+      "side_ambiguity_ratio": 0.85
+    },
+    "platform": {
+      "sweep_step_deg": 4.0,
+      "hard_penetration_mm": 6.0,
+      "soft_penetration_mm": 1.0,
+      "pivot_dip_exempt_mm": 1000000000.0,
+      "ground_soft_mm": 3.0,
+      "ground_hard_mm": 1000000000.0,
+      "torque_cap_nm": 5.8,
+      "torque_stall_nm": 10.6,
+      "balance_margin_mm": -20.0,
+      "fold_budget_s": 30.0,
+      "node_budget": 200000,
+      "detour_budget": 8,
+      "side_ambiguity_ratio": 0.85
+    },
+    "strict": {
+      "sweep_step_deg": 2.0,
+      "hard_penetration_mm": 0.0,
+      "soft_penetration_mm": 0.0,
+      "pivot_dip_exempt_mm": 2.4,
+      "ground_soft_mm": 0.5,
+      "ground_hard_mm": 40.0,
+      "torque_cap_nm": 5.8,
+      "torque_stall_nm": 10.6,
+      "balance_margin_mm": 10.0,
+      "fold_budget_s": 120.0,
+      "node_budget": 1000000,
+      "detour_budget": 12,
+      "side_ambiguity_ratio": 0.85
+    }
+  }
+}

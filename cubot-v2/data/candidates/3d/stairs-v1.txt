@@ -1,0 +1,21 @@
+// stairs-v1: stairs: 4 unit steps, 3 wide
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+##...
+##...
+##...
+
+.##..
+.##..
+.##..
+
+..##.
+..##.
+..##.
+
+...##
+...##
+...##
+
+....#
+....#
+....#

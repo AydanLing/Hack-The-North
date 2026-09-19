@@ -1,0 +1,8 @@
+// sailboat round 2 (g): 8-wide hull required, sail preferred (stair), nothing else required
+...+....
+...++...
+...+++..
+...++++.
+...++++.
+########
+?######?

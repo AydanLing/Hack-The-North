@@ -114,8 +114,12 @@ def solve(
     deadline_s: float | None = None,
     all_solutions: bool = False,
     max_solutions: int = 64,
+    tether: bool = False,
 ) -> SolveResult:
     """Thread ``cells`` under ``roll`` with exact integer kinematics.
+
+    With ``tether`` the cell outside module 0's mount face (where the cable
+    bundle leaves) must not belong to the target.
 
     A budget stop is always ``TIMEOUT`` unless a complete solution was already
     found, in which case the result is ``FOUND`` but ``exhaustive`` is false.
@@ -311,6 +315,11 @@ def solve(
         if majority is not None and colors[start] != majority:
             continue
         for base in range(len(ORIENTS)):
+            if tether:
+                mount = _direction(base, 0)
+                keep_out = (target[start][0] - mount[0], target[start][1] - mount[1], target[start][2] - mount[2])
+                if keep_out in cell_index:
+                    continue
             cell_path[:] = [start]
             frame_path[:] = [base]
             state_path.clear()

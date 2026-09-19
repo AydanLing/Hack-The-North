@@ -1,0 +1,5 @@
+// truck round 2 (g): 11-wide; preferred = 6-wide box, gap, 3-wide cab with a windshield hole
+?+++++?....
+?+++++?.+.+
+###########
+##?.....?##

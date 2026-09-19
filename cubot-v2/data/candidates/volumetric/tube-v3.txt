@@ -1,0 +1,16 @@
+// standing can: ring x3 + 1 lip cell on top corner + 2 foot cells on ground
+#....
+.....
+.....
+---
+###..
+#.#..
+###..
+---
+###..
+#.#..
+###..
+---
+###..
+#.#..
+#####

@@ -1,0 +1,16 @@
+// can retainer v2: lip split into two corner nubs on the back edge (9 + 16 + 2 = 27)
+#.#
+...
+...
+---
+###
+#.#
+###
+---
+###
+#.#
+###
+---
+###
+###
+###

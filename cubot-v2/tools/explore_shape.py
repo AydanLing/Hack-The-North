@@ -128,7 +128,7 @@ def explore_one(
         row["elapsed_s"] = round(time.monotonic() - started, 2)
         return row
 
-    threaded = solve(cells, machine.roll, all_solutions=True, max_solutions=64)
+    threaded = solve(cells, machine.roll, all_solutions=True, max_solutions=64, tether=machine.has_tether)
     row["thread_status"] = threaded.status.value
     row["threadings"] = len(threaded.solutions)
     if not threaded.found:
@@ -226,7 +226,7 @@ def main() -> int:
             if not report.ok:
                 print(f"{args.name}/{variant_label(mask_path)}: STRUCTURAL FAIL at {report.stage} — {report.reason}")
                 continue
-            threaded = solve(cells, machine.roll, all_solutions=True, max_solutions=64)
+            threaded = solve(cells, machine.roll, all_solutions=True, max_solutions=64, tether=machine.has_tether)
             print(f"{args.name}/{variant_label(mask_path)}: {threaded.status.value}, {len(threaded.solutions)} threadings")
             if threaded.found:
                 exit_code = 0
