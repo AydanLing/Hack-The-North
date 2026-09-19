@@ -1,0 +1,16 @@
+// room-v1: room corner: 3x3 floor with a 3x3 back wall and a 3x3 side wall standing beside it
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+###.
+####
+####
+####
+
+###.
+...#
+...#
+...#
+
+###.
+...#
+...#
+...#

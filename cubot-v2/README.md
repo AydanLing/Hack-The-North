@@ -40,7 +40,12 @@ dependency-free folder (JSON, CSV, PNG, one pure-Python verifier) meant to be
 handed to the MuJoCo sim owner. See `handoff/README.md` for the conventions and
 `handoff/PATHS.md` for the move lists. Regenerate it with
 `uv run python tools/export_handoff.py` after a new planner run; add
-exploration winners with `--manifest` or `--shape NAME=RUN_DIR`.
+exploration winners with `--manifest` or `--shape NAME=RUN_DIR`. The
+committed `handoff/` currently carries 84 paths — the demo seven, the 42
+exploration winners and the 35 loose-passing glyph-atlas candidates
+(`tools/discovery_manifest.py` turns a discovery `summary.json` into the same
+manifest form) — and `../cubot_urdf/make_fold_viewer.py` bundles all of them
+into the interactive fold viewer.
 
 New shapes are found with the **mask-first method** (`docs/METHOD.md`), the
 preferred way unless a task says otherwise: draw a few recognizable 27-cell
@@ -60,6 +65,12 @@ boundary-perturbation *repair* of a hand-drawn concept that is roll-UNSAT, but
 its ranking is a threadability filter, not a recognizability judgment; only
 1.6 % of generated masks thread versus 39 % of hand-drawn ones.
 Recognizability is always decided by a human blind pick.
+
+The first cube is tethered (servo bus and power leave through its mount
+face).  `config/machine.toml` models that bundle as a rigid keep-out on module
+0 (`tether_length_mm`, `tether_width_mm`); every sweep, rest check and
+threading honours it, and `tools/tether_audit.py` replays shipped paths
+against it (`docs/TETHER.md`).
 
 MuJoCo, hardware drivers, voice, and LLM generation are deliberately not
 dependencies of this project. The optional `judge` extra

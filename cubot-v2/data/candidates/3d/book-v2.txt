@@ -1,0 +1,17 @@
+// book-v2: laptop: 6-deep base, 3-high lid, 3 wide
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+######
+######
+######
+
+.....#
+.....#
+.....#
+
+.....#
+.....#
+.....#
+
+.....#
+.....#
+.....#

@@ -1,0 +1,2579 @@
+[
+ {
+  "name": "sun",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "sunshine",
+   "sunny"
+  ]
+ },
+ {
+  "name": "crescent-moon",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "moon",
+   "crescent"
+  ]
+ },
+ {
+  "name": "cloud",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "clouds"
+  ]
+ },
+ {
+  "name": "rain-cloud",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "rain",
+   "raining",
+   "rainy cloud"
+  ]
+ },
+ {
+  "name": "snowflake",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "snow",
+   "snow flake"
+  ]
+ },
+ {
+  "name": "leaf",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "leaves"
+  ]
+ },
+ {
+  "name": "flower",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "daisy",
+   "blossom",
+   "tulip"
+  ]
+ },
+ {
+  "name": "tree",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "pine tree",
+   "pine",
+   "evergreen",
+   "fir tree"
+  ]
+ },
+ {
+  "name": "palm-tree",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "palm"
+  ]
+ },
+ {
+  "name": "cactus",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "cacti"
+  ]
+ },
+ {
+  "name": "mountain",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "mountains",
+   "peak",
+   "hill"
+  ]
+ },
+ {
+  "name": "volcano",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "eruption"
+  ]
+ },
+ {
+  "name": "rainbow",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "arc"
+  ]
+ },
+ {
+  "name": "mushroom",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "toadstool",
+   "fungus"
+  ]
+ },
+ {
+  "name": "flame",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "fire",
+   "campfire",
+   "flames"
+  ]
+ },
+ {
+  "name": "droplet",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "drop",
+   "water drop",
+   "raindrop",
+   "teardrop",
+   "water"
+  ]
+ },
+ {
+  "name": "star",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "five point star",
+   "five-pointed star"
+  ]
+ },
+ {
+  "name": "comet",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "shooting star",
+   "meteor"
+  ]
+ },
+ {
+  "name": "planet",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "saturn",
+   "ringed planet"
+  ]
+ },
+ {
+  "name": "clover",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "four leaf clover",
+   "shamrock"
+  ]
+ },
+ {
+  "name": "feather",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "quill",
+   "plume"
+  ]
+ },
+ {
+  "name": "apple",
+  "category": "nature",
+  "priority": 1,
+  "aliases": []
+ },
+ {
+  "name": "pear",
+  "category": "nature",
+  "priority": 1,
+  "aliases": []
+ },
+ {
+  "name": "cherry",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "cherries"
+  ]
+ },
+ {
+  "name": "carrot",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "root vegetable"
+  ]
+ },
+ {
+  "name": "banana",
+  "category": "nature",
+  "priority": 1,
+  "aliases": []
+ },
+ {
+  "name": "acorn",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "nut"
+  ]
+ },
+ {
+  "name": "tornado",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "twister",
+   "cyclone"
+  ]
+ },
+ {
+  "name": "sunrise",
+  "category": "nature",
+  "priority": 1,
+  "aliases": [
+   "sunset",
+   "horizon"
+  ]
+ },
+ {
+  "name": "wheat",
+  "category": "nature",
+  "priority": 2,
+  "aliases": [
+   "grain",
+   "stalk"
+  ]
+ },
+ {
+  "name": "seedling",
+  "category": "nature",
+  "priority": 2,
+  "aliases": [
+   "sprout",
+   "plant",
+   "potted plant"
+  ]
+ },
+ {
+  "name": "lightning-cloud",
+  "category": "nature",
+  "priority": 2,
+  "aliases": [
+   "storm",
+   "thunderstorm",
+   "storm cloud"
+  ]
+ },
+ {
+  "name": "wave",
+  "category": "nature",
+  "priority": 2,
+  "aliases": [
+   "ocean wave",
+   "tide",
+   "waves"
+  ]
+ },
+ {
+  "name": "cat",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "kitten",
+   "kitty"
+  ]
+ },
+ {
+  "name": "dog",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "puppy",
+   "hound"
+  ]
+ },
+ {
+  "name": "bird",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "sparrow",
+   "songbird",
+   "bird silhouette"
+  ]
+ },
+ {
+  "name": "fish",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "goldfish"
+  ]
+ },
+ {
+  "name": "snake",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "serpent",
+   "cobra"
+  ]
+ },
+ {
+  "name": "rabbit",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "bunny",
+   "hare"
+  ]
+ },
+ {
+  "name": "duck",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "duckling",
+   "rubber duck"
+  ]
+ },
+ {
+  "name": "whale",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "orca"
+  ]
+ },
+ {
+  "name": "turtle",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "tortoise"
+  ]
+ },
+ {
+  "name": "butterfly",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "moth"
+  ]
+ },
+ {
+  "name": "bee",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "bumblebee",
+   "wasp"
+  ]
+ },
+ {
+  "name": "spider",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "tarantula"
+  ]
+ },
+ {
+  "name": "frog",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "toad"
+  ]
+ },
+ {
+  "name": "elephant",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "mammoth"
+  ]
+ },
+ {
+  "name": "giraffe",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "long neck"
+  ]
+ },
+ {
+  "name": "horse",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "pony",
+   "stallion"
+  ]
+ },
+ {
+  "name": "pig",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "hog",
+   "piglet"
+  ]
+ },
+ {
+  "name": "cow",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "bull",
+   "cattle"
+  ]
+ },
+ {
+  "name": "sheep",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "lamb",
+   "ram"
+  ]
+ },
+ {
+  "name": "chicken",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "hen",
+   "rooster",
+   "chick"
+  ]
+ },
+ {
+  "name": "owl",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "owl face"
+  ]
+ },
+ {
+  "name": "penguin",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "bird"
+  ]
+ },
+ {
+  "name": "crab",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "lobster"
+  ]
+ },
+ {
+  "name": "octopus",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "squid"
+  ]
+ },
+ {
+  "name": "dolphin",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "porpoise"
+  ]
+ },
+ {
+  "name": "shark",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "fin"
+  ]
+ },
+ {
+  "name": "seahorse",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "sea horse"
+  ]
+ },
+ {
+  "name": "dinosaur",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "t-rex",
+   "dino",
+   "brontosaurus",
+   "tyrannosaurus"
+  ]
+ },
+ {
+  "name": "bat",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "vampire bat"
+  ]
+ },
+ {
+  "name": "mouse",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "rat",
+   "rodent"
+  ]
+ },
+ {
+  "name": "bear",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "teddy bear"
+  ]
+ },
+ {
+  "name": "fox",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "wolf"
+  ]
+ },
+ {
+  "name": "deer",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "reindeer",
+   "stag",
+   "moose"
+  ]
+ },
+ {
+  "name": "camel",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "dromedary"
+  ]
+ },
+ {
+  "name": "swan",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "goose"
+  ]
+ },
+ {
+  "name": "snail",
+  "category": "animals",
+  "priority": 1,
+  "aliases": [
+   "slug",
+   "escargot"
+  ]
+ },
+ {
+  "name": "flamingo",
+  "category": "animals",
+  "priority": 2,
+  "aliases": [
+   "stork",
+   "heron",
+   "crane"
+  ]
+ },
+ {
+  "name": "kangaroo",
+  "category": "animals",
+  "priority": 2,
+  "aliases": [
+   "wallaby"
+  ]
+ },
+ {
+  "name": "monkey",
+  "category": "animals",
+  "priority": 2,
+  "aliases": [
+   "ape",
+   "gorilla"
+  ]
+ },
+ {
+  "name": "ant",
+  "category": "animals",
+  "priority": 2,
+  "aliases": [
+   "insect",
+   "bug"
+  ]
+ },
+ {
+  "name": "worm",
+  "category": "animals",
+  "priority": 2,
+  "aliases": [
+   "caterpillar",
+   "inchworm"
+  ]
+ },
+ {
+  "name": "ladybug",
+  "category": "animals",
+  "priority": 2,
+  "aliases": [
+   "ladybird",
+   "beetle"
+  ]
+ },
+ {
+  "name": "car",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "automobile",
+   "sedan"
+  ]
+ },
+ {
+  "name": "truck",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "lorry",
+   "pickup",
+   "pickup truck"
+  ]
+ },
+ {
+  "name": "bus",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "school bus",
+   "coach"
+  ]
+ },
+ {
+  "name": "train",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "locomotive",
+   "steam engine",
+   "railway"
+  ]
+ },
+ {
+  "name": "airplane",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "plane",
+   "aeroplane",
+   "jet",
+   "aircraft"
+  ]
+ },
+ {
+  "name": "sailboat",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "sail boat",
+   "yacht",
+   "sailing boat"
+  ]
+ },
+ {
+  "name": "bicycle",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "bike",
+   "cycle"
+  ]
+ },
+ {
+  "name": "motorcycle",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "motorbike",
+   "scooter"
+  ]
+ },
+ {
+  "name": "helicopter",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "chopper",
+   "heli"
+  ]
+ },
+ {
+  "name": "rocket",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "rocket ship",
+   "spaceship",
+   "missile"
+  ]
+ },
+ {
+  "name": "submarine",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "sub",
+   "u-boat"
+  ]
+ },
+ {
+  "name": "tractor",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "farm tractor"
+  ]
+ },
+ {
+  "name": "skateboard",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "skate board",
+   "longboard"
+  ]
+ },
+ {
+  "name": "ufo",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "flying saucer",
+   "saucer"
+  ]
+ },
+ {
+  "name": "tank",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "army tank",
+   "battle tank"
+  ]
+ },
+ {
+  "name": "canoe",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "kayak",
+   "rowboat"
+  ]
+ },
+ {
+  "name": "hot-air-balloon",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "balloon",
+   "hot air balloon"
+  ]
+ },
+ {
+  "name": "wheelbarrow",
+  "category": "vehicles",
+  "priority": 1,
+  "aliases": [
+   "barrow"
+  ]
+ },
+ {
+  "name": "van",
+  "category": "vehicles",
+  "priority": 2,
+  "aliases": [
+   "minivan",
+   "camper"
+  ]
+ },
+ {
+  "name": "ambulance",
+  "category": "vehicles",
+  "priority": 2,
+  "aliases": [
+   "van"
+  ]
+ },
+ {
+  "name": "forklift",
+  "category": "vehicles",
+  "priority": 2,
+  "aliases": [
+   "lift truck"
+  ]
+ },
+ {
+  "name": "tram",
+  "category": "vehicles",
+  "priority": 2,
+  "aliases": [
+   "streetcar"
+  ]
+ },
+ {
+  "name": "house",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "home",
+   "cottage",
+   "hut"
+  ]
+ },
+ {
+  "name": "castle",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "fort",
+   "fortress",
+   "palace"
+  ]
+ },
+ {
+  "name": "tower",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "skyscraper",
+   "high-rise",
+   "block tower"
+  ]
+ },
+ {
+  "name": "bridge",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "arch bridge",
+   "viaduct"
+  ]
+ },
+ {
+  "name": "church",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "chapel",
+   "cathedral",
+   "steeple"
+  ]
+ },
+ {
+  "name": "tent",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "camping",
+   "teepee",
+   "tipi"
+  ]
+ },
+ {
+  "name": "door",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "doorway",
+   "entrance"
+  ]
+ },
+ {
+  "name": "window",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "pane"
+  ]
+ },
+ {
+  "name": "lighthouse",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "beacon"
+  ]
+ },
+ {
+  "name": "windmill",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "wind turbine",
+   "turbine",
+   "pinwheel"
+  ]
+ },
+ {
+  "name": "factory",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "mill",
+   "warehouse"
+  ]
+ },
+ {
+  "name": "barn",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "shed",
+   "farmhouse"
+  ]
+ },
+ {
+  "name": "pyramid",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "pyramids",
+   "tetrahedron"
+  ]
+ },
+ {
+  "name": "igloo",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "dome",
+   "snow house"
+  ]
+ },
+ {
+  "name": "pagoda",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "temple",
+   "shrine"
+  ]
+ },
+ {
+  "name": "arch",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "archway",
+   "gateway"
+  ]
+ },
+ {
+  "name": "fence",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "picket fence",
+   "railing"
+  ]
+ },
+ {
+  "name": "ladder",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "rungs",
+   "step ladder"
+  ]
+ },
+ {
+  "name": "traffic-light",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "stoplight",
+   "traffic signal"
+  ]
+ },
+ {
+  "name": "streetlamp",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "street light",
+   "lamp post",
+   "lamppost"
+  ]
+ },
+ {
+  "name": "bench",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "park bench"
+  ]
+ },
+ {
+  "name": "road-sign",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "signpost",
+   "sign post",
+   "sign"
+  ]
+ },
+ {
+  "name": "well",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "wishing well",
+   "water well"
+  ]
+ },
+ {
+  "name": "gate",
+  "category": "places",
+  "priority": 1,
+  "aliases": [
+   "garden gate"
+  ]
+ },
+ {
+  "name": "silo",
+  "category": "places",
+  "priority": 2,
+  "aliases": [
+   "grain silo"
+  ]
+ },
+ {
+  "name": "stairs",
+  "category": "places",
+  "priority": 2,
+  "aliases": [
+   "steps",
+   "staircase icon"
+  ]
+ },
+ {
+  "name": "mailbox",
+  "category": "places",
+  "priority": 2,
+  "aliases": [
+   "post box",
+   "letterbox",
+   "postbox"
+  ]
+ },
+ {
+  "name": "fountain",
+  "category": "places",
+  "priority": 2,
+  "aliases": [
+   "water fountain"
+  ]
+ },
+ {
+  "name": "monument",
+  "category": "places",
+  "priority": 2,
+  "aliases": [
+   "obelisk",
+   "statue",
+   "washington monument"
+  ]
+ },
+ {
+  "name": "bunk-bed",
+  "category": "places",
+  "priority": 2,
+  "aliases": [
+   "bed",
+   "bunk"
+  ]
+ },
+ {
+  "name": "play",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "play button",
+   "triangle",
+   "play icon"
+  ]
+ },
+ {
+  "name": "pause",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "pause button"
+  ]
+ },
+ {
+  "name": "stop",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "stop button",
+   "stop sign"
+  ]
+ },
+ {
+  "name": "power",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "power button",
+   "on off",
+   "on/off"
+  ]
+ },
+ {
+  "name": "wifi",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "wi-fi",
+   "wireless",
+   "signal bars"
+  ]
+ },
+ {
+  "name": "battery",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "battery icon",
+   "cell"
+  ]
+ },
+ {
+  "name": "magnifier",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "magnifying glass",
+   "search",
+   "loupe"
+  ]
+ },
+ {
+  "name": "gear",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "cog",
+   "cogwheel",
+   "settings"
+  ]
+ },
+ {
+  "name": "target",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "bullseye",
+   "bulls eye",
+   "crosshair"
+  ]
+ },
+ {
+  "name": "clock",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "watch",
+   "time",
+   "alarm clock"
+  ]
+ },
+ {
+  "name": "hourglass",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "sand timer",
+   "timer",
+   "egg timer"
+  ]
+ },
+ {
+  "name": "calendar",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "date",
+   "schedule"
+  ]
+ },
+ {
+  "name": "envelope",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "mail",
+   "email",
+   "letter"
+  ]
+ },
+ {
+  "name": "phone",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "telephone",
+   "handset",
+   "cell phone",
+   "smartphone"
+  ]
+ },
+ {
+  "name": "speech-bubble",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "chat",
+   "comment",
+   "bubble",
+   "speech balloon"
+  ]
+ },
+ {
+  "name": "thumbs-up",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "like",
+   "thumb",
+   "thumbs up"
+  ]
+ },
+ {
+  "name": "infinity",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "infinite",
+   "loop",
+   "figure eight"
+  ]
+ },
+ {
+  "name": "peace",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "peace sign",
+   "peace symbol"
+  ]
+ },
+ {
+  "name": "yin-yang",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "yin yang",
+   "taijitu"
+  ]
+ },
+ {
+  "name": "smiley",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "smiley face",
+   "smile",
+   "happy face",
+   "face"
+  ]
+ },
+ {
+  "name": "skull",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "death",
+   "crossbones",
+   "skeleton"
+  ]
+ },
+ {
+  "name": "ghost",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "spirit",
+   "phantom",
+   "spook"
+  ]
+ },
+ {
+  "name": "robot",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "android",
+   "droid",
+   "bot"
+  ]
+ },
+ {
+  "name": "alien",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "martian",
+   "extraterrestrial",
+   "et"
+  ]
+ },
+ {
+  "name": "music-note",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "note",
+   "eighth note",
+   "quaver",
+   "musical note"
+  ]
+ },
+ {
+  "name": "question-mark",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "question",
+   "?"
+  ]
+ },
+ {
+  "name": "lightbulb",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "light bulb",
+   "bulb",
+   "idea"
+  ]
+ },
+ {
+  "name": "lock",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "padlock",
+   "locked"
+  ]
+ },
+ {
+  "name": "key",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "door key",
+   "skeleton key"
+  ]
+ },
+ {
+  "name": "recycle",
+  "category": "ui",
+  "priority": 1,
+  "aliases": [
+   "recycling",
+   "recycle arrows"
+  ]
+ },
+ {
+  "name": "exclamation",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "exclamation mark",
+   "exclamation point",
+   "!"
+  ]
+ },
+ {
+  "name": "at-sign",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "at",
+   "@",
+   "at symbol"
+  ]
+ },
+ {
+  "name": "ampersand",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "and",
+   "&",
+   "and sign"
+  ]
+ },
+ {
+  "name": "dollar",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "dollar sign",
+   "$",
+   "money"
+  ]
+ },
+ {
+  "name": "percent",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "percent sign",
+   "%"
+  ]
+ },
+ {
+  "name": "hashtag",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "hash",
+   "pound sign",
+   "number sign",
+   "#"
+  ]
+ },
+ {
+  "name": "home",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "home icon",
+   "house icon"
+  ]
+ },
+ {
+  "name": "trash",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "trash can",
+   "bin",
+   "garbage",
+   "waste basket",
+   "rubbish bin"
+  ]
+ },
+ {
+  "name": "download",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "download arrow",
+   "down arrow",
+   "downward arrow"
+  ]
+ },
+ {
+  "name": "refresh",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "reload",
+   "circular arrow",
+   "rotate"
+  ]
+ },
+ {
+  "name": "volume",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "speaker",
+   "loudspeaker",
+   "sound"
+  ]
+ },
+ {
+  "name": "wrench-icon",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "tools",
+   "settings wrench"
+  ]
+ },
+ {
+  "name": "link",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "chain link",
+   "chain"
+  ]
+ },
+ {
+  "name": "pin",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "map pin",
+   "location pin",
+   "marker",
+   "location"
+  ]
+ },
+ {
+  "name": "eye",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "eye icon",
+   "vision",
+   "view"
+  ]
+ },
+ {
+  "name": "cursor",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "pointer",
+   "mouse pointer",
+   "arrow cursor"
+  ]
+ },
+ {
+  "name": "x-mark",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "cross mark",
+   "close",
+   "x",
+   "cancel",
+   "times"
+  ]
+ },
+ {
+  "name": "hand",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "stop hand",
+   "high five",
+   "wave hand"
+  ]
+ },
+ {
+  "name": "fist",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "raised fist",
+   "punch"
+  ]
+ },
+ {
+  "name": "male",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "mars symbol",
+   "male sign"
+  ]
+ },
+ {
+  "name": "female",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "venus symbol",
+   "female sign"
+  ]
+ },
+ {
+  "name": "no-entry",
+  "category": "ui",
+  "priority": 2,
+  "aliases": [
+   "prohibited",
+   "forbidden",
+   "no sign"
+  ]
+ },
+ {
+  "name": "trophy",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "cup trophy",
+   "award",
+   "winner"
+  ]
+ },
+ {
+  "name": "medal",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "prize",
+   "ribbon medal"
+  ]
+ },
+ {
+  "name": "soccer-goal",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "goal",
+   "goalpost",
+   "football goal",
+   "net"
+  ]
+ },
+ {
+  "name": "basketball-hoop",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "hoop",
+   "basket",
+   "basketball net"
+  ]
+ },
+ {
+  "name": "dice",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "die",
+   "dice cube",
+   "cube with dots"
+  ]
+ },
+ {
+  "name": "chess-pawn",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "pawn",
+   "chess piece"
+  ]
+ },
+ {
+  "name": "chess-rook",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "rook",
+   "castle piece",
+   "tower piece"
+  ]
+ },
+ {
+  "name": "chess-knight",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "knight",
+   "horse piece",
+   "chess horse"
+  ]
+ },
+ {
+  "name": "chess-king",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "king",
+   "chess king piece"
+  ]
+ },
+ {
+  "name": "tennis-racket",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "racket",
+   "racquet",
+   "tennis",
+   "badminton racket"
+  ]
+ },
+ {
+  "name": "baseball-bat",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "bat",
+   "club",
+   "cricket bat"
+  ]
+ },
+ {
+  "name": "bowling-pin",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "pin",
+   "skittle"
+  ]
+ },
+ {
+  "name": "kite",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "diamond kite"
+  ]
+ },
+ {
+  "name": "hockey-stick",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "hockey",
+   "stick"
+  ]
+ },
+ {
+  "name": "golf-flag",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "golf",
+   "golf hole",
+   "hole flag",
+   "putting green"
+  ]
+ },
+ {
+  "name": "skis",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "ski",
+   "skiing"
+  ]
+ },
+ {
+  "name": "surfboard",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "surf",
+   "board",
+   "paddle board"
+  ]
+ },
+ {
+  "name": "boxing-glove",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "glove",
+   "boxing"
+  ]
+ },
+ {
+  "name": "whistle",
+  "category": "sports",
+  "priority": 1,
+  "aliases": [
+   "referee whistle"
+  ]
+ },
+ {
+  "name": "dart",
+  "category": "sports",
+  "priority": 2,
+  "aliases": [
+   "arrow dart",
+   "dart board"
+  ]
+ },
+ {
+  "name": "bowling-ball",
+  "category": "sports",
+  "priority": 2,
+  "aliases": [
+   "ball",
+   "bowling"
+  ]
+ },
+ {
+  "name": "puck",
+  "category": "sports",
+  "priority": 2,
+  "aliases": [
+   "hockey puck",
+   "disc"
+  ]
+ },
+ {
+  "name": "weight",
+  "category": "sports",
+  "priority": 2,
+  "aliases": [
+   "kettlebell",
+   "kettle bell"
+  ]
+ },
+ {
+  "name": "flag-checkered",
+  "category": "sports",
+  "priority": 2,
+  "aliases": [
+   "checkered flag",
+   "race flag",
+   "finish flag"
+  ]
+ },
+ {
+  "name": "pizza-slice",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "pizza",
+   "slice"
+  ]
+ },
+ {
+  "name": "ice-cream",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "ice cream cone",
+   "cone",
+   "icecream"
+  ]
+ },
+ {
+  "name": "burger",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "hamburger",
+   "cheeseburger",
+   "sandwich"
+  ]
+ },
+ {
+  "name": "hotdog",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "hot dog",
+   "sausage"
+  ]
+ },
+ {
+  "name": "bottle",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "water bottle",
+   "soda bottle",
+   "flask"
+  ]
+ },
+ {
+  "name": "wine-glass",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "glass",
+   "goblet",
+   "wine"
+  ]
+ },
+ {
+  "name": "teapot",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "kettle",
+   "tea pot"
+  ]
+ },
+ {
+  "name": "fork",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "cutlery"
+  ]
+ },
+ {
+  "name": "spoon",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "ladle"
+  ]
+ },
+ {
+  "name": "knife",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "blade",
+   "dagger",
+   "chef knife"
+  ]
+ },
+ {
+  "name": "cupcake",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "muffin",
+   "cake with cherry"
+  ]
+ },
+ {
+  "name": "cake",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "birthday cake",
+   "layer cake"
+  ]
+ },
+ {
+  "name": "donut",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "doughnut",
+   "ring donut"
+  ]
+ },
+ {
+  "name": "egg",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "fried egg",
+   "oval egg"
+  ]
+ },
+ {
+  "name": "candy",
+  "category": "food",
+  "priority": 1,
+  "aliases": [
+   "lollipop",
+   "sweet",
+   "wrapped candy"
+  ]
+ },
+ {
+  "name": "cheese",
+  "category": "food",
+  "priority": 2,
+  "aliases": [
+   "cheese wedge"
+  ]
+ },
+ {
+  "name": "popsicle",
+  "category": "food",
+  "priority": 2,
+  "aliases": [
+   "ice lolly",
+   "ice pop"
+  ]
+ },
+ {
+  "name": "pretzel",
+  "category": "food",
+  "priority": 2,
+  "aliases": [
+   "pretzel knot"
+  ]
+ },
+ {
+  "name": "chili",
+  "category": "food",
+  "priority": 2,
+  "aliases": [
+   "pepper",
+   "chilli",
+   "hot pepper"
+  ]
+ },
+ {
+  "name": "bread",
+  "category": "food",
+  "priority": 2,
+  "aliases": [
+   "loaf",
+   "toast"
+  ]
+ },
+ {
+  "name": "soup",
+  "category": "food",
+  "priority": 2,
+  "aliases": [
+   "bowl",
+   "bowl of soup"
+  ]
+ },
+ {
+  "name": "coffee-cup",
+  "category": "food",
+  "priority": 2,
+  "aliases": [
+   "coffee",
+   "takeaway cup",
+   "paper cup"
+  ]
+ },
+ {
+  "name": "hammer",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "mallet"
+  ]
+ },
+ {
+  "name": "wrench",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "spanner"
+  ]
+ },
+ {
+  "name": "scissors",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "shears",
+   "snips"
+  ]
+ },
+ {
+  "name": "pencil",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "pen",
+   "pencil icon"
+  ]
+ },
+ {
+  "name": "paintbrush",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "brush",
+   "paint brush"
+  ]
+ },
+ {
+  "name": "book",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "open book",
+   "notebook",
+   "textbook"
+  ]
+ },
+ {
+  "name": "camera",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "photo",
+   "photograph",
+   "camera icon"
+  ]
+ },
+ {
+  "name": "tv",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "television",
+   "monitor",
+   "screen"
+  ]
+ },
+ {
+  "name": "laptop",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "computer",
+   "notebook computer"
+  ]
+ },
+ {
+  "name": "headphones",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "headset",
+   "earphones"
+  ]
+ },
+ {
+  "name": "microphone",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "mic",
+   "mike"
+  ]
+ },
+ {
+  "name": "guitar",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "acoustic guitar",
+   "electric guitar",
+   "ukulele"
+  ]
+ },
+ {
+  "name": "drum",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "snare drum",
+   "drum kit"
+  ]
+ },
+ {
+  "name": "candle",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "candlestick",
+   "taper"
+  ]
+ },
+ {
+  "name": "gift",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "present",
+   "gift box",
+   "wrapped gift"
+  ]
+ },
+ {
+  "name": "lamp",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "desk lamp",
+   "table lamp",
+   "lampshade"
+  ]
+ },
+ {
+  "name": "chair",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "seat",
+   "armchair",
+   "stool"
+  ]
+ },
+ {
+  "name": "table",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "desk",
+   "tabletop"
+  ]
+ },
+ {
+  "name": "glasses",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "spectacles",
+   "eyeglasses",
+   "sunglasses"
+  ]
+ },
+ {
+  "name": "hat",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "top hat",
+   "cap",
+   "fedora"
+  ]
+ },
+ {
+  "name": "shirt",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "t-shirt",
+   "tee",
+   "tshirt"
+  ]
+ },
+ {
+  "name": "pants",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "trousers",
+   "jeans"
+  ]
+ },
+ {
+  "name": "shoe",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "sneaker",
+   "boot",
+   "footwear"
+  ]
+ },
+ {
+  "name": "sock",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "stocking"
+  ]
+ },
+ {
+  "name": "briefcase",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "suitcase",
+   "bag",
+   "luggage"
+  ]
+ },
+ {
+  "name": "shopping-cart",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "cart",
+   "trolley"
+  ]
+ },
+ {
+  "name": "snowman",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "snow man",
+   "frosty"
+  ]
+ },
+ {
+  "name": "christmas-tree",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "xmas tree",
+   "holiday tree"
+  ]
+ },
+ {
+  "name": "pumpkin",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "jack-o-lantern",
+   "jack o lantern",
+   "halloween"
+  ]
+ },
+ {
+  "name": "crown",
+  "category": "objects",
+  "priority": 1,
+  "aliases": [
+   "king crown",
+   "tiara"
+  ]
+ },
+ {
+  "name": "axe",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "hatchet"
+  ]
+ },
+ {
+  "name": "saw",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "handsaw"
+  ]
+ },
+ {
+  "name": "screwdriver",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "driver"
+  ]
+ },
+ {
+  "name": "shovel",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "spade"
+  ]
+ },
+ {
+  "name": "broom",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "sweep",
+   "broomstick"
+  ]
+ },
+ {
+  "name": "bucket",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "pail"
+  ]
+ },
+ {
+  "name": "vase",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "urn",
+   "pot"
+  ]
+ },
+ {
+  "name": "clothes-hanger",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "hanger",
+   "coat hanger"
+  ]
+ },
+ {
+  "name": "toothbrush",
+  "category": "objects",
+  "priority": 2,
+  "aliases": []
+ },
+ {
+  "name": "watering-can",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "can",
+   "sprinkler"
+  ]
+ },
+ {
+  "name": "telescope",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "spyglass"
+  ]
+ },
+ {
+  "name": "bookshelf",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "shelf",
+   "shelves"
+  ]
+ },
+ {
+  "name": "rocking-horse",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "toy horse"
+  ]
+ },
+ {
+  "name": "teddy-bear",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "teddy",
+   "stuffed bear"
+  ]
+ },
+ {
+  "name": "balloon",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "party balloon"
+  ]
+ },
+ {
+  "name": "paper-plane",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "paper airplane",
+   "origami plane"
+  ]
+ },
+ {
+  "name": "puzzle-piece",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "jigsaw",
+   "puzzle"
+  ]
+ },
+ {
+  "name": "sword",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "saber"
+  ]
+ },
+ {
+  "name": "shield",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "crest",
+   "badge"
+  ]
+ },
+ {
+  "name": "magnet",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "horseshoe magnet"
+  ]
+ },
+ {
+  "name": "bomb",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "cartoon bomb"
+  ]
+ },
+ {
+  "name": "battery-charging",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "charging",
+   "plug"
+  ]
+ },
+ {
+  "name": "plug",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "power plug",
+   "socket"
+  ]
+ },
+ {
+  "name": "thermometer",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "temperature"
+  ]
+ },
+ {
+  "name": "syringe",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "needle",
+   "injection"
+  ]
+ },
+ {
+  "name": "pill",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "capsule",
+   "medicine"
+  ]
+ },
+ {
+  "name": "bandage",
+  "category": "objects",
+  "priority": 2,
+  "aliases": [
+   "band aid",
+   "plaster"
+  ]
+ }
+]

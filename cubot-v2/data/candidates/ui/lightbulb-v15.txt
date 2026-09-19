@@ -1,0 +1,10 @@
+// design_search: from lightbulb-r2.txt, distance 11, 5 threadings
+..####
+###..#
+##...#
+#....#
+##...#
+.##..#
+..#.##
+..#.#.
+..###.

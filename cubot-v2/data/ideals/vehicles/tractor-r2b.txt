@@ -1,0 +1,8 @@
+// tractor round 2 (b): v6 neighbourhood with an exhaust stack on the hood
+.##..?..
+###..?..
+###..?..
+#######.
+###...##
+#.#...##
+###.....

@@ -1,0 +1,7 @@
+// truck round 2 (d): same, cab 2 rows required, box 4 wide
+?##?.....
+#??#.....
+#??#.?#?.
+#??#.###.
+#########
+##?...?##

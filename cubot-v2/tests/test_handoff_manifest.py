@@ -17,6 +17,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
+import discovery_manifest  # noqa: E402
 import explore_summary  # noqa: E402
 import export_handoff  # noqa: E402
 
@@ -85,3 +86,37 @@ def test_manifest_schema_is_checked(tmp_path: Path) -> None:
     bad.write_text(json.dumps({"schema": "something-else", "shapes": []}))
     with pytest.raises(ValueError, match="schema"):
         export_handoff.load_manifest(bad)
+
+
+def _candidate(slug: str, record: Path, complete: bool = True, loose: bool = True) -> dict:
+    return {"slug": slug, "concept": slug.rsplit("-v", 1)[0], "complete": complete, "loose_hard_ok": loose,
+            "record": str(record), "moves": 4, "ends_flat": False}
+
+
+def test_discovery_summary_manifest_keeps_loose_passing_slugs(tmp_path: Path) -> None:
+    out = tmp_path / "discovery"
+    for slug in ("hook-v01", "hook-v02", "plus-v01", "x-v01"):
+        (out / "runs" / slug).mkdir(parents=True)
+        (out / "runs" / slug / "record.json").write_text("{}")
+    summary = {"candidates": [
+        _candidate("hook-v01", out / "runs/hook-v01/record.json"),
+        _candidate("hook-v02", out / "runs/hook-v02/record.json"),
+        _candidate("plus-v01", out / "runs/plus-v01/record.json", loose=False),
+        _candidate("x-v01", out / "runs/x-v01/record.json", complete=False),
+    ]}
+
+    manifest_path = discovery_manifest.write_manifest(summary, out)
+    manifest = json.loads(manifest_path.read_text())
+    assert manifest["schema"] == export_handoff.MANIFEST_SCHEMA
+    assert [s["name"] for s in manifest["shapes"]] == ["hook-v01", "hook-v02"]
+    assert manifest["shapes"][0]["run"] == "runs/hook-v01"
+    assert manifest["shapes"][0]["variant"] == "hook-v01"
+
+    entries = export_handoff.load_manifest(manifest_path)
+    assert [e["run"] for e in entries] == [(out / "runs/hook-v01").resolve(), (out / "runs/hook-v02").resolve()]
+    demo = [{"name": n, "run": tmp_path / n, "variant": None} for n in export_handoff.SHAPES]
+    planned = export_handoff.plan_exports(demo, entries)
+    assert [(p["number"], p["name"]) for p in planned[7:]] == [(8, "hook-v01"), (9, "hook-v02")]
+
+    with pytest.raises(SystemExit, match="plus-v01"):
+        discovery_manifest.write_manifest(summary, out, only={"hook-v01", "plus-v01"})

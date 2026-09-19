@@ -1,0 +1,6 @@
+// ufo round 2 (e): 2-row disc with chamfered top corners required, dome preferred, underside lights negotiable
+....+++....
+..+++++++..
+.#########.
+###########
+.?.?.?.?.?.

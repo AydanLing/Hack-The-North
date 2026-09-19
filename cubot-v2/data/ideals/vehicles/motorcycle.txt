@@ -1,0 +1,6 @@
+// ideal for motorcycle: '#' required, '?' negotiable (template motorcycle3; searched with a 1-cell ring of extra '?' and <=3 ring cells used)
+....???..
+????????.
+###...###
+#.#...#.#
+###...###

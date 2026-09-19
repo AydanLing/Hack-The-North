@@ -1,0 +1,5 @@
+// truck round 2: long tall cargo box at the back (left), low cab at the front (right) one row lower, wheel corners under the chassis row; interior negotiable
+?####?...
+#????#?##
+#########
+##?...?##

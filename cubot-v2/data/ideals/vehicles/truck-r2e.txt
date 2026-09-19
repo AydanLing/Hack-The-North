@@ -1,0 +1,6 @@
+// truck round 2 (e): loose region; preferred = tall box at the back, low cab at the front, gap column; only chassis + wheels required
+?+++??????
+?++++?????
+?++++?+++?
+##########
+##?....?##

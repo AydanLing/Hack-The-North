@@ -1,0 +1,6 @@
+// design_search: from cloud.txt, distance 3, 3 threadings
+...###.
+######.
+#######
+#######
+..####.

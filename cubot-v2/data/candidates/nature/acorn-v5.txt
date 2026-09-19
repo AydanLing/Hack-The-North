@@ -1,0 +1,8 @@
+// design_search: from acorn.txt, distance 4, 3 threadings
+...##...
+..######
+########
+...###..
+...###..
+...###..
+....##..

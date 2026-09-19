@@ -224,6 +224,22 @@ def _piece_from_halfspaces(name: str, normals: FloatArray, offsets: FloatArray) 
     return ConvexPiece(name, vertices, _unique_directions(normals), _edges_from_active_planes(vertices, normals, offsets))
 
 
+def tether_piece(side_mm: float, length_mm: float, width_mm: float) -> ConvexPiece:
+    """Rigid keep-out box for the cable bundle leaving a module's mount face.
+
+    Module-local millimetres: the box sits flush against the ``-x`` face
+    (where the previous module would mount), ``length_mm`` long along ``-x``
+    and ``width_mm`` square, centred on the face.
+    """
+
+    if length_mm <= 0.0 or width_mm <= 0.0:
+        raise ValueError("tether box needs positive length and width")
+    half = side_mm / 2.0
+    normals = _unit_rows([(1.0, 0.0, 0.0), (-1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, -1.0, 0.0), (0.0, 0.0, 1.0), (0.0, 0.0, -1.0)])
+    offsets = np.asarray([-half, half + length_mm, width_mm / 2.0, width_mm / 2.0, width_mm / 2.0, width_mm / 2.0], dtype=float)
+    return _piece_from_halfspaces("tether", normals, offsets)
+
+
 def analytic_module_solid(side_mm: float = 80.0, chamfer_mm: float = 8.0) -> ModuleSolid:
     """Return a corner-chamfered cube split by the body-diagonal hinge plane."""
 
@@ -258,6 +274,7 @@ __all__ = [
     "MODULE_SOLID",
     "ModuleSolid",
     "analytic_module_solid",
+    "tether_piece",
     "load_module_solid",
     "solid_geometry_hash",
 ]

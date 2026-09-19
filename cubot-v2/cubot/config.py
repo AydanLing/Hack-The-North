@@ -27,6 +27,15 @@ class Machine:
     joint_angle_deg: float = 120.0
     joint_min_position: int = -1
     joint_max_position: int = 1
+    # Cable bundle leaving module 0 through its mount face (local -x, the face
+    # a preceding module would attach to).  Modelled as a rigid keep-out box:
+    # nothing may sweep through it or rest in the lattice cell it occupies.
+    tether_length_mm: float = 0.0
+    tether_width_mm: float = 40.0
+
+    @property
+    def has_tether(self) -> bool:
+        return self.tether_length_mm > 0.0
 
     @property
     def pitch_mm(self) -> float:
@@ -72,6 +81,8 @@ def _validate_machine(machine: Machine) -> None:
         raise ValueError("CuBot V2 joint detents must be 120 degrees")
     if (machine.joint_min_position, machine.joint_max_position) != (-1, 1):
         raise ValueError("CuBot V2 joints must have positions -1, 0, and +1")
+    if machine.tether_length_mm < 0.0 or machine.tether_width_mm <= 0.0 or machine.tether_width_mm > machine.side_mm:
+        raise ValueError("tether_length_mm must be >= 0 and 0 < tether_width_mm <= side_mm")
 
 
 def load_machine(path: str | Path | None = None) -> Machine:

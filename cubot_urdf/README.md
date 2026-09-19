@@ -18,8 +18,13 @@ checks (roll word read from the mounts, pitch/gap, axes, mass, mesh bounds, span
 wrong, the viewer shows it wrong. Click a module, drive its servo to detents or sweep it, toggle the ideal-cube ghost
 to see what the chamfers and neck remove.
 
-`fold_viewer.html` animates the seven handoff paths (`../cubot-v2/handoff/shapes/*/path.json`) on the same URDF chain:
-pick a shape, play / scrub / step through the moves, or unfold back to the straight chain. `out` moves swing the tail side;
+`fold_viewer.html` animates every handoff path (`../cubot-v2/handoff/shapes/*/path.json` — the demo seven, the 42
+mask-first exploration winners and the 35 loose-passing glyph-atlas candidates, 84 in all) on the same URDF chain. The
+left-hand browser groups them by run family with a thumbnail of each goal silhouette; type in the filter box (`/`) to
+narrow by name, alias or mask variant, `[` / `]` step through the visible shapes, `1`–`7` jump to the demo seven. Pick a
+shape, play / scrub / step through the moves, or unfold back to the straight chain; the *fold pattern* strip shows the
+26 joint states (−120° / 0° / +120°) at the current rest pose over the goal pattern, with the joint that is moving
+outlined. `out` moves swing the tail side;
 `in` moves hold the tail and swing the base side, so the base re-orients and T, N and lightning finish standing on edge,
 exactly as `final_tracked` predicts. At load the page replays every path and checks each rest pose against the planner's
 `cells_after` / `base_after` (the header shows the result). Rest poses are settled onto z = 0 like the planner does; the

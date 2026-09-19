@@ -1,0 +1,6 @@
+// ideal for helicopter: '#' required, '?' negotiable (template helicopter4; searched with a 1-cell ring of extra '?' and <=3 ring cells used)
+#######..
+...##....
+..????...
+..???????
+..???????

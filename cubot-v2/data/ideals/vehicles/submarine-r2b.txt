@@ -1,0 +1,7 @@
+// submarine round 2 (b): lozenge hull required (7/9/7), tower + periscope anywhere on top
+..?????..
+..?????..
+..?????..
+.#######.
+#########
+.#######.

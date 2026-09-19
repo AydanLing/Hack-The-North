@@ -1,8 +1,12 @@
 # CuBot V2 — finalized demo paths (handoff to the MuJoCo sim)
 
-This folder is the complete, self-contained hand-off of the seven finalized
-fold paths — **heart, arrow, lightning, plus, H, T, N** — from the offline
-pre-simulation planner (`cubot-v2`) to the MuJoCo simulation pipeline.
+This folder is the complete, self-contained hand-off of every fold path the
+offline pre-simulation planner (`cubot-v2`) has certified, to the MuJoCo
+simulation pipeline: the seven finalized demo paths — **heart, arrow,
+lightning, plus, H, T, N** (shapes 1–7, the fixed review contract) — followed
+by the 42 mask-first exploration winners (8–49) and the 35 loose-passing
+glyph-atlas discovery candidates (50–84). 84 paths in all; see
+"Appended shapes" below for how the two extra groups differ from the demo seven.
 
 Everything a replay needs is here: the machine constants, the collision hull,
 the roll word, the start pose (including how the straight chain lies on the
@@ -13,9 +17,9 @@ swings, our per-move check results, and renders. Nothing in this folder imports
 | # | shape | moves | loose hard checks | strict | predicted finish | notes |
 |---|-------|------:|-------------------|--------|------------------|-------|
 | 1 | heart | 16 | pass | fail¹ | flat | the original hardware certificate (tether was hand-lifted once at move 12) |
-| 2 | arrow | 23 | pass | fail¹ | flat | open-chevron outline; 2 alternate passing routes |
-| 3 | lightning | 14 | **FAIL** — 6 table-incursion violations | fail | **standing** | only complete route found; no loose-passing plan exists yet |
-| 4 | plus | 22 | pass | fail¹ | flat | thick cross (family entry 32951); 6 alternate passing routes |
+| 2 | arrow | 24 | pass | fail¹ | flat | open-chevron outline; re-folded 2026-09-19 for the module-0 tether; 1 alternate passing routes |
+| 3 | lightning | 15 | pass | fail¹ | flat | re-folded 2026-09-19 with the module-0 tether modelled; first loose-passing lightning plan |
+| 4 | plus | 23 | pass | fail¹ | flat | thick cross; re-folded 2026-09-19 for the module-0 tether; 3 alternate passing routes |
 | 5 | h | 11 | pass | fail¹ | flat | |
 | 6 | t | 6 | pass | fail¹ | **standing** | |
 | 7 | n | 10 | pass | fail¹ | **standing** | |
@@ -25,40 +29,75 @@ neighbours against strict's 0 mm penetration limit (loose allows 6 mm). It is
 a modelling artefact of the conservative hull, not a real collision.
 
 `PATHS.md` is a generated digest with the silhouette and full move list of
-every shape; `index.json` is the same table for machines. **No human pick has
+every shape (all 84); `index.json` is the same table for machines. **No human pick has
 been recorded yet** (`human_pick: null` everywhere) — "finalized" here means
 these are the routes the planner shipped for the seven demo icons, reviewed on
 `contact-sheet-labeled.png`.
 
 ## Two things to read before simulating
 
-1. **Three shapes are predicted to finish standing up, not lying flat.**
-   T, N and lightning end with the drawing plane vertical, balanced on a
+1. **Some shapes are predicted to finish standing up, not lying flat.**
+   Of the demo seven, T and N end with the drawing plane vertical, balanced on a
    one-cube-wide edge (final support margin exactly +40 mm = half a cube).
    The reason: an `in` move swings the *base* side while the tail stays put,
    so the world orientation of the finished shape is a consequence of the
    move sides, not of the design. The record's nominal `goal.base` (what the
    `top.png` renders show) is *not* where the shape ends up. `path.json`
    carries both: `goal` (nominal) and `final_tracked` (predicted, with
-   `ends_flat_on_table`). Heart, arrow, plus and H finish flat.
+   `ends_flat_on_table`). Heart, arrow, lightning, plus and H finish flat.
    Whether a standing T is acceptable for the demo (it does read as a T from
    the side) or these need re-planning with a different lay-down is a human
    decision — the sim should simply report the orientation it ends on.
+   (After the tether re-fold the set of standing finishes changed; read
+   `final_tracked.ends_flat_on_table` per shape rather than this list.)
 
-2. **Lightning is not a passing plan.** It is shipped so the sim can measure
-   it, but six of its fourteen moves dip the moving side 49–328 mm into the
-   table in our sampled sweep (limit 40 mm). Expect it to fail physically.
+2. **Module 0 is tethered, and every path here respects that.** A cable
+   bundle leaves the first cube through its mount face (the face a preceding
+   module would attach to; module-local `-x`). `machine.json` models it as a
+   rigid keep-out box (`tether_length_mm` = 82, `tether_width_mm` = 40) that
+   rides with module 0's still half: no module may sweep through it, occupy
+   the lattice cell behind module 0 at rest, or push it into the table. On
+   2026-09-19 all 84 paths were re-audited against it (`tools/tether_audit.py`)
+   and the 36 that violated it — mostly by an opening `(0, ±1, in)` flip that
+   turned the cable into the table — were re-folded from their authored
+   masks. Lightning's re-fold is now a loose-passing plan (15 moves) rather
+   than the measured-only fallback shipped earlier. In the sim, give module 0
+   the same keep-out and expect zero contacts with it.
+
+## Appended shapes (8–84)
+
+Everything after the demo seven was found by one of the two discovery methods
+and exported through the very same replay and consistency checks
+(`tools/export_handoff.py --manifest`), so the files, fields and conventions
+are identical. What differs is provenance and review status:
+
+| # | group | count | how they were found | manifest |
+|---|-------|------:|---------------------|----------|
+| 8–49 | mask-first exploration | 42 | hand-drawn 27-cell masks, gated by an exact shipped-roll threading, folded exactly (`docs/METHOD.md`, `docs/EXPLORATION-20260919.md`) | `out/explore-20260919/handoff-manifest.json` from `tools/explore_summary.py` |
+| 50–84 | glyph-atlas discovery | 35 | generated atlas variants ranked offline, then folded (`docs/DISCOVERY.md`); names keep the atlas slug (`c-v01`), so several concepts appear twice (`hook-v01` / `hook-v02`) or also exist as an exploration winner (`c` vs `c-v01`) | `out/discovery-20260919/handoff-manifest.json` from `tools/discovery_manifest.py` |
+
+- `path.json → provenance.source_record` says which run family a shape came
+  from; `provenance.mask_variant` is the mask / atlas slug that was folded.
+- Every appended shape is kinematically complete and passes the **loose** hard
+  checks (that was the admission rule; the 21 discovery candidates that fold but
+  violate loose are not exported). Strict fails everywhere for the same 0.398 mm
+  artefact as the demo seven.
+- Many appended shapes finish **standing** (see `ends_flat_on_table` in
+  `index.json`) — the same `in`-move effect described above.
+- No human pick has been recorded for any of them either; they are candidates,
+  not a curated set. Recognizability was judged on the blind contact sheets in
+  `docs/exploration-20260919/` and `docs/discovery-20260919/`.
 
 ## Folder layout
 
 ```
 handoff/
 ├── README.md                 this file — conventions and field reference
-├── PATHS.md                  generated digest: silhouettes + move lists for all seven
+├── PATHS.md                  generated digest: silhouettes + move lists for all 84
 ├── index.json                one row per shape (status, move count, bases, files)
 ├── machine.json              constants: 27 modules, 80 mm cube, 82 mm pitch, roll word, servo, check profiles
 ├── module_solid.json         conservative convex hull of one module (full / still / moving pieces), mm
-├── contact-sheet-labeled.png the seven goal silhouettes, numbered
+├── contact-sheet-labeled.png the seven demo goal silhouettes, numbered (exploration / atlas sheets live under docs/)
 ├── contact-sheet-blind.png   same, unlabeled (for blind recognizability review)
 ├── tools/replay.py           dependency-free verifier / pretty-printer (python3 tools/replay.py shapes/*/path.json)
 └── shapes/
@@ -70,6 +109,8 @@ handoff/
     │   ├── iso.png           isometric render of the goal
     │   └── engineering.png   top view with module numbers (0 = base ... 26 = tail)
     ├── 02-arrow/  03-lightning/  04-plus/  05-h/  06-t/  07-n/   (same files)
+    ├── 08-c/ … 49-a/                 mask-first exploration winners (same files)
+    └── 50-hook-v01/ … 84-check-v01/  glyph-atlas discovery candidates (same files)
 ```
 
 ## Conventions (the contract)

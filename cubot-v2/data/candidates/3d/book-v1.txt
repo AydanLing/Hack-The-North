@@ -1,0 +1,21 @@
+// book-v1: open book: two 5x3 plates at right angles
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+#####
+#####
+#####
+
+....#
+....#
+....#
+
+....#
+....#
+....#
+
+....#
+....#
+....#
+
+....#
+....#
+....#
