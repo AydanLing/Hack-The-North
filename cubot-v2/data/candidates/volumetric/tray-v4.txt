@@ -1,0 +1,12 @@
+// tray v4: 3x5 floor + rim with mid-edge gap on the long side + spout tab on the ground outside the gap (15 + 11 + 1 = 27)
+.###
+.#.#
+...#
+.#.#
+.###
+---
+.###
+.###
+####
+.###
+.###

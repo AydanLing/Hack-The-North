@@ -1,0 +1,16 @@
+// can retainer / open box: 3x3 floor + 2-tall rim + 2-cell lip on the back-left top edge (9 + 16 + 2 = 27)
+##.
+...
+...
+---
+###
+#.#
+###
+---
+###
+#.#
+###
+---
+###
+###
+###

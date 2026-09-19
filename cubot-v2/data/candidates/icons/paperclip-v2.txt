@@ -1,0 +1,10 @@
+// paperclip: inner loop shorter, outer left reaches top
+.#.###.
+.#.#.#.
+.#.#.#.
+.#.#.#.
+.#.#.#.
+.#...#.
+.#...#.
+.#...#.
+.#####.

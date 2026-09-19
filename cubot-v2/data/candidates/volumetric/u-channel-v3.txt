@@ -1,0 +1,16 @@
+// U-channel v3: 3x7 floor + two 3-long side walls centred (21 + 6 = 27), 2 layers
+...
+...
+#.#
+#.#
+#.#
+...
+...
+---
+###
+###
+###
+###
+###
+###
+###

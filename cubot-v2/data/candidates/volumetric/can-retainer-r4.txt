@@ -1,0 +1,16 @@
+// repaired from can-retainer-v1.txt: moved (0, 0, 0) -> (2, 0, 3); 3 threadings; dense 15
+##.
+...
+..#
+---
+###
+#.#
+###
+---
+###
+#.#
+###
+---
+###
+###
+.##

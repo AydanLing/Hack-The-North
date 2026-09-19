@@ -12,3 +12,4 @@ joint_min_position = -1        # no alternate winding beyond -120 degrees
 joint_max_position = 1         # no alternate winding beyond +120 degrees
 tether_length_mm = 82.0        # cable bundle out of module 0 mount face (-x): rigid keep-out, one pitch long
 tether_width_mm = 40.0         # square cross-section of that keep-out, centred on the face
+tether_facets = 4              # 4 = square box of tether_width_mm (this model); 8 = round bundle of that diameter

@@ -1,0 +1,16 @@
+// standing can: rings 7(bottom, corner notch)+8+8, 4-cell L lip on top
+##.
+#..
+#..
+---
+###
+#.#
+###
+---
+###
+#.#
+###
+---
+###
+#.#
+##.

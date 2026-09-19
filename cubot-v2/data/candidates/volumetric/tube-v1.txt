@@ -1,0 +1,16 @@
+// standing square tube: 3x3 ring x3 + 3-cell side tail on top (roll-UNSAT as drawn; repair base)
+#..
+#..
+#..
+---
+###
+#.#
+###
+---
+###
+#.#
+###
+---
+###
+#.#
+###

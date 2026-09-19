@@ -1,0 +1,15 @@
+// tray v2: 4x4 floor + 3-sided rim (open front) + 1 post cell on the back-left rim corner (16 + 10 + 1 = 27)
+#...
+....
+....
+....
+---
+####
+#..#
+#..#
+#..#
+---
+####
+####
+####
+####

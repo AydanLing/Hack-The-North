@@ -1,0 +1,11 @@
+// pencil: eraser nub, 3x8 body, 2-cell chisel tip
+#..
+###
+###
+###
+###
+###
+###
+###
+###
+##.

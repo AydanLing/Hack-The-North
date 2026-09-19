@@ -1,0 +1,16 @@
+// can with a door: bottom ring 7 (front gap), 2 full rings, 3-lip on back top + 1 nub front top
+###
+...
+.#.
+---
+###
+#.#
+###
+---
+###
+#.#
+###
+---
+#.#
+#.#
+###

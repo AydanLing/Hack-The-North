@@ -32,6 +32,7 @@ class Machine:
     # nothing may sweep through it or rest in the lattice cell it occupies.
     tether_length_mm: float = 0.0
     tether_width_mm: float = 40.0
+    tether_facets: int = 4  # 4 = square box of tether_width_mm; 8 = round bundle of that diameter
 
     @property
     def has_tether(self) -> bool:
@@ -83,6 +84,8 @@ def _validate_machine(machine: Machine) -> None:
         raise ValueError("CuBot V2 joints must have positions -1, 0, and +1")
     if machine.tether_length_mm < 0.0 or machine.tether_width_mm <= 0.0 or machine.tether_width_mm > machine.side_mm:
         raise ValueError("tether_length_mm must be >= 0 and 0 < tether_width_mm <= side_mm")
+    if machine.tether_facets < 3:
+        raise ValueError("tether_facets must be >= 3 (4 = square box, 8 = round bundle)")
 
 
 def load_machine(path: str | Path | None = None) -> Machine:

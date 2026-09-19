@@ -1,0 +1,12 @@
+// arch 3 wide: 3x5 lintel, posts 3x2 with one-cell overhang on one end only
+#####
+#####
+#####
+---
+#..#.
+#..#.
+#..#.
+---
+#..#.
+#..#.
+#..#.

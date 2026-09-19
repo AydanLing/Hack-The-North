@@ -1,0 +1,15 @@
+// repaired from cube-outline-v1.txt: moved (0, 3, 3) -> (1, 2, 0); 6 threadings; dense 16
+###
+#.#
+###
+...
+---
+###
+#.#
+###
+...
+---
+###
+###
+###
+##.

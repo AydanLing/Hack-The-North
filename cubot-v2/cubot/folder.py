@@ -16,6 +16,8 @@ Two details are important for callers:
 
 from __future__ import annotations
 
+import numpy as np
+
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field, replace
 import heapq
@@ -28,7 +30,6 @@ from .config import Machine, Profile, load_machine, load_profile
 from .lattice import (
     apply_detent,
     base_rot_orientation,
-    fk,
     lying_variants,
     pose_cells,
 )
@@ -186,16 +187,23 @@ def aggregate_reports(moves: Sequence[Move]) -> CheckReport:
 
 
 def tether_cell(pose: Pose) -> tuple[int, int, int]:
-    """Lattice cell just outside module 0's mount face, where the cable bundle leaves."""
+    """The lattice cell behind module 0's free face, where its wire bundle lives."""
 
     from .lattice import DIRS
 
-    cells, orients = fk(pose.states, pose.roll, pose.base)
-    direction = DIRS[orients[0], 0]
-    return (cells[0][0] - int(direction[0]), cells[0][1] - int(direction[1]), cells[0][2] - int(direction[2]))
+    cells = pose_cells(pose)
+    direction = DIRS[pose.base, 0]
+    return tuple(int(v) for v in (np.asarray(cells[0]) - np.asarray(direction)))
 
 
 def _rest_report(after: Pose, machine: Machine | None = None, profile: Profile | None = None) -> CheckReport:
+    """Lattice-level rest checks, plus the tether rules when the machine has a cable bundle.
+
+    Without a ``machine`` the shipped one is assumed, i.e. the tether rules
+    apply (``machine.has_tether`` switches them off for a bare chain).  With a
+    ``profile`` the keep-out's actual table incursion at rest is measured too.
+    """
+
     cells = pose_cells(after)
     unique = len(set(cells))
     report = CheckReport(
@@ -203,26 +211,37 @@ def _rest_report(after: Pose, machine: Machine | None = None, profile: Profile |
             "rest_cell_overlap": (
                 unique == len(cells),
                 f"{len(cells) - unique} duplicate occupied lattice cells at rest",
-            )
+            ),
         },
         measurements={"rest_unique_cells": unique},
     )
-    if machine is not None and machine.has_tether:
-        keep_out = tether_cell(after)
-        occupied = keep_out in set(cells)
-        report.hard["tether_cell"] = (
-            not occupied,
-            f"cell {keep_out} outside module 0's mount face is {'occupied by a module' if occupied else 'clear'} at rest",
-        )
-        if profile is not None:
-            from .geometry import tether_rest_depth
+    if machine is not None and not machine.has_tether:
+        return report
+    wire = tether_cell(after)
+    wire_clear = wire not in set(cells)
+    lowest = min(cell[2] for cell in cells)
+    wire_down = wire[2] < cells[0][2] and cells[0][2] == lowest
+    report.hard["tether_cell"] = (
+        wire_clear,
+        f"cell {wire} outside module 0's mount face is clear at rest"
+        if wire_clear
+        else f"a module rests in the wire cell {wire} outside module 0's mount face",
+    )
+    report.hard["tether_down"] = (
+        not wire_down,
+        "wire bundle does not point into the resting surface"
+        if not wire_down
+        else "module 0 rests on the lowest layer with its wire bundle pointing down",
+    )
+    if machine is not None and profile is not None:
+        from .geometry import tether_rest_depth
 
-            depth = tether_rest_depth(after, machine)
-            report.hard["tether_ground"] = (
-                depth <= profile.ground_hard_mm + 1e-6,
-                f"tether keep-out enters the table {depth:.3f} mm at rest (limit {profile.ground_hard_mm:.3f} mm)",
-            )
-            report.measurements["tether_rest_depth_mm"] = depth
+        depth = tether_rest_depth(after, machine)
+        report.hard["tether_ground"] = (
+            depth <= profile.ground_hard_mm + 1e-6,
+            f"tether keep-out enters the table {depth:.3f} mm at rest (limit {profile.ground_hard_mm:.3f} mm)",
+        )
+        report.measurements["tether_rest_depth_mm"] = depth
     return report
 
 
@@ -242,7 +261,7 @@ def _early_geometry_rejection(
     """
 
     from .geometry import _evaluate_sample, _pose_frames
-    from .solid import MODULE_SOLID
+    from .solid import MODULE_SOLID, TETHER_MODULE
 
     frames = _pose_frames(pose, machine)
     max_depth = 0.0
@@ -262,8 +281,11 @@ def _early_geometry_rejection(
         max_depth = max(max_depth, max((hit.depth_mm for hit in collisions), default=0.0))
         max_ground = max(
             max_ground,
-            max((hit.depth_mm for hit in ground if not hit.pivot_piece), default=0.0),
+            max((hit.depth_mm for hit in ground if not hit.pivot_piece and hit.module != TETHER_MODULE), default=0.0),
         )
+        # The tether's own table contact obeys the table rule (``ground_hard_mm``),
+        # like a module's: it is a rigid stand-in for a cable that really bends.
+        max_ground = max(max_ground, max((hit.depth_mm for hit in ground if hit.module == TETHER_MODULE), default=0.0))
         if (
             max_depth > profile.hard_penetration_mm + 1e-6
             or max_ground > profile.ground_hard_mm + 1e-6
