@@ -1,0 +1,7 @@
+// sailboat round 2 (b): mast column required, sail stair preferred, two-row hull core required, edges negotiable
+...?#?....
+...?#+?...
+...?#++?..
+...?#+++?.
+?+#######+
+??+#####+?

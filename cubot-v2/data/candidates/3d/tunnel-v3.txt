@@ -1,0 +1,9 @@
+// tunnel-v3: bench: 3-wide, legs 1 high, span 7
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+#.....#
+#.....#
+#.....#
+
+#######
+#######
+#######

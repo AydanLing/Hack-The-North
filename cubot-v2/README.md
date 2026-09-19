@@ -66,6 +66,12 @@ its ranking is a threadability filter, not a recognizability judgment; only
 1.6 % of generated masks thread versus 39 % of hand-drawn ones.
 Recognizability is always decided by a human blind pick.
 
+The first cube is tethered (servo bus and power leave through its mount
+face).  `config/machine.toml` models that bundle as a rigid keep-out on module
+0 (`tether_length_mm`, `tether_width_mm`); every sweep, rest check and
+threading honours it, and `tools/tether_audit.py` replays shipped paths
+against it (`docs/TETHER.md`).
+
 MuJoCo, hardware drivers, voice, and LLM generation are deliberately not
 dependencies of this project. The optional `judge` extra
 (`uv sync --extra judge`) enables a Claude blind-naming annotation on the

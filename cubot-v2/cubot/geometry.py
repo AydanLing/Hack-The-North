@@ -7,6 +7,8 @@ convex SAT penetration, and table clearance.
 
 from __future__ import annotations
 
+import functools
+
 from dataclasses import dataclass, field
 import math
 from typing import Iterable
@@ -313,6 +315,32 @@ def _rotate_positions(points: FloatArray, pivot: FloatArray, rotation: FloatArra
     return (points - pivot) @ rotation.T + pivot
 
 
+@functools.lru_cache(maxsize=8)
+def _tether_piece(side_mm: float, length_mm: float, width_mm: float) -> ConvexPiece:
+    from .solid import tether_piece
+
+    return tether_piece(side_mm, length_mm, width_mm)
+
+
+def tether_transform(pose: Pose, machine: Machine, *, base_frames: tuple[FloatArray, FloatArray] | None = None) -> Transform | None:
+    """World placement of the tether keep-out at rest (module 0's still-half frame), or ``None``."""
+
+    if not machine.has_tether:
+        return None
+    centers, rotations = base_frames if base_frames is not None else _pose_frames(pose, machine)
+    return Transform(np.asarray(rotations[0], dtype=float), np.asarray(centers[0], dtype=float))
+
+
+def tether_rest_depth(pose: Pose, machine: Machine) -> float:
+    """Table incursion of the tether keep-out in the settled rest pose, mm."""
+
+    transform = tether_transform(pose, machine)
+    if transform is None:
+        return 0.0
+    piece = _tether_piece(machine.side_mm, machine.tether_length_mm, machine.tether_width_mm)
+    return ground_depth(piece, transform)
+
+
 def _sample_placements(
     pose: Pose,
     machine: Machine,
@@ -330,6 +358,14 @@ def _sample_placements(
     axis = rotations[joint] @ solid.joint_axis
     start_angle = pose.states[joint] * DETENT_RAD
     start_moving_rotation = rotations[joint] @ rotation_about_axis(solid.joint_axis, start_angle)
+    # The cable bundle is rigid with module 0's still half: static on ``out``
+    # moves, swinging with the base side on ``in`` moves.  It shares module
+    # index 0 so its designed contact with module 0 itself is not a collision.
+    tether = (
+        _tether_piece(machine.side_mm, machine.tether_length_mm, machine.tether_width_mm)
+        if machine.has_tether
+        else None
+    )
 
     static: list[_PlacedPiece] = []
     moving: list[_PlacedPiece] = []
@@ -338,6 +374,8 @@ def _sample_placements(
         for module in range(joint):
             static.append(_PlacedPiece(module, "full", solid.full, Transform(rotations[module], centers[module])))
         static.append(_PlacedPiece(joint, "still", solid.still, Transform(rotations[joint], pivot), True))
+        if tether is not None:
+            static.append(_PlacedPiece(0, "tether", tether, Transform(rotations[0], centers[0])))
         moving.append(
             _PlacedPiece(
                 joint,
@@ -365,6 +403,9 @@ def _sample_placements(
                 moving.append(
                     _PlacedPiece(module, "full", solid.full, Transform(world_rotation @ rotations[module], center))
                 )
+        if tether is not None:
+            tether_center = _rotate_positions(centers[:1], pivot, world_rotation)[0]
+            moving.append(_PlacedPiece(0, "tether", tether, Transform(world_rotation @ rotations[0], tether_center)))
         for module in range(joint + 1, len(centers)):
             static.append(_PlacedPiece(module, "full", solid.full, Transform(rotations[module], centers[module])))
     return static, moving

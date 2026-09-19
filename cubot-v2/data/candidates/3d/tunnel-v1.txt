@@ -1,0 +1,17 @@
+// tunnel-v1: gate: 3-wide, legs 3 high, span 3
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+#.#
+#.#
+#.#
+
+#.#
+#.#
+#.#
+
+#.#
+#.#
+#.#
+
+###
+###
+###

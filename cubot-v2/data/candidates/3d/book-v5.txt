@@ -1,0 +1,25 @@
+// book-v5: monitor: 4-deep base, 6-high screen, 3 wide
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+####
+####
+####
+
+...#
+...#
+...#
+
+...#
+...#
+...#
+
+...#
+...#
+...#
+
+...#
+...#
+...#
+
+...#
+...#
+...#

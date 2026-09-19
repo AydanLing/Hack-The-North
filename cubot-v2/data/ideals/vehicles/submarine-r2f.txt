@@ -1,0 +1,7 @@
+// submarine round 2 (f): periscope + tower required, 3-row hull preferred with negotiable ends and interior
+....#....
+....#....
+..?###?..
+?+++++++?
+?+++++++?
+??+++++??

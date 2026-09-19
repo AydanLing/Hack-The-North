@@ -1,0 +1,9 @@
+// book-v4: tray: 8-long base with a 2-high lip, 3 wide
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+########
+########
+########
+
+.......#
+.......#
+.......#

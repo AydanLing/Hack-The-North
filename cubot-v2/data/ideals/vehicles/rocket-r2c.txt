@@ -1,0 +1,10 @@
+// rocket round 2 (c): fin base required, body/nose preferred but negotiable (porthole allowed), flame negotiable
+..++..
+.++++.
+.++++.
+.++++.
+.++++.
+##++##
+######
+.?++?.
+..??..

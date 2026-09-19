@@ -1,0 +1,13 @@
+// helix-v3: spiral ramp: helix around a 3x3 core, axis along x
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+##..##..#
+#...#...#
+#..##..##
+
+.#...#...
+.........
+...#...#.
+
+.##..##..
+..#...#..
+..##..##.

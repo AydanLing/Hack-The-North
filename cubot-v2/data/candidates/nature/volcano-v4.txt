@@ -1,0 +1,6 @@
+// design_search: from volcano.txt, distance 4, 6 threadings
+..#.##.
+###.##.
+#####..
+#######
+#######

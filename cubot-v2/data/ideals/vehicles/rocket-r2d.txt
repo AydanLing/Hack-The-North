@@ -1,0 +1,11 @@
+// rocket round 2 (d): 3-wide body with 2-1 nose, fins flaring at the bottom, nozzle/flame below the fins; only the fin row and nozzle required
+..+..
+.+++.
+.+++.
+.+++.
+.+++.
+.+++.
+#+++#
+##+##
+.?#?.
+.?+?.

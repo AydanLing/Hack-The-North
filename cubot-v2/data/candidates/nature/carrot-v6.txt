@@ -1,0 +1,10 @@
+// r2 walk carrot-r2g.txt: bushy notched tuft wider than the cone, 1-wide tail
+.####..
+##.##..
+#######
+..###..
+..###..
+..###..
+..#....
+..#....
+..#....

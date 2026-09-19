@@ -1,0 +1,6 @@
+// ufo round 2 (c): chamfered 3-row 10-wide disc required, dome preferred
+....??....
+..++++++..
+.########.
+##########
+.########.

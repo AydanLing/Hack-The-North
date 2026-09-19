@@ -1,0 +1,19 @@
+// wire-v4: box frame: 5x5x3 wire cycle, one y-edge cell dropped
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+#####
+....#
+.....
+....#
+#####
+
+#....
+.....
+.....
+.....
+#....
+
+#####
+....#
+....#
+....#
+#####

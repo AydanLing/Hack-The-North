@@ -1,0 +1,5 @@
+// ufo round 2 (d): 2-row disc with chamfered bottom corners required (corner tips are the chain ends), dome preferred
+....+++....
+..+++++++..
+###########
+.#########.

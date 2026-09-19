@@ -1,0 +1,18 @@
+# ``loose`` with the table removed: the chain starts on a raised platform or a
+# table edge so intermediate 3-D poses may dip below the start plane.  Second
+# tier for volumetric shells (CUBOT_V2_PLAN.md section 2.4); never a substitute
+# for a ``loose`` verdict in handoff.
+[profile]
+sweep_step_deg = 4.0
+hard_penetration_mm = 6.0
+soft_penetration_mm = 1.0
+pivot_dip_exempt_mm = 3.0
+ground_soft_mm = 1000000000.0
+ground_hard_mm = 1000000000.0
+torque_cap_nm = 5.8
+torque_stall_nm = 10.6
+balance_margin_mm = -20.0
+fold_budget_s = 30.0
+node_budget = 200000
+detour_budget = 8
+side_ambiguity_ratio = 0.85

@@ -1,0 +1,6 @@
+// truck round 2 (c): box 3 rows over chassis, gap column, cab 1 row (+ optional 2nd row) over chassis, wheel corners
+?###?.....
+#???#.....
+#???#.?##?
+##########
+##?....?##

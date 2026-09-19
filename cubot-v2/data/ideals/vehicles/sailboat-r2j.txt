@@ -1,0 +1,8 @@
+// sailboat round 2 (j): tapered hull (9 over 7, corners are the chain ends) required, sail region negotiable
+...?+?...
+...?++?..
+...?+++?.
+...?++++?
+...?+....
+#########
+.#######.

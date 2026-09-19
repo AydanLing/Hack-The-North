@@ -28,6 +28,7 @@ from .config import Machine, Profile, load_machine, load_profile
 from .lattice import (
     apply_detent,
     base_rot_orientation,
+    fk,
     lying_variants,
     pose_cells,
 )
@@ -184,10 +185,20 @@ def aggregate_reports(moves: Sequence[Move]) -> CheckReport:
     return aggregate
 
 
-def _rest_report(after: Pose) -> CheckReport:
+def tether_cell(pose: Pose) -> tuple[int, int, int]:
+    """Lattice cell just outside module 0's mount face, where the cable bundle leaves."""
+
+    from .lattice import DIRS
+
+    cells, orients = fk(pose.states, pose.roll, pose.base)
+    direction = DIRS[orients[0], 0]
+    return (cells[0][0] - int(direction[0]), cells[0][1] - int(direction[1]), cells[0][2] - int(direction[2]))
+
+
+def _rest_report(after: Pose, machine: Machine | None = None, profile: Profile | None = None) -> CheckReport:
     cells = pose_cells(after)
     unique = len(set(cells))
-    return CheckReport(
+    report = CheckReport(
         hard={
             "rest_cell_overlap": (
                 unique == len(cells),
@@ -196,6 +207,23 @@ def _rest_report(after: Pose) -> CheckReport:
         },
         measurements={"rest_unique_cells": unique},
     )
+    if machine is not None and machine.has_tether:
+        keep_out = tether_cell(after)
+        occupied = keep_out in set(cells)
+        report.hard["tether_cell"] = (
+            not occupied,
+            f"cell {keep_out} outside module 0's mount face is {'occupied by a module' if occupied else 'clear'} at rest",
+        )
+        if profile is not None:
+            from .geometry import tether_rest_depth
+
+            depth = tether_rest_depth(after, machine)
+            report.hard["tether_ground"] = (
+                depth <= profile.ground_hard_mm + 1e-6,
+                f"tether keep-out enters the table {depth:.3f} mm at rest (limit {profile.ground_hard_mm:.3f} mm)",
+            )
+            report.measurements["tether_rest_depth_mm"] = depth
+    return report
 
 
 def _early_geometry_rejection(
@@ -343,7 +371,7 @@ def check_move(
     except ValueError as exc:
         return CheckReport(hard={"winding": (False, str(exc))})
     after = next_pose(pose, move)
-    rest = _rest_report(after)
+    rest = _rest_report(after, machine, profile)
 
     # Imports stay local so lattice-only tools can import ``cubot.folder`` even
     # in minimal installations, and to keep the mechanics boundary explicit.
@@ -877,7 +905,7 @@ def fold(
                     break
                 move = Move(joint, delta, side, machine.move_time_s)
                 after = next_pose(node.pose, move)
-                rest = _rest_report(after)
+                rest = _rest_report(after, machine)
                 if not rest.hard_ok:
                     failed_move = Move(
                         move.joint,
@@ -1019,4 +1047,5 @@ __all__ = [
     "replay_forward",
     "replay_heart",
     "replay_tracked",
+    "tether_cell",
 ]
