@@ -236,3 +236,36 @@ should stay an offline cache-building operation.
   with `cubot library pick ... --root out/discovery-20260919/library`.
 - Digest committed as `docs/DISCOVERY.md`; the folded blind and labeled
   contact sheets are copied to `docs/discovery-20260919/`.
+
+## 2026-09-19 — exploration of 47 new common structures
+
+- Command: `uv run python tools/explore_shape.py --name <shape> [--gate-only]
+  data/candidates/<category>/<shape>-v*.txt`, run by five parallel workers
+  (letters ×2, digits, geometric, icons), then a verification pass of every best
+  variant with `-k 2 --time-budget 150` and a second pass with
+  `-k 1 --time-budget 240` for masks whose first fold only produced a violating
+  plan. Summary: `uv run python tools/explore_summary.py --out out/explore-20260919`.
+- Result: 261 masks gated; 47 shapes. 42 have a complete loose-passing plan on
+  the exact mask; 1 completes only with violations (the sole threadable "Z",
+  which is not a Z); 3 are roll-UNSAT in every variant (crown, diamond, double
+  arrow); X is structurally impossible (four stroke tips). 37 winners are
+  registered in `cubot/generate/parametric.py` (`EXPLORED_NAMES`); the five
+  passing-but-unrecognizable masks (hourglass, rocket, tree, triangle, up-arrow)
+  are not. Full table and masks: `docs/EXPLORATION-20260919.md`.
+- The pipeline matcher folds nearby family drawings alongside exact threadings
+  and ranks plans by fold quality only, so a "PASS" can belong to a substitute
+  silhouette. Three workers caught this independently; the driver now folds
+  exact threadings only and records `goal_is_mask`. Rows without that flag are
+  excluded from the summary.
+- The fold search is budget-bound: 18 of the first-pass "complete but
+  violating" verdicts (all ground incursion from the direct-replay fallback)
+  became clean loose passes at 240 s. A violating verdict at 90–150 s is weak
+  evidence about the mask.
+- Roll-word structure confirmed by all workers against `solver.solve`: in-plane
+  rotation/mirroring never changes threadability; same-side double turns are
+  impossible at roll-digit-0 joints (2, 3, 6, 7, 12, 16, 25) and zig-zags at
+  roll-digit-2 joints (1, 14, 20, 23); alternating turns run at most 5 joints
+  (16–20), so 45° diagonals longer than ~5 cells never thread. 2-wide strokes
+  are the hardest width; 1-wide and 3-wide thread far more often.
+- Human picks remain unset; `docs/exploration-20260919/contact-sheet-blind.png`
+  is the blind sheet for the 37 registered winners.

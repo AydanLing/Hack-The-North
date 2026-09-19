@@ -11,7 +11,9 @@ from cubot.match import chamfer_distance, proposal_matches, match, recognition_s
 
 
 def test_icon_registry_is_complete() -> None:
-    assert ICON_NAMES == (
+    from cubot.generate.parametric import DEMO_NAMES, EXPLORED_NAMES, REJECTED_NAMES
+
+    assert ICON_NAMES[:14] == (
         "heart",
         "arrow",
         "lightning",
@@ -27,7 +29,34 @@ def test_icon_registry_is_complete() -> None:
         "question-mark",
         "smiley",
     )
+    assert ICON_NAMES == DEMO_NAMES + REJECTED_NAMES + EXPLORED_NAMES
     assert all(get_icon(name).grid.dtype == np.bool_ for name in ICON_NAMES)
+
+
+def test_explored_glyphs_are_exact_shipped_roll_targets() -> None:
+    """Exploration winners share the demo-glyph contract: 27 cells, exact threading."""
+
+    from cubot.generate.parametric import EXPLORED_NAMES
+    from cubot.shapes import screen
+    from cubot.solver import solve
+
+    roll = load_machine().roll
+    assert len(EXPLORED_NAMES) >= 20
+    for name in EXPLORED_NAMES:
+        target = get_icon(name)
+        assert len(target.cells) == 27, name
+        assert screen(target.cells, 27).ok, name
+        result = solve(target.cells, roll, budget_nodes=250_000)
+        assert result.found, (name, result.diagnostics)
+        assert result.solution is not None
+        assert set(result.solution.states) <= {-1, 0, 1}
+
+
+def test_explored_glyph_aliases() -> None:
+    assert get_icon("zero").concept == "0"
+    assert get_icon("letter-k").concept == "k"
+    assert get_icon("wave").concept == "square-wave"
+    assert get_icon("barbell").concept == "dumbbell"
 
 
 def test_demo_glyphs_are_exact_shipped_roll_targets() -> None:
