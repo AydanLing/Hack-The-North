@@ -4200,6 +4200,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 0, 1) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 0.717 N\u00b7m (eased demand 0.737) (cap 5.800, stall 10.600)"
@@ -4220,7 +4228,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 0.7171055324110653
+          "static_peak_nm": 0.7171055324110653,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -4445,6 +4454,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 1, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 0.120 N\u00b7m (eased demand 0.121) (cap 5.800, stall 10.600)"
@@ -4465,7 +4482,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 0.1195175887351776
+          "static_peak_nm": 0.1195175887351776,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -4690,6 +4708,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 1, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 0.359 N\u00b7m (eased demand 0.366) (cap 5.800, stall 10.600)"
@@ -4710,7 +4736,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 0.3585527662055334
+          "static_peak_nm": 0.3585527662055334,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -4746,23 +4773,23 @@
     },
     {
       "step": 4,
-      "joint": 2,
-      "delta": 1,
+      "joint": 7,
+      "delta": -1,
       "side": "in",
       "moving_side_snake_pipeline": "parent",
       "duration_s": 2.0,
       "state_before": 0,
-      "state_after": 1,
-      "angle_after_deg": 120.0,
+      "state_after": -1,
+      "angle_after_deg": -120.0,
       "states_after": [
         0,
         -1,
-        1,
+        0,
         -1,
         0,
         0,
         0,
-        0,
+        -1,
         0,
         0,
         0,
@@ -4782,7 +4809,7 @@
         -1,
         0
       ],
-      "base_after": 13,
+      "base_after": 19,
       "cells_after": [
         [
           0,
@@ -4790,134 +4817,134 @@
           0
         ],
         [
-          0,
-          0,
-          1
-        ],
-        [
-          1,
-          0,
-          1
-        ],
-        [
-          1,
+          -1,
           0,
           0
+        ],
+        [
+          -1,
+          1,
+          0
+        ],
+        [
+          -1,
+          2,
+          0
+        ],
+        [
+          -1,
+          2,
+          -1
+        ],
+        [
+          -1,
+          2,
+          -2
+        ],
+        [
+          -1,
+          2,
+          -3
+        ],
+        [
+          -1,
+          2,
+          -4
+        ],
+        [
+          0,
+          2,
+          -4
+        ],
+        [
+          1,
+          2,
+          -4
         ],
         [
           2,
-          0,
-          0
+          2,
+          -4
         ],
         [
           3,
-          0,
-          0
+          2,
+          -4
         ],
         [
           4,
-          0,
-          0
+          2,
+          -4
         ],
         [
           5,
-          0,
-          0
+          2,
+          -4
         ],
         [
           6,
-          0,
-          0
+          2,
+          -4
         ],
         [
           7,
-          0,
-          0
+          2,
+          -4
         ],
         [
           8,
-          0,
-          0
+          2,
+          -4
         ],
         [
           9,
-          0,
-          0
+          2,
+          -4
         ],
         [
           10,
-          0,
-          0
+          2,
+          -4
         ],
         [
           11,
-          0,
-          0
+          2,
+          -4
         ],
         [
           12,
-          0,
-          0
+          2,
+          -4
         ],
         [
           13,
-          0,
-          0
+          2,
+          -4
         ],
         [
           14,
-          0,
-          0
+          2,
+          -4
         ],
         [
           15,
-          0,
-          0
+          2,
+          -4
         ],
         [
           16,
-          0,
-          0
+          2,
+          -4
         ],
         [
-          17,
-          0,
-          0
+          16,
+          2,
+          -3
         ],
         [
-          18,
-          0,
-          0
-        ],
-        [
-          19,
-          0,
-          0
-        ],
-        [
-          20,
-          0,
-          0
-        ],
-        [
-          21,
-          0,
-          0
-        ],
-        [
-          22,
-          0,
-          0
-        ],
-        [
-          22,
-          0,
-          1
-        ],
-        [
-          22,
-          0,
-          2
+          16,
+          2,
+          -2
         ]
       ],
       "hard_ok": true,
@@ -4925,7 +4952,7 @@
         "hard": {
           "cad_penetration": [
             true,
-            "max CAD penetration 0.398 mm for modules (2, 3) (limit 6.000 mm)"
+            "max CAD penetration 0.398 mm for modules (6, 7) (limit 6.000 mm)"
           ],
           "ground": [
             true,
@@ -4935,70 +4962,79 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
-            "peak static torque 0.316 N\u00b7m (eased demand 0.319) (cap 5.800, stall 10.600)"
+            "peak static torque 2.471 N\u00b7m (eased demand 2.623) (cap 5.800, stall 10.600)"
           ]
         },
         "measurements": {
-          "arc": "down",
-          "balance_margin_mm": 39.99999999999994,
+          "arc": "up",
+          "balance_margin_mm": 24.814814814814856,
           "first_contact_angle_deg": 12.0,
-          "holding_peak_nm": 2.674789670418803,
-          "inertia_kgm2": 0.0044742720000000005,
+          "holding_peak_nm": 3.1960730928684797,
+          "inertia_kgm2": 0.07563803200000001,
           "max_ground_depth_mm": 0.0,
-          "max_penetration_mm": 0.3984185130400846,
-          "max_pivot_dip_mm": 0.0,
+          "max_penetration_mm": 0.3984185130401092,
+          "max_pivot_dip_mm": 2.398418513039985,
           "moving_side": "in",
-          "peak_angle_deg": 72.0,
-          "peak_demand_nm": 0.3186091540732509,
+          "peak_angle_deg": 16.0,
+          "peak_demand_nm": 2.622673981244621,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 0.31634755115977403
+          "static_peak_nm": 2.4710945792401695,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
             1.0,
-            "support margin 40.000 mm (preferred -20.000 mm)"
+            "support margin 24.815 mm (preferred -20.000 mm)"
           ],
           "ground": [
             1.0,
             "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
           ],
           "holding_load": [
-            0.7476613518472828,
-            "peak holding load 2.675 N\u00b7m at joint 11"
+            0.6984836704841058,
+            "peak holding load 3.196 N\u00b7m at joint 8"
           ],
           "moving_side": [
             1.0,
-            "side moment ratio 0.004; selected in"
+            "side moment ratio 0.123; selected in"
           ],
           "near_contact": [
             1.0,
-            "max CAD penetration 0.398 mm for modules (2, 3) (limit 6.000 mm)"
+            "max CAD penetration 0.398 mm for modules (6, 7) (limit 6.000 mm)"
           ],
           "pivot_dip": [
             1.0,
-            "pivoting hinge half dips 0.000 mm"
+            "pivoting hinge half dips 2.398 mm"
           ],
           "torque": [
             1.0,
-            "peak demand including inertia 0.319 N\u00b7m"
+            "peak demand including inertia 2.623 N\u00b7m"
           ]
         }
       }
     },
     {
       "step": 5,
-      "joint": 7,
-      "delta": -1,
+      "joint": 2,
+      "delta": 1,
       "side": "in",
       "moving_side_snake_pipeline": "parent",
       "duration_s": 2.0,
       "state_before": 0,
-      "state_after": -1,
-      "angle_after_deg": -120.0,
+      "state_after": 1,
+      "angle_after_deg": 120.0,
       "states_after": [
         0,
         -1,
@@ -5170,7 +5206,7 @@
         "hard": {
           "cad_penetration": [
             true,
-            "max CAD penetration 0.398 mm for modules (6, 7) (limit 6.000 mm)"
+            "max CAD penetration 0.398 mm for modules (1, 2) (limit 6.000 mm)"
           ],
           "ground": [
             true,
@@ -5180,27 +5216,36 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 1, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
-            "peak static torque 2.757 N\u00b7m (eased demand 2.901) (cap 5.800, stall 10.600)"
+            "peak static torque 0.316 N\u00b7m (eased demand 0.326) (cap 5.800, stall 10.600)"
           ]
         },
         "measurements": {
           "arc": "up",
           "balance_margin_mm": 33.925925925925974,
           "first_contact_angle_deg": 12.0,
-          "holding_peak_nm": 3.3141874908722775,
-          "inertia_kgm2": 0.09063255199999999,
+          "holding_peak_nm": 2.6927773363337266,
+          "inertia_kgm2": 0.0044742720000000005,
           "max_ground_depth_mm": 0.0,
-          "max_penetration_mm": 0.39841851304015563,
-          "max_pivot_dip_mm": 2.398418513040035,
+          "max_penetration_mm": 0.3984185130400988,
+          "max_pivot_dip_mm": 0.0,
           "moving_side": "in",
-          "peak_angle_deg": 24.000000000000004,
-          "peak_demand_nm": 2.9005069471292555,
+          "peak_angle_deg": 12.000000000000002,
+          "peak_demand_nm": 0.3260185278349822,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 2.7571638371423024
+          "static_peak_nm": 0.31634755115977403,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -5212,24 +5257,24 @@
             "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
           ],
           "holding_load": [
-            0.6873408027478983,
-            "peak holding load 3.314 N\u00b7m at joint 8"
+            0.7459644022326672,
+            "peak holding load 2.693 N\u00b7m at joint 11"
           ],
           "moving_side": [
             1.0,
-            "side moment ratio 0.128; selected in"
+            "side moment ratio 0.018; selected in"
           ],
           "near_contact": [
             1.0,
-            "max CAD penetration 0.398 mm for modules (6, 7) (limit 6.000 mm)"
+            "max CAD penetration 0.398 mm for modules (1, 2) (limit 6.000 mm)"
           ],
           "pivot_dip": [
             1.0,
-            "pivoting hinge half dips 2.398 mm"
+            "pivoting hinge half dips 0.000 mm"
           ],
           "torque": [
             1.0,
-            "peak demand including inertia 2.901 N\u00b7m"
+            "peak demand including inertia 0.326 N\u00b7m"
           ]
         }
       }
@@ -5425,6 +5470,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 0, -1) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 1.925 N\u00b7m (eased demand 2.009) (cap 5.800, stall 10.600)"
@@ -5445,7 +5498,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 1.9246166597452223
+          "static_peak_nm": 1.9246166597452223,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -5670,6 +5724,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, -1, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 6.109 N\u00b7m (eased demand 6.632) (cap 5.800, stall 10.600)"
@@ -5690,7 +5752,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 6.1094265325351556
+          "static_peak_nm": 6.1094265325351556,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -5915,6 +5978,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (-1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 6.628 N\u00b7m (eased demand 7.574) (cap 5.800, stall 10.600)"
@@ -5935,7 +6006,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 6.628374981744555
+          "static_peak_nm": 6.628374981744555,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -6160,6 +6232,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, -1, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 6.757 N\u00b7m (eased demand 7.605) (cap 5.800, stall 10.600)"
@@ -6180,7 +6260,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 6.757035841603862
+          "static_peak_nm": 6.757035841603862,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -6405,6 +6486,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 0, -1) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 4.814 N\u00b7m (eased demand 5.188) (cap 5.800, stall 10.600)"
@@ -6425,7 +6514,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 4.813917015055599
+          "static_peak_nm": 4.813917015055599,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -6650,6 +6740,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 0, -1) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 2.175 N\u00b7m (eased demand 2.383) (cap 5.800, stall 10.600)"
@@ -6670,7 +6768,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 2.174935540884932
+          "static_peak_nm": 2.174935540884932,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -6895,6 +6994,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 0, -1) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 1.294 N\u00b7m (eased demand 1.315) (cap 5.800, stall 10.600)"
@@ -6915,7 +7022,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 1.2935663360378171
+          "static_peak_nm": 1.2935663360378171,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -7140,6 +7248,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 0, -1) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 2.182 N\u00b7m (eased demand 2.359) (cap 5.800, stall 10.600)"
@@ -7160,7 +7276,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 2.1821508183010767
+          "static_peak_nm": 2.1821508183010767,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -7385,6 +7502,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, -1, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 4.814 N\u00b7m (eased demand 5.188) (cap 5.800, stall 10.600)"
@@ -7405,7 +7530,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 4.8139170150555985
+          "static_peak_nm": 4.8139170150555985,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -7630,6 +7756,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 6.111 N\u00b7m (eased demand 6.861) (cap 5.800, stall 10.600)"
@@ -7650,7 +7784,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 6.110533186295764
+          "static_peak_nm": 6.110533186295764,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -7875,6 +8010,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 9.824 N\u00b7m (eased demand 9.735) (cap 5.800, stall 10.600)"
@@ -7895,7 +8038,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": true,
-          "static_peak_nm": 9.82376275640336
+          "static_peak_nm": 9.82376275640336,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -8120,6 +8264,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 5.987 N\u00b7m (eased demand 6.615) (cap 5.800, stall 10.600)"
@@ -8140,7 +8292,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 5.986719514247612
+          "static_peak_nm": 5.986719514247612,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -8365,6 +8518,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 3.768 N\u00b7m (eased demand 3.948) (cap 5.800, stall 10.600)"
@@ -8385,7 +8546,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": true,
-          "static_peak_nm": 3.7684185287646317
+          "static_peak_nm": 3.7684185287646317,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -8610,6 +8772,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 0, 1) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 0.311 N\u00b7m (eased demand 0.322) (cap 5.800, stall 10.600)"
@@ -8630,7 +8800,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 0.3107050772692761
+          "static_peak_nm": 0.3107050772692761,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -8855,6 +9026,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 0.621 N\u00b7m (eased demand 0.654) (cap 5.800, stall 10.600)"
@@ -8875,7 +9054,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 0.6214101545385522
+          "static_peak_nm": 0.6214101545385522,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -9100,6 +9280,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 2.786 N\u00b7m (eased demand 2.693) (cap 5.800, stall 10.600)"
@@ -9120,7 +9308,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": true,
-          "static_peak_nm": 2.7862452650839793
+          "static_peak_nm": 2.7862452650839793,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -9345,6 +9534,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 2.175 N\u00b7m (eased demand 2.359) (cap 5.800, stall 10.600)"
@@ -9365,7 +9562,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 2.174935540884934
+          "static_peak_nm": 2.174935540884934,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -9590,6 +9788,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 1.469 N\u00b7m (eased demand 1.573) (cap 5.800, stall 10.600)"
@@ -9610,7 +9816,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 1.4691336898996408
+          "static_peak_nm": 1.4691336898996408,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -9835,6 +10042,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, -1, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 4.422 N\u00b7m (eased demand 4.774) (cap 5.800, stall 10.600)"
@@ -9855,7 +10070,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": true,
-          "static_peak_nm": 4.422150783201571
+          "static_peak_nm": 4.422150783201571,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -10080,6 +10296,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 0, -1) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 0.316 N\u00b7m (eased demand 0.319) (cap 5.800, stall 10.600)"
@@ -10100,7 +10324,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 0.31634755115977403
+          "static_peak_nm": 0.31634755115977403,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -10325,6 +10550,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 0, -1) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 6.750 N\u00b7m (eased demand 6.564) (cap 5.800, stall 10.600)"
@@ -10345,7 +10578,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": true,
-          "static_peak_nm": 6.750018773370309
+          "static_peak_nm": 6.750018773370309,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -10570,6 +10804,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, -1, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 1.761 N\u00b7m (eased demand 1.879) (cap 5.800, stall 10.600)"
@@ -10590,7 +10832,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 1.7606621045258979
+          "static_peak_nm": 1.7606621045258979,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -10815,6 +11058,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, -1, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 6.319 N\u00b7m (eased demand 6.527) (cap 5.800, stall 10.600)"
@@ -10835,7 +11086,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 6.318829994691034
+          "static_peak_nm": 6.318829994691034,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -11060,6 +11312,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, -1, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 1.469 N\u00b7m (eased demand 1.573) (cap 5.800, stall 10.600)"
@@ -11080,7 +11340,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 1.4691336898996408
+          "static_peak_nm": 1.4691336898996408,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -11305,6 +11566,14 @@
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 0, -1) outside module 0's mount face is clear at rest"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 40.000 mm)"
+          ],
           "torque_stall": [
             true,
             "peak static torque 3.418 N\u00b7m (eased demand 3.760) (cap 5.800, stall 10.600)"
@@ -11325,7 +11594,8 @@
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": true,
-          "static_peak_nm": 3.4177558499620417
+          "static_peak_nm": 3.4177558499620417,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
@@ -11399,14 +11669,14 @@
           2.0
         ],
         [
-          2,
-          1,
+          7,
+          -1,
           "in",
           2.0
         ],
         [
-          7,
-          -1,
+          2,
+          1,
           "in",
           2.0
         ],
@@ -11600,14 +11870,14 @@
           2.0
         ],
         [
-          2,
-          1,
+          7,
+          -1,
           "in",
           2.0
         ],
         [
-          7,
-          -1,
+          2,
+          1,
           "in",
           2.0
         ],
@@ -11801,14 +12071,14 @@
           2.0
         ],
         [
-          2,
-          1,
+          7,
+          -1,
           "in",
           2.0
         ],
         [
-          7,
-          -1,
+          2,
+          1,
           "in",
           2.0
         ],
@@ -12221,7 +12491,7 @@
   "reports": {
     "loose": {
       "profile": "loose",
-      "config_hash": "7487b5c67bd18dfb",
+      "config_hash": "ea63668b2947dc04",
       "candidates_summary": {
         "candidates": 4,
         "complete_passing": 4,
@@ -12248,7 +12518,7 @@
     },
     "strict": {
       "profile": "strict",
-      "config_hash": "ccfb6e2b5dbdd610",
+      "config_hash": "058abd8d0b435638",
       "candidates_summary": {
         "candidates": 4,
         "complete_passing": 0,
@@ -12262,8 +12532,8 @@
           "move 0 cad_penetration: max CAD penetration 0.398 mm for modules (3, 4) (limit 0.000 mm)",
           "move 1 cad_penetration: max CAD penetration 0.398 mm for modules (0, 1) (limit 0.000 mm)",
           "move 2 cad_penetration: max CAD penetration 0.398 mm for modules (24, 25) (limit 0.000 mm)",
-          "move 3 cad_penetration: max CAD penetration 0.398 mm for modules (2, 3) (limit 0.000 mm)",
-          "move 4 cad_penetration: max CAD penetration 0.398 mm for modules (6, 7) (limit 0.000 mm)",
+          "move 3 cad_penetration: max CAD penetration 0.398 mm for modules (6, 7) (limit 0.000 mm)",
+          "move 4 cad_penetration: max CAD penetration 0.398 mm for modules (1, 2) (limit 0.000 mm)",
           "move 5 cad_penetration: max CAD penetration 0.398 mm for modules (5, 6) (limit 0.000 mm)",
           "move 6 cad_penetration: max CAD penetration 0.398 mm for modules (10, 11) (limit 0.000 mm)",
           "move 7 cad_penetration: max CAD penetration 0.398 mm for modules (13, 14) (limit 0.000 mm)",
@@ -12307,12 +12577,12 @@
     }
   },
   "provenance": {
-    "source_record": "/Users/justinrui/Documents/GitHub/Hack-The-North/cubot-v2/out/explore-20260919/verify2/letters-b/runs/a-v3/a/record.json",
+    "source_record": "/Users/justinrui/Documents/GitHub/Hack-The-North/cubot-v2/out/tether-refold/explore2/runs/a/a/record.json",
     "plan_index": 0,
     "record_source": "explore",
-    "created": "2026-09-19T13:03:35.496174+00:00",
-    "git_sha": "e1c89bd9f98f019ab7898b23bef93890bdf09985",
-    "config_hash": "7487b5c67bd18dfb",
+    "created": "2026-09-19T16:59:51.055728+00:00",
+    "git_sha": "da6d90ffe805d2b495529998b8d56112cb694314",
+    "config_hash": "ea63668b2947dc04",
     "source_hash": "e833fe57e15a741f0a71fca988f59d4a3075c6dd2193fbe282932c2f30345d8d",
     "profile": "loose",
     "seed": 0,

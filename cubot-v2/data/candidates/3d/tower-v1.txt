@@ -1,0 +1,25 @@
+// tower-v1: tower: hollow 3x3 tube 3 high + 3-cell antenna on a corner
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+###
+#.#
+###
+
+###
+#.#
+###
+
+###
+#.#
+###
+
+...
+...
+#..
+
+...
+...
+#..
+
+...
+...
+#..

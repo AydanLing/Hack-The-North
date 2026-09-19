@@ -1,0 +1,16 @@
+// box-v1: box: hollow 4x4 tube 2 high + 3 cells of a third ring
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+####
+#..#
+#..#
+####
+
+####
+#..#
+#..#
+####
+
+....
+....
+....
+###.

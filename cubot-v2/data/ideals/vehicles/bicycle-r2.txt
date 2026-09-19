@@ -1,0 +1,7 @@
+// bicycle round 2: two 3x3 ring wheels (3-col gap) required; frame = seat post + top bar + head post preferred, bumps negotiable
+??+????+??
+??+????+??
+?+++++++??
+###...###.
+#.#...#.#.
+###...###.

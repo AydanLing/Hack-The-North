@@ -1,0 +1,9 @@
+// wave-v1: square wave / battlement, 3 wide
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+#.###.
+#.###.
+#.###.
+
+###.##
+###.##
+###.##

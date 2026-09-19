@@ -1,0 +1,6 @@
+// motorcycle round 2 (b): rings required, two free rows above (preferred: solid body row, seat hump left, handlebar right)
+?++???.?+?
+?++++++++?
+###...###.
+#.#...#.#.
+###...###.

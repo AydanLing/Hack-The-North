@@ -1,0 +1,7 @@
+// ufo round 2 (b): chamfered 3-row disc (no tips) required, stepped dome preferred, antenna negotiable
+....?....
+...+++...
+.?+++++?.
+.#######.
+#########
+.#######.

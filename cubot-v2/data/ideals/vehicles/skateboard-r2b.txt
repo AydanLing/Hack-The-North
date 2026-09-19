@@ -1,0 +1,6 @@
+// skateboard round 2 (b): top view, 3-wide rounded deck, wheel bumps negotiable on both sides
+.??...??.
+.#######.
+#########
+.#######.
+.??...??.

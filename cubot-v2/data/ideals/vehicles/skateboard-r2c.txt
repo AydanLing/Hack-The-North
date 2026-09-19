@@ -1,0 +1,5 @@
+// skateboard round 2 (c): side view, 2-row deck with kicks, wheels as 2-cell bumps
+#.........#
+###########
+?#########?
+.##.....##.

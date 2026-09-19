@@ -1,0 +1,9 @@
+// sailboat round 2 (h): sail-aq neighbourhood; mast column + hull core required, sail body preferred, ring negotiable
+.?#?....
+.?#+?...
+.?#+?...
+.?#++?..
+.?#++?..
+.?#++??.
+?######?
+?+####+?

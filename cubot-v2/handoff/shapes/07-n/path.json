@@ -6783,7 +6783,7 @@
     }
   },
   "provenance": {
-    "source_record": "/Users/justinrui/Documents/GitHub/Hack-The-North/cubot-v2/out/demo-20260919/runs/n/record.json",
+    "source_record": "out/tether-refold/demo-runs/n/record.json",
     "plan_index": 0,
     "record_source": "parametric",
     "created": "2026-09-19T08:41:35.243796+00:00",

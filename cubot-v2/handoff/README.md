@@ -17,9 +17,9 @@ swings, our per-move check results, and renders. Nothing in this folder imports
 | # | shape | moves | loose hard checks | strict | predicted finish | notes |
 |---|-------|------:|-------------------|--------|------------------|-------|
 | 1 | heart | 16 | pass | fail¹ | flat | the original hardware certificate (tether was hand-lifted once at move 12) |
-| 2 | arrow | 23 | pass | fail¹ | flat | open-chevron outline; 2 alternate passing routes |
-| 3 | lightning | 14 | **FAIL** — 6 table-incursion violations | fail | **standing** | only complete route found; no loose-passing plan exists yet |
-| 4 | plus | 22 | pass | fail¹ | flat | thick cross (family entry 32951); 6 alternate passing routes |
+| 2 | arrow | 24 | pass | fail¹ | flat | open-chevron outline; re-folded 2026-09-19 for the module-0 tether; 1 alternate passing routes |
+| 3 | lightning | 15 | pass | fail¹ | flat | re-folded 2026-09-19 with the module-0 tether modelled; first loose-passing lightning plan |
+| 4 | plus | 23 | pass | fail¹ | flat | thick cross; re-folded 2026-09-19 for the module-0 tether; 3 alternate passing routes |
 | 5 | h | 11 | pass | fail¹ | flat | |
 | 6 | t | 6 | pass | fail¹ | **standing** | |
 | 7 | n | 10 | pass | fail¹ | **standing** | |
@@ -36,22 +36,33 @@ these are the routes the planner shipped for the seven demo icons, reviewed on
 
 ## Two things to read before simulating
 
-1. **Three shapes are predicted to finish standing up, not lying flat.**
-   T, N and lightning end with the drawing plane vertical, balanced on a
+1. **Some shapes are predicted to finish standing up, not lying flat.**
+   Of the demo seven, T and N end with the drawing plane vertical, balanced on a
    one-cube-wide edge (final support margin exactly +40 mm = half a cube).
    The reason: an `in` move swings the *base* side while the tail stays put,
    so the world orientation of the finished shape is a consequence of the
    move sides, not of the design. The record's nominal `goal.base` (what the
    `top.png` renders show) is *not* where the shape ends up. `path.json`
    carries both: `goal` (nominal) and `final_tracked` (predicted, with
-   `ends_flat_on_table`). Heart, arrow, plus and H finish flat.
+   `ends_flat_on_table`). Heart, arrow, lightning, plus and H finish flat.
    Whether a standing T is acceptable for the demo (it does read as a T from
    the side) or these need re-planning with a different lay-down is a human
    decision — the sim should simply report the orientation it ends on.
+   (After the tether re-fold the set of standing finishes changed; read
+   `final_tracked.ends_flat_on_table` per shape rather than this list.)
 
-2. **Lightning is not a passing plan.** It is shipped so the sim can measure
-   it, but six of its fourteen moves dip the moving side 49–328 mm into the
-   table in our sampled sweep (limit 40 mm). Expect it to fail physically.
+2. **Module 0 is tethered, and every path here respects that.** A cable
+   bundle leaves the first cube through its mount face (the face a preceding
+   module would attach to; module-local `-x`). `machine.json` models it as a
+   rigid keep-out box (`tether_length_mm` = 82, `tether_width_mm` = 40) that
+   rides with module 0's still half: no module may sweep through it, occupy
+   the lattice cell behind module 0 at rest, or push it into the table. On
+   2026-09-19 all 84 paths were re-audited against it (`tools/tether_audit.py`)
+   and the 36 that violated it — mostly by an opening `(0, ±1, in)` flip that
+   turned the cable into the table — were re-folded from their authored
+   masks. Lightning's re-fold is now a loose-passing plan (15 moves) rather
+   than the measured-only fallback shipped earlier. In the sim, give module 0
+   the same keep-out and expect zero contacts with it.
 
 ## Appended shapes (8–84)
 

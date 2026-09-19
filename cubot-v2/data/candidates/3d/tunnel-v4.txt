@@ -1,0 +1,17 @@
+// tunnel-v4: gate: 3-wide, legs 3, span 3, one leg foot moved to a top-corner nub
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+..#.
+..#.
+..#.
+
+#.#.
+#.#.
+#.#.
+
+#.#.
+#.#.
+#.#.
+
+####
+####
+####

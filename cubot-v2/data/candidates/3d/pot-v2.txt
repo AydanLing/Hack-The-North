@@ -1,0 +1,13 @@
+// pot-v2: pot: hollow 4x3 tube 2 high + 7 cells of a third ring (other gap)
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+####
+#..#
+####
+
+####
+#..#
+####
+
+...#
+#..#
+####

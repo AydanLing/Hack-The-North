@@ -1,0 +1,13 @@
+// hump-v1: stepped hump / roof: 3 wide
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+##..#
+##..#
+##..#
+
+.####
+.####
+.####
+
+..##.
+..##.
+..##.

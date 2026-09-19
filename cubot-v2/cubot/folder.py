@@ -196,34 +196,53 @@ def tether_cell(pose: Pose) -> tuple[int, int, int]:
     return tuple(int(v) for v in (np.asarray(cells[0]) - np.asarray(direction)))
 
 
-def _rest_report(after: Pose) -> CheckReport:
+def _rest_report(after: Pose, machine: Machine | None = None, profile: Profile | None = None) -> CheckReport:
+    """Lattice-level rest checks, plus the tether rules when the machine has a cable bundle.
+
+    Without a ``machine`` the shipped one is assumed, i.e. the tether rules
+    apply (``machine.has_tether`` switches them off for a bare chain).  With a
+    ``profile`` the keep-out's actual table incursion at rest is measured too.
+    """
+
     cells = pose_cells(after)
     unique = len(set(cells))
-    wire = tether_cell(after)
-    wire_clear = wire not in set(cells)
-    lowest = min(cell[2] for cell in cells)
-    wire_down = wire[2] < cells[0][2] and cells[0][2] == lowest
-    return CheckReport(
+    report = CheckReport(
         hard={
             "rest_cell_overlap": (
                 unique == len(cells),
                 f"{len(cells) - unique} duplicate occupied lattice cells at rest",
             ),
-            "tether_cell": (
-                wire_clear,
-                "cell behind module 0's free face is clear"
-                if wire_clear
-                else f"a module rests in the wire cell {wire} behind module 0",
-            ),
-            "tether_down": (
-                not wire_down,
-                "wire bundle does not point into the resting surface"
-                if not wire_down
-                else "module 0 rests on the lowest layer with its wire bundle pointing down",
-            ),
         },
         measurements={"rest_unique_cells": unique},
     )
+    if machine is not None and not machine.has_tether:
+        return report
+    wire = tether_cell(after)
+    wire_clear = wire not in set(cells)
+    lowest = min(cell[2] for cell in cells)
+    wire_down = wire[2] < cells[0][2] and cells[0][2] == lowest
+    report.hard["tether_cell"] = (
+        wire_clear,
+        f"cell {wire} outside module 0's mount face is clear at rest"
+        if wire_clear
+        else f"a module rests in the wire cell {wire} outside module 0's mount face",
+    )
+    report.hard["tether_down"] = (
+        not wire_down,
+        "wire bundle does not point into the resting surface"
+        if not wire_down
+        else "module 0 rests on the lowest layer with its wire bundle pointing down",
+    )
+    if machine is not None and profile is not None:
+        from .geometry import tether_rest_depth
+
+        depth = tether_rest_depth(after, machine)
+        report.hard["tether_ground"] = (
+            depth <= profile.ground_hard_mm + 1e-6,
+            f"tether keep-out enters the table {depth:.3f} mm at rest (limit {profile.ground_hard_mm:.3f} mm)",
+        )
+        report.measurements["tether_rest_depth_mm"] = depth
+    return report
 
 
 def _early_geometry_rejection(
@@ -264,10 +283,9 @@ def _early_geometry_rejection(
             max_ground,
             max((hit.depth_mm for hit in ground if not hit.pivot_piece and hit.module != TETHER_MODULE), default=0.0),
         )
-        if profile.ground_hard_mm < 1e8:
-            max_tether = max((hit.depth_mm for hit in ground if hit.module == TETHER_MODULE), default=0.0)
-            if max_tether > profile.hard_penetration_mm + 1e-6:
-                max_depth = max(max_depth, max_tether)  # the wire went into the table
+        # The tether's own table contact obeys the table rule (``ground_hard_mm``),
+        # like a module's: it is a rigid stand-in for a cable that really bends.
+        max_ground = max(max_ground, max((hit.depth_mm for hit in ground if hit.module == TETHER_MODULE), default=0.0))
         if (
             max_depth > profile.hard_penetration_mm + 1e-6
             or max_ground > profile.ground_hard_mm + 1e-6
@@ -375,7 +393,7 @@ def check_move(
     except ValueError as exc:
         return CheckReport(hard={"winding": (False, str(exc))})
     after = next_pose(pose, move)
-    rest = _rest_report(after)
+    rest = _rest_report(after, machine, profile)
 
     # Imports stay local so lattice-only tools can import ``cubot.folder`` even
     # in minimal installations, and to keep the mechanics boundary explicit.
@@ -909,7 +927,7 @@ def fold(
                     break
                 move = Move(joint, delta, side, machine.move_time_s)
                 after = next_pose(node.pose, move)
-                rest = _rest_report(after)
+                rest = _rest_report(after, machine)
                 if not rest.hard_ok:
                     failed_move = Move(
                         move.joint,
@@ -1051,4 +1069,5 @@ __all__ = [
     "replay_forward",
     "replay_heart",
     "replay_tracked",
+    "tether_cell",
 ]

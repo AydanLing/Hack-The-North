@@ -1,0 +1,6 @@
+// ufo round 2: 2-row stepped dome preferred, 11-wide disc required, tapered underside preferred (lens), edges negotiable
+...?+++?...
+.?+++++++?.
+###########
+?+++++++++?
+??.+++++.??

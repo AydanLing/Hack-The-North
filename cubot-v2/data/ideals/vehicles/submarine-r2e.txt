@@ -1,0 +1,7 @@
+// submarine round 2 (e): periscope required, tower + three-row cigar hull preferred, everything else negotiable
+....#.....
+....#.....
+.??+++??..
+?++++++++?
+?++++++++?
+??++++++??

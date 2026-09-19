@@ -1,0 +1,11 @@
+// band-v1: band: hollow 5x4 tube 2 high with a 1-cell notch in the top rim
+// layers bottom (z=0) first, separated by blank lines; rows top-first
+#####
+#...#
+#...#
+#####
+
+#####
+#...#
+#...#
+##.##

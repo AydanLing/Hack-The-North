@@ -1,0 +1,10 @@
+// rocket round 2 (b): 3-wide body, 2-1 nose, fins as 1-cell flares, flame below
+..?..
+.+++.
+.###.
+.###.
+.###.
+.###.
+#.#.#
+#####
+.?+?.

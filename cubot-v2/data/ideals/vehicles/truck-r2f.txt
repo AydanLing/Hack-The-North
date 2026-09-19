@@ -1,0 +1,7 @@
+// truck round 2 (f): loose 10x6 region; preferred = box 3 rows tall at the back, cab 2 rows at the front with a gap column
+?++++?....
+?++++?....
+?++++?.++?
+?++++?.++?
+##########
+##?....?##
