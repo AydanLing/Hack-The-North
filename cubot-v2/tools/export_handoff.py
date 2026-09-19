@@ -33,7 +33,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from cubot.config import load_machine, load_profile  # noqa: E402
-from cubot.folder import next_pose  # noqa: E402
+from cubot.folder import ends_flat_on_table, lattice_span, next_pose  # noqa: E402
 from cubot.geometry import pose_frames  # noqa: E402
 from cubot.lattice import ORIENTS, fk  # noqa: E402
 from cubot.records import Move, Pose  # noqa: E402
@@ -162,9 +162,8 @@ def export_shape(name: str, number: int, run_dir: Path, out_dir: Path, machine, 
     # orientation of the finished shape is a consequence of the move sides.
     # Both are exported; the sim should expect the tracked one.
     goal_cells = fk(goal.states, goal.roll, goal.base)[0]
-    tracked_cells = fk(replayed.states, replayed.roll, replayed.base)[0]
-    tracked_span = (np.asarray(tracked_cells).max(axis=0) - np.asarray(tracked_cells).min(axis=0)).tolist()
-    ends_flat = tracked_span[2] == 0
+    tracked_span = list(lattice_span(replayed))
+    ends_flat = ends_flat_on_table(replayed)
     if [list(c) for c in goal_cells] != [list(c) for c in record["cells"]]:
         raise ValueError(f"{name}: goal FK cells differ from the record's cells")
     if len(set(goal_cells)) != 27:
