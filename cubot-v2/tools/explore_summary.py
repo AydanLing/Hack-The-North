@@ -3,11 +3,17 @@
 
 Reads ``<out>/results.jsonl``, keeps the best variant per concept, and writes
 ``summary.md`` (ranked table), ``contact-sheet-blind.png`` (numbered, no
-labels, for the recognizability pick) and ``contact-sheet-labeled.png``.
+labels, for the recognizability pick), ``contact-sheet-labeled.png`` and
+``handoff-manifest.json`` — every loose-passing row in
+``cubot.handoff.manifest.v1`` form, so the winners export with
+``tools/export_handoff.py --manifest <out>/handoff-manifest.json`` after the
+blind pick (``docs/METHOD.md``).  Pass ``--only`` to restrict the manifest to
+the picked names.
 
 Usage (from ``cubot-v2/``)::
 
     uv run python tools/explore_summary.py --out out/explore-20260919
+    uv run python tools/explore_summary.py --out out/explore-20260919 --only rocket mug bell
 """
 
 from __future__ import annotations
@@ -108,14 +114,45 @@ def write_summary(rows: list[dict], out_root: Path) -> Path:
     return path
 
 
+MANIFEST_SCHEMA = "cubot.handoff.manifest.v1"
+
+
+def write_manifest(rows: list[dict], out_root: Path, only: set[str] | None = None) -> Path:
+    """Write the loose-passing rows as a handoff manifest; run dirs are relative to the manifest."""
+
+    shapes = []
+    for row in rows:
+        if not (row["complete"] and row["hard_ok"] and row["record_json"]):
+            continue
+        if only is not None and row["name"] not in only:
+            continue
+        run_dir = Path(row["record_json"]).resolve().parent
+        try:
+            run = str(run_dir.relative_to(out_root.resolve()))
+        except ValueError:
+            run = str(run_dir)
+        shapes.append({"name": row["name"], "variant": row["variant"], "run": run,
+                       "moves": row["moves"], "ends_flat": row["ends_flat"]})
+    if only is not None:
+        missing = sorted(only - {s["name"] for s in shapes})
+        if missing:
+            raise SystemExit(f"--only names without a loose-passing row: {', '.join(missing)}")
+    path = out_root / "handoff-manifest.json"
+    path.write_text(json.dumps({"schema": MANIFEST_SCHEMA, "source": str(out_root), "shapes": shapes}, indent=2) + "\n")
+    return path
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--out", type=Path, default=Path("out/explore-20260919"))
     parser.add_argument("--columns", type=int, default=6)
+    parser.add_argument("--only", nargs="*", default=None, metavar="NAME",
+                        help="restrict handoff-manifest.json to these picked concept names")
     args = parser.parse_args()
 
     rows = load_rows(args.out)
     summary = write_summary(rows, args.out)
+    manifest = write_manifest(rows, args.out, None if args.only is None else set(args.only))
     rendered = [(row["name"], row["top_png"]) for row in rows if row["top_png"] and Path(row["top_png"]).is_file()]
     if rendered:
         contact_sheet(rendered, args.out / "contact-sheet-labeled.png", columns=args.columns, show_labels=True)
@@ -124,7 +161,7 @@ def main() -> int:
     for row in rows:
         key = verdict(row).split(" ")[0].split(":")[0]
         counts[key] = counts.get(key, 0) + 1
-    print(f"{len(rows)} shapes: {counts}; wrote {summary}")
+    print(f"{len(rows)} shapes: {counts}; wrote {summary} and {manifest}")
     return 0
 
 

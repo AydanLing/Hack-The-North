@@ -22,6 +22,12 @@ targets must have intersecting contiguous bars reaching all four directions
 without a detached nub or hole. Final acceptance still requires a blind human
 pick.
 
+Beyond the demo seven, shapes are found with the mask-first method in
+`docs/METHOD.md` (draw recognizable exact masks, gate in seconds, fold only
+exact threadings, blind-pick, export through the handoff manifest). It is the
+default discovery route unless a task says otherwise; the glyph atlas and
+family rescoring are secondary tools for breadth and repair.
+
 The implementation is deliberately offline. MuJoCo, hardware drivers, voice,
 LLMs, vision judging, unrestricted 3D discovery, and learned optimizers are not
 part of this phase.

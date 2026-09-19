@@ -13,6 +13,19 @@ Usage (from ``cubot-v2/``)::
 
     uv run python tools/export_handoff.py                 # default run dir
     uv run python tools/export_handoff.py --runs out/demo-20260919/runs
+
+Shapes found by the mask-first exploration method (``docs/METHOD.md``) are
+appended after the demo seven through a manifest written by
+``tools/explore_summary.py``, or one at a time with ``--shape NAME=RUN_DIR``::
+
+    uv run python tools/export_handoff.py --manifest out/explore-20260919/handoff-manifest.json
+    uv run python tools/export_handoff.py --shape rocket=out/explore-20260919/verify/icons/runs/rocket-v4/rocket
+
+A manifest is JSON ``{"schema": "cubot.handoff.manifest.v1", "shapes": [{"name", "run", "variant"?}]}``;
+``run`` is the directory holding ``record.json`` and is resolved relative to the
+manifest's own directory when it is not absolute.  ``--no-demo`` exports only the
+manifest/``--shape`` entries.  Every entry goes through the same replay and
+consistency checks as the demo seven; numbering continues after them.
 """
 
 from __future__ import annotations
@@ -39,6 +52,7 @@ from cubot.lattice import ORIENTS, fk  # noqa: E402
 from cubot.records import Move, Pose  # noqa: E402
 
 SCHEMA = "cubot.handoff.v1"
+MANIFEST_SCHEMA = "cubot.handoff.manifest.v1"
 DETENT_DEG = 120.0
 
 # Demo order and numbering are part of the review contract (contact sheets are
@@ -48,6 +62,45 @@ SHAPES = ("heart", "arrow", "lightning", "plus", "h", "t", "n")
 # cubot-v2 chain frame (chain along +x) -> snake_pipeline chain frame (chain
 # along +z).  Verified on all seven goals: cell_sp = M @ cell_v2.
 V2_TO_SNAKE_PIPELINE = np.array(((0, 1, 0), (0, 0, 1), (1, 0, 0)), dtype=int)
+
+
+def load_manifest(path: Path) -> list[dict]:
+    """Read a ``cubot.handoff.manifest.v1`` file into ``[{name, run, variant}]`` with absolute run dirs."""
+
+    raw = json.loads(path.read_text())
+    if raw.get("schema") != MANIFEST_SCHEMA:
+        raise ValueError(f"{path}: expected schema {MANIFEST_SCHEMA!r}, got {raw.get('schema')!r}")
+    entries = []
+    for item in raw.get("shapes", []):
+        if "name" not in item or "run" not in item:
+            raise ValueError(f"{path}: every manifest shape needs 'name' and 'run'")
+        run = Path(item["run"])
+        if not run.is_absolute():
+            run = (path.parent / run).resolve()
+        entries.append({"name": str(item["name"]), "run": run, "variant": item.get("variant")})
+    return entries
+
+
+def parse_shape_arg(spec: str) -> dict:
+    """``NAME=RUN_DIR`` from the command line, run dir resolved against the cwd."""
+
+    name, sep, run = spec.partition("=")
+    if not sep or not name or not run:
+        raise ValueError(f"--shape expects NAME=RUN_DIR, got {spec!r}")
+    return {"name": name.strip(), "run": Path(run).resolve(), "variant": None}
+
+
+def plan_exports(demo: list[dict], extra: list[dict]) -> list[dict]:
+    """Number the demo seven first, then every extra entry; names must be unique."""
+
+    ordered = list(demo) + list(extra)
+    seen: dict[str, int] = {}
+    for number, entry in enumerate(ordered, start=1):
+        if entry["name"] in seen:
+            raise ValueError(f"duplicate handoff shape name {entry['name']!r} (#{seen[entry['name']]} and #{number})")
+        seen[entry["name"]] = number
+        entry["number"] = number
+    return ordered
 
 
 def _pose(raw: dict) -> Pose:
@@ -136,7 +189,7 @@ def _plan_summary(plan: dict) -> dict:
     }
 
 
-def export_shape(name: str, number: int, run_dir: Path, out_dir: Path, machine, profiles: dict) -> dict:
+def export_shape(name: str, number: int, run_dir: Path, out_dir: Path, machine, profiles: dict, variant: str | None = None) -> dict:
     record = json.loads((run_dir / "record.json").read_text())
     reports = {
         p: json.loads((run_dir / f"{p}-report.json").read_text())
@@ -297,6 +350,7 @@ def export_shape(name: str, number: int, run_dir: Path, out_dir: Path, machine, 
             "source_hash": record["meta"]["source_hash"],
             "profile": record["meta"]["profile"],
             "seed": record["meta"]["seed"],
+            "mask_variant": variant,
             "exporter": "tools/export_handoff.py",
         },
     }
@@ -337,6 +391,7 @@ def export_shape(name: str, number: int, run_dir: Path, out_dir: Path, machine, 
         "final_base_tracked": replayed.base,
         "goal_states": list(goal.states),
         "created": record["meta"]["created"],
+        "mask_variant": variant,
     }
 
 
@@ -411,6 +466,11 @@ def main() -> int:
     parser.add_argument("--runs", type=Path, default=ROOT / "out" / "demo-20260919" / "runs")
     parser.add_argument("--out", type=Path, default=ROOT / "handoff")
     parser.add_argument("--contact-sheets", type=Path, default=ROOT / "out" / "demo-20260919")
+    parser.add_argument("--manifest", type=Path, action="append", default=[],
+                        help="cubot.handoff.manifest.v1 file(s); shapes are appended after the demo seven")
+    parser.add_argument("--shape", action="append", default=[], metavar="NAME=RUN_DIR",
+                        help="append one shape from a pipeline run directory holding record.json")
+    parser.add_argument("--no-demo", action="store_true", help="export only --manifest/--shape entries")
     args = parser.parse_args()
 
     machine = load_machine()
@@ -433,14 +493,24 @@ def main() -> int:
         "check_profiles": profiles,
     }, indent=2) + "\n")
 
+    demo = [] if args.no_demo else [{"name": name, "run": args.runs / name, "variant": None} for name in SHAPES]
+    try:
+        extra = [entry for manifest in args.manifest for entry in load_manifest(manifest)]
+        extra += [parse_shape_arg(spec) for spec in args.shape]
+        planned_all = plan_exports(demo, extra)
+    except ValueError as error:
+        raise SystemExit(str(error)) from error
+    if not planned_all:
+        raise SystemExit("nothing to export: --no-demo given without --manifest or --shape")
+
     entries = []
-    for number, name in enumerate(SHAPES, start=1):
-        run_dir = args.runs / name
-        if not run_dir.is_dir():
-            raise SystemExit(f"missing run directory {run_dir}")
-        entries.append(export_shape(name, number, run_dir, args.out, machine, profiles))
+    for planned in planned_all:
+        run_dir = planned["run"]
+        if not (run_dir / "record.json").is_file():
+            raise SystemExit(f"missing record.json in run directory {run_dir}")
+        entries.append(export_shape(planned["name"], planned["number"], run_dir, args.out, machine, profiles, variant=planned["variant"]))
         e = entries[-1]
-        print(f"exported {number}. {name}: {e['moves']} moves, loose_hard_ok={e['loose_hard_ok']}, ends_flat={e['ends_flat_on_table']}")
+        print(f"exported {e['number']}. {e['name']}: {e['moves']} moves, loose_hard_ok={e['loose_hard_ok']}, ends_flat={e['ends_flat_on_table']}")
 
     for sheet in ("contact-sheet-labeled.png", "contact-sheet-blind.png"):
         src = args.contact_sheets / sheet
