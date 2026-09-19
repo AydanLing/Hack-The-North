@@ -4,7 +4,8 @@
  "source": {
   "tool": "physics-in-the-loop beam search (MuJoCo: gravity, 5.8 N*m cap, free base; every move must pass in three worlds, friction 0.30 / 0.35 / 0.45, with >= 5 mm wire-to-table and >= 3 mm wire-to-module clearance, plus a 2 s hold at the end). Each move kept only if its servo reaches the detent in its 2.75 s slot and an 80x50x50 mm wire keep-out box on module 27's outer face never touches another module or the table; plus clear ray out of that face at every rest and URDF sweep <= 1 mm (re-checked at 2 deg).",
   "wire_end_module": 27,
-  "side_note": "side = planner's guess only; physics chooses which half swings"
+  "side_note": "side = planner's guess only; physics chooses which half swings",
+  "timing_note": "move 15 runs over 3.0 s (others 2.0 s) to soften the final face-to-face landing of modules 10 and 25"
  },
  "machine": {
   "pitch_mm": 82.0,
@@ -2768,7 +2769,7 @@
    "joint": 19,
    "delta": 1,
    "side": "out",
-   "duration_s": 2.0,
+   "duration_s": 3.0,
    "state_before": 0,
    "state_after": 1,
    "angle_after_deg": 120.0
