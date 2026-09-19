@@ -455,10 +455,10 @@ def _paths_markdown(entries: list[dict], out_dir: Path) -> str:
                 notes.append(note)
         if e.get("layered"):
             finish = "upright" if e.get("final_upright") else f"tilted (drawn +z -> {payload['final_tracked'].get('up_axis')})"
-            if e.get("tier") == 2:
-                notes.append("tier 2: passes only with the table removed (platform profile)")
         else:
             finish = "flat on table" if e["ends_flat_on_table"] else "STANDING"
+        if e.get("tier") == 2:
+            notes.append("tier 2: passes only with the table removed (platform profile)")
         lines.append(
             f"| {e['number']} | {e['name']} | {e['moves']} | {'pass' if e['loose_hard_ok'] else 'FAIL'} | "
             f"{'pass' if e['strict_hard_ok'] else 'fail'} | {finish} | "
