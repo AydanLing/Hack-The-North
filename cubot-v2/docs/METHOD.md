@@ -144,6 +144,11 @@ annotates the sheet; it never picks.
 uv run python tools/export_handoff.py --manifest out/explore-<date>/handoff-manifest.json
 ```
 
+A glyph-atlas sweep exports the same way once `tools/discovery_manifest.py`
+has written its `handoff-manifest.json` from the sweep's `summary.json`;
+`--manifest` may be repeated, and the whole set is rebuilt into the interactive
+fold viewer with `python3 ../cubot_urdf/make_fold_viewer.py`.
+
 Every manifest entry goes through exactly the checks the demo seven do: the
 recorded moves are replayed with the current kinematics, the replayed states
 must equal the recorded goal, the goal FK must equal the record's cells, the

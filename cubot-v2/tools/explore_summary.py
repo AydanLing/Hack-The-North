@@ -64,8 +64,13 @@ def verdict(row: dict) -> str:
     return "partial"
 
 
-def load_rows(root: Path) -> list[dict]:
-    """Merge every ``results.jsonl`` under ``root`` (one per parallel worker)."""
+def load_rows(root: Path, prefer: dict[str, str] | None = None) -> list[dict]:
+    """Merge every ``results.jsonl`` under ``root`` (one per parallel worker).
+
+    ``prefer`` maps a concept name to the variant that should represent it
+    even when another variant ranks better mechanically (the blind pick may
+    prefer a better-reading drawing); it must have a loose-passing row.
+    """
 
     rows = [
         json.loads(line)
@@ -79,10 +84,22 @@ def load_rows(root: Path) -> list[dict]:
     rows = [row for row in rows if row["complete"] is None or row.get("goal_is_mask") is True]
     best: dict[str, dict] = {}
     tried: dict[str, int] = {}
+    prefer = prefer or {}
     for row in rows:
         tried[row["name"]] = tried.get(row["name"], 0) + 1
+        wanted = prefer.get(row["name"])
+        if wanted is not None:
+            if row["variant"] != wanted:
+                continue
+            current = best.get(row["name"])
+            if current is None or rank_key(row) < rank_key(current):
+                best[row["name"]] = row
+            continue
         if row["name"] not in best or rank_key(row) < rank_key(best[row["name"]]):
             best[row["name"]] = row
+    missing = sorted(name for name in prefer if name not in best)
+    if missing:
+        raise SystemExit(f"--prefer variants without a row: {', '.join(f'{n}={prefer[n]}' for n in missing)}")
     for name, row in best.items():
         row["variants_tried"] = tried[name]
     return sorted(best.values(), key=lambda r: (rank_key(r), r["name"]))
@@ -173,9 +190,17 @@ def main() -> int:
     parser.add_argument("--columns", type=int, default=6)
     parser.add_argument("--only", nargs="*", default=None, metavar="NAME",
                         help="restrict handoff-manifest.json to these picked concept names")
+    parser.add_argument("--prefer", nargs="*", default=[], metavar="NAME=VARIANT",
+                        help="represent NAME by VARIANT (a better-reading pick) instead of the mechanics-best row")
     args = parser.parse_args()
 
-    rows = load_rows(args.out)
+    prefer = {}
+    for spec in args.prefer:
+        name, sep, variant = spec.partition("=")
+        if not sep or not variant:
+            parser.error(f"--prefer expects NAME=VARIANT, got {spec!r}")
+        prefer[name] = variant
+    rows = load_rows(args.out, prefer)
     summary = write_summary(rows, args.out)
     manifest = write_manifest(rows, args.out, None if args.only is None else set(args.only))
     rendered = [(row["name"], review_png(row)) for row in rows if review_png(row) and Path(review_png(row)).is_file()]

@@ -1,8 +1,12 @@
 # CuBot V2 — finalized demo paths (handoff to the MuJoCo sim)
 
-This folder is the complete, self-contained hand-off of the seven finalized
-fold paths — **heart, arrow, lightning, plus, H, T, N** — from the offline
-pre-simulation planner (`cubot-v2`) to the MuJoCo simulation pipeline.
+This folder is the complete, self-contained hand-off of every fold path the
+offline pre-simulation planner (`cubot-v2`) has certified, to the MuJoCo
+simulation pipeline: the seven finalized demo paths — **heart, arrow,
+lightning, plus, H, T, N** (shapes 1–7, the fixed review contract) — followed
+by the 42 mask-first exploration winners (8–49) and the 35 loose-passing
+glyph-atlas discovery candidates (50–84). 84 paths in all; see
+"Appended shapes" below for how the two extra groups differ from the demo seven.
 
 Everything a replay needs is here: the machine constants, the collision hull,
 the roll word, the start pose (including how the straight chain lies on the
@@ -25,7 +29,7 @@ neighbours against strict's 0 mm penetration limit (loose allows 6 mm). It is
 a modelling artefact of the conservative hull, not a real collision.
 
 `PATHS.md` is a generated digest with the silhouette and full move list of
-every shape; `index.json` is the same table for machines. **No human pick has
+every shape (all 84); `index.json` is the same table for machines. **No human pick has
 been recorded yet** (`human_pick: null` everywhere) — "finalized" here means
 these are the routes the planner shipped for the seven demo icons, reviewed on
 `contact-sheet-labeled.png`.
@@ -49,16 +53,40 @@ these are the routes the planner shipped for the seven demo icons, reviewed on
    it, but six of its fourteen moves dip the moving side 49–328 mm into the
    table in our sampled sweep (limit 40 mm). Expect it to fail physically.
 
+## Appended shapes (8–84)
+
+Everything after the demo seven was found by one of the two discovery methods
+and exported through the very same replay and consistency checks
+(`tools/export_handoff.py --manifest`), so the files, fields and conventions
+are identical. What differs is provenance and review status:
+
+| # | group | count | how they were found | manifest |
+|---|-------|------:|---------------------|----------|
+| 8–49 | mask-first exploration | 42 | hand-drawn 27-cell masks, gated by an exact shipped-roll threading, folded exactly (`docs/METHOD.md`, `docs/EXPLORATION-20260919.md`) | `out/explore-20260919/handoff-manifest.json` from `tools/explore_summary.py` |
+| 50–84 | glyph-atlas discovery | 35 | generated atlas variants ranked offline, then folded (`docs/DISCOVERY.md`); names keep the atlas slug (`c-v01`), so several concepts appear twice (`hook-v01` / `hook-v02`) or also exist as an exploration winner (`c` vs `c-v01`) | `out/discovery-20260919/handoff-manifest.json` from `tools/discovery_manifest.py` |
+
+- `path.json → provenance.source_record` says which run family a shape came
+  from; `provenance.mask_variant` is the mask / atlas slug that was folded.
+- Every appended shape is kinematically complete and passes the **loose** hard
+  checks (that was the admission rule; the 21 discovery candidates that fold but
+  violate loose are not exported). Strict fails everywhere for the same 0.398 mm
+  artefact as the demo seven.
+- Many appended shapes finish **standing** (see `ends_flat_on_table` in
+  `index.json`) — the same `in`-move effect described above.
+- No human pick has been recorded for any of them either; they are candidates,
+  not a curated set. Recognizability was judged on the blind contact sheets in
+  `docs/exploration-20260919/` and `docs/discovery-20260919/`.
+
 ## Folder layout
 
 ```
 handoff/
 ├── README.md                 this file — conventions and field reference
-├── PATHS.md                  generated digest: silhouettes + move lists for all seven
+├── PATHS.md                  generated digest: silhouettes + move lists for all 84
 ├── index.json                one row per shape (status, move count, bases, files)
 ├── machine.json              constants: 27 modules, 80 mm cube, 82 mm pitch, roll word, servo, check profiles
 ├── module_solid.json         conservative convex hull of one module (full / still / moving pieces), mm
-├── contact-sheet-labeled.png the seven goal silhouettes, numbered
+├── contact-sheet-labeled.png the seven demo goal silhouettes, numbered (exploration / atlas sheets live under docs/)
 ├── contact-sheet-blind.png   same, unlabeled (for blind recognizability review)
 ├── tools/replay.py           dependency-free verifier / pretty-printer (python3 tools/replay.py shapes/*/path.json)
 └── shapes/
@@ -70,6 +98,8 @@ handoff/
     │   ├── iso.png           isometric render of the goal
     │   └── engineering.png   top view with module numbers (0 = base ... 26 = tail)
     ├── 02-arrow/  03-lightning/  04-plus/  05-h/  06-t/  07-n/   (same files)
+    ├── 08-c/ … 49-a/                 mask-first exploration winners (same files)
+    └── 50-hook-v01/ … 84-check-v01/  glyph-atlas discovery candidates (same files)
 ```
 
 ## Conventions (the contract)

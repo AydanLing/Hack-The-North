@@ -1,0 +1,1684 @@
+[
+ {
+  "sheet": "blind-01",
+  "tile": 1,
+  "name": "crab",
+  "variant": "crab-v2",
+  "mask": "data/candidates/animals/crab-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/crab-v2.png",
+  "threadings": 3,
+  "mask_rows": [
+   "##....#",
+   "##....#",
+   "#######",
+   "#######",
+   "#######"
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 2,
+  "name": "bird",
+  "variant": "bird-v4",
+  "mask": "data/candidates/animals/bird-v4.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/bird-v4.png",
+  "threadings": 6,
+  "mask_rows": [
+   "....##.",
+   "....###",
+   "..#####",
+   "######.",
+   "####.#.",
+   "######."
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 3,
+  "name": "camel",
+  "variant": "camel-v2",
+  "mask": "data/candidates/animals/camel-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/camel-v2.png",
+  "threadings": 3,
+  "mask_rows": [
+   ".##.##..",
+   ".##.##..",
+   "########",
+   "########",
+   "##.....#"
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 4,
+  "name": "bird",
+  "variant": "bird-v3",
+  "mask": "data/candidates/animals/bird-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/bird-v3.png",
+  "threadings": 6,
+  "mask_rows": [
+   "....##.",
+   "...####",
+   "...###.",
+   "#######",
+   "#######",
+   ".####.."
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 5,
+  "name": "frog",
+  "variant": "frog-v2",
+  "mask": "data/candidates/animals/frog-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/frog-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   ".#####.",
+   "#######",
+   "###.###",
+   ".#####.",
+   "##...##"
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 6,
+  "name": "camel",
+  "variant": "camel-v4",
+  "mask": "data/candidates/animals/camel-v4.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/camel-v4.png",
+  "threadings": 12,
+  "mask_rows": [
+   ".#######.",
+   ".#######.",
+   "#########",
+   "##.....##"
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 7,
+  "name": "ant",
+  "variant": "ant-v3",
+  "mask": "data/candidates/animals/ant-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/ant-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   "##.#######",
+   "####.#####",
+   "####.#####"
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 8,
+  "name": "turtle",
+  "variant": "turtle-v1",
+  "mask": "data/candidates/animals/turtle-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/turtle-v1.png",
+  "threadings": 6,
+  "mask_rows": [
+   "......##",
+   "...#####",
+   ".#######",
+   "########",
+   "###...##"
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 9,
+  "name": "whale",
+  "variant": "whale-v1",
+  "mask": "data/candidates/animals/whale-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/whale-v1.png",
+  "threadings": 12,
+  "mask_rows": [
+   ".....####",
+   "######.##",
+   "########.",
+   ".#######."
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 10,
+  "name": "kangaroo",
+  "variant": "kangaroo-v1",
+  "mask": "data/candidates/animals/kangaroo-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/kangaroo-v1.png",
+  "threadings": 6,
+  "mask_rows": [
+   "....##",
+   "....##",
+   "....##",
+   "..####",
+   "..####",
+   "######",
+   "#####.",
+   ".##..."
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 11,
+  "name": "cat",
+  "variant": "cat-v13",
+  "mask": "data/candidates/animals/cat-v13.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/cat-v13.png",
+  "threadings": 3,
+  "mask_rows": [
+   "#.....#",
+   "#...###",
+   "#######",
+   "#######",
+   "###.#..",
+   "..###.."
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 12,
+  "name": "mouse",
+  "variant": "mouse-v3",
+  "mask": "data/candidates/animals/mouse-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/mouse-v3.png",
+  "threadings": 12,
+  "mask_rows": [
+   "##....",
+   "##....",
+   ".#####",
+   "######",
+   "######",
+   "######"
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 13,
+  "name": "horse",
+  "variant": "horse-v1",
+  "mask": "data/candidates/animals/horse-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/horse-v1.png",
+  "threadings": 3,
+  "mask_rows": [
+   ".....##.",
+   ".....##.",
+   ".....##.",
+   "########",
+   "########",
+   "###...##"
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 14,
+  "name": "fish",
+  "variant": "fish-v3",
+  "mask": "data/candidates/animals/fish-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/fish-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   "...####",
+   "#######",
+   "#######",
+   ".####.#",
+   "...####"
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 15,
+  "name": "shark",
+  "variant": "shark-v4",
+  "mask": "data/candidates/animals/shark-v4.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/shark-v4.png",
+  "threadings": 6,
+  "mask_rows": [
+   "....##....",
+   "....##....",
+   "###.##..##",
+   "######..##",
+   ".########."
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 16,
+  "name": "bat",
+  "variant": "bat-v1",
+  "mask": "data/candidates/animals/bat-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/bat-v1.png",
+  "threadings": 3,
+  "mask_rows": [
+   "#.....#",
+   "#.....#",
+   "#######",
+   "#######",
+   "#######",
+   "##....."
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 17,
+  "name": "fox",
+  "variant": "fox-v2",
+  "mask": "data/candidates/animals/fox-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/fox-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "###....",
+   "###..##",
+   "#######",
+   "######.",
+   "..####.",
+   "...##.."
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 18,
+  "name": "snake",
+  "variant": "snake-v3",
+  "mask": "data/candidates/animals/snake-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/snake-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   "##.....",
+   "#######",
+   "#.....#",
+   "#######",
+   "##.....",
+   "#######"
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 19,
+  "name": "shark",
+  "variant": "shark-v2",
+  "mask": "data/candidates/animals/shark-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/shark-v2.png",
+  "threadings": 3,
+  "mask_rows": [
+   "....##....",
+   "....##....",
+   "########..",
+   "#########.",
+   "...######."
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 20,
+  "name": "owl",
+  "variant": "owl-v3",
+  "mask": "data/candidates/animals/owl-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/owl-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   "##...##",
+   "#######",
+   "##...##",
+   "######.",
+   "######."
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 21,
+  "name": "chicken",
+  "variant": "chicken-v4",
+  "mask": "data/candidates/animals/chicken-v4.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/chicken-v4.png",
+  "threadings": 6,
+  "mask_rows": [
+   "..##....",
+   "..##..##",
+   "########",
+   "########",
+   "..#####."
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 22,
+  "name": "bird",
+  "variant": "bird-v2",
+  "mask": "data/candidates/animals/bird-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/bird-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "....##.",
+   "..#####",
+   "..#####",
+   "######.",
+   "#####..",
+   ".####.."
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 23,
+  "name": "crab",
+  "variant": "crab-v3",
+  "mask": "data/candidates/animals/crab-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/crab-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   "##...##",
+   "#....##",
+   "#######",
+   "#####.#",
+   "#######"
+  ]
+ },
+ {
+  "sheet": "blind-01",
+  "tile": 24,
+  "name": "butterfly",
+  "variant": "butterfly-v3",
+  "mask": "data/candidates/animals/butterfly-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/butterfly-v3.png",
+  "threadings": 6,
+  "mask_rows": [
+   ".##.##",
+   ".#####",
+   ".####.",
+   "..###.",
+   "###.##",
+   "######"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 1,
+  "name": "monkey",
+  "variant": "monkey-v1",
+  "mask": "data/candidates/animals/monkey-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/monkey-v1.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##...##",
+   "#######",
+   "######.",
+   "######.",
+   "..##...",
+   "..##..."
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 2,
+  "name": "dog",
+  "variant": "dog-v3",
+  "mask": "data/candidates/animals/dog-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/dog-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   "#......",
+   "#...###",
+   "#..##.#",
+   "#######",
+   "#######",
+   "##...##"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 3,
+  "name": "crab",
+  "variant": "crab-v1",
+  "mask": "data/candidates/animals/crab-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/crab-v1.png",
+  "threadings": 3,
+  "mask_rows": [
+   "##...##",
+   "##...##",
+   "#######",
+   "#######",
+   "#####.."
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 4,
+  "name": "dog",
+  "variant": "dog-v2",
+  "mask": "data/candidates/animals/dog-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/dog-v2.png",
+  "threadings": 3,
+  "mask_rows": [
+   "#..####",
+   "#..####",
+   "#######",
+   "##.####",
+   "##...##"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 5,
+  "name": "sheep",
+  "variant": "sheep-v4",
+  "mask": "data/candidates/animals/sheep-v4.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/sheep-v4.png",
+  "threadings": 6,
+  "mask_rows": [
+   "..######",
+   "########",
+   "#######.",
+   "##...##.",
+   "##......"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 6,
+  "name": "duck",
+  "variant": "duck-v3",
+  "mask": "data/candidates/animals/duck-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/duck-v3.png",
+  "threadings": 6,
+  "mask_rows": [
+   "####...",
+   "####...",
+   ".###...",
+   ".##.###",
+   ".######",
+   ".#####."
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 7,
+  "name": "turtle",
+  "variant": "turtle-v3",
+  "mask": "data/candidates/animals/turtle-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/turtle-v3.png",
+  "threadings": 12,
+  "mask_rows": [
+   ".#######.",
+   ".#######.",
+   "#########",
+   "##.....##"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 8,
+  "name": "sheep",
+  "variant": "sheep-v2",
+  "mask": "data/candidates/animals/sheep-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/sheep-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   ".######.",
+   ".######.",
+   "########",
+   "###...##",
+   "##......"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 9,
+  "name": "flamingo",
+  "variant": "flamingo-v1",
+  "mask": "data/candidates/animals/flamingo-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/flamingo-v1.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##....",
+   "####..",
+   ".###..",
+   ".#####",
+   ".#####",
+   ".####.",
+   "...##.",
+   "...##."
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 10,
+  "name": "worm",
+  "variant": "worm-v3",
+  "mask": "data/candidates/animals/worm-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/worm-v3.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##.....",
+   "#####..",
+   "######.",
+   "##.####",
+   ".##.###",
+   "..###.."
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 11,
+  "name": "snake",
+  "variant": "snake-v2",
+  "mask": "data/candidates/animals/snake-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/snake-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##.....",
+   "#######",
+   ".....##",
+   ".....#.",
+   ".....#.",
+   "######.",
+   "#......",
+   "#######"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 12,
+  "name": "dinosaur",
+  "variant": "dinosaur-v3",
+  "mask": "data/candidates/animals/dinosaur-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/dinosaur-v3.png",
+  "threadings": 6,
+  "mask_rows": [
+   "...##.",
+   "...###",
+   "....##",
+   "...##.",
+   "...##.",
+   "#####.",
+   "######",
+   "##.###"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 13,
+  "name": "dolphin",
+  "variant": "dolphin-v4",
+  "mask": "data/candidates/animals/dolphin-v4.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/dolphin-v4.png",
+  "threadings": 6,
+  "mask_rows": [
+   "...####..",
+   "..#######",
+   "#########",
+   ".#######."
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 14,
+  "name": "snake",
+  "variant": "snake-v4",
+  "mask": "data/candidates/animals/snake-v4.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/snake-v4.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##.....",
+   "#######",
+   ".....##",
+   "#######",
+   "##....#",
+   ".######"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 15,
+  "name": "flamingo",
+  "variant": "flamingo-v2",
+  "mask": "data/candidates/animals/flamingo-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/flamingo-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##....",
+   "###...",
+   "#.#...",
+   "######",
+   ".#####",
+   ".####.",
+   "..###.",
+   "..##.."
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 16,
+  "name": "cat",
+  "variant": "cat-v11",
+  "mask": "data/candidates/animals/cat-v11.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/cat-v11.png",
+  "threadings": 3,
+  "mask_rows": [
+   "#.....#",
+   "#.....#",
+   "#######",
+   ".######",
+   ".######",
+   "...##..",
+   "...##.."
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 17,
+  "name": "snail",
+  "variant": "snail-v1",
+  "mask": "data/candidates/animals/snail-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/snail-v1.png",
+  "threadings": 3,
+  "mask_rows": [
+   ".######..",
+   ".#....#..",
+   ".#..#.#..",
+   ".#..#.#..",
+   ".####.###",
+   ".##..####"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 18,
+  "name": "pig",
+  "variant": "pig-v2",
+  "mask": "data/candidates/animals/pig-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/pig-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   ".######..",
+   "########.",
+   "###.#####",
+   "##....###"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 19,
+  "name": "bear",
+  "variant": "bear-v1",
+  "mask": "data/candidates/animals/bear-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/bear-v1.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##...##",
+   ".#####.",
+   "###.###",
+   "#######",
+   ".#####."
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 20,
+  "name": "cow",
+  "variant": "cow-v2",
+  "mask": "data/candidates/animals/cow-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/cow-v2.png",
+  "threadings": 3,
+  "mask_rows": [
+   ".....#.#",
+   ".....###",
+   ".....###",
+   "######.#",
+   "#####..#",
+   "##..####"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 21,
+  "name": "cat",
+  "variant": "cat-v12",
+  "mask": "data/candidates/animals/cat-v12.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/cat-v12.png",
+  "threadings": 3,
+  "mask_rows": [
+   "#.....#",
+   "#.....#",
+   "#######",
+   "##.####",
+   "##.####",
+   "...##..",
+   "...##.."
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 22,
+  "name": "cow",
+  "variant": "cow-v3",
+  "mask": "data/candidates/animals/cow-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/cow-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   ".....#.#",
+   ".....###",
+   ".....###",
+   "######.#",
+   "#...####",
+   "#####.##"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 23,
+  "name": "dog",
+  "variant": "dog-v4",
+  "mask": "data/candidates/animals/dog-v4.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/dog-v4.png",
+  "threadings": 3,
+  "mask_rows": [
+   "##..###",
+   "#..##.#",
+   "#######",
+   "#######",
+   "##...##"
+  ]
+ },
+ {
+  "sheet": "blind-02",
+  "tile": 24,
+  "name": "seahorse",
+  "variant": "seahorse-v2",
+  "mask": "data/candidates/animals/seahorse-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/seahorse-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "###..",
+   "###..",
+   "###..",
+   ".####",
+   ".####",
+   "#####",
+   "###..",
+   ".##.."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 1,
+  "name": "ladybug",
+  "variant": "ladybug-v2",
+  "mask": "data/candidates/animals/ladybug-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/ladybug-v2.png",
+  "threadings": 3,
+  "mask_rows": [
+   ".#####.",
+   "######.",
+   "#######",
+   "#######",
+   ".##...."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 2,
+  "name": "penguin",
+  "variant": "penguin-v1",
+  "mask": "data/candidates/animals/penguin-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/penguin-v1.png",
+  "threadings": 6,
+  "mask_rows": [
+   "..##..",
+   ".###..",
+   ".####.",
+   ".####.",
+   "######",
+   "##...#",
+   ".#####"
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 3,
+  "name": "rabbit",
+  "variant": "rabbit-v3",
+  "mask": "data/candidates/animals/rabbit-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/rabbit-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   "#.#....",
+   "#.#....",
+   "#.#....",
+   "###.###",
+   ".####.#",
+   ".######",
+   ".####.."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 4,
+  "name": "giraffe",
+  "variant": "giraffe-v1",
+  "mask": "data/candidates/animals/giraffe-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/giraffe-v1.png",
+  "threadings": 3,
+  "mask_rows": [
+   "....##",
+   "....##",
+   "....##",
+   "######",
+   "######",
+   "#####.",
+   "##..##"
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 5,
+  "name": "penguin",
+  "variant": "penguin-v3",
+  "mask": "data/candidates/animals/penguin-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/penguin-v3.png",
+  "threadings": 6,
+  "mask_rows": [
+   ".###..",
+   ".###..",
+   "..###.",
+   "..###.",
+   "######",
+   "###.##",
+   ".##.##"
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 6,
+  "name": "deer",
+  "variant": "deer-v1",
+  "mask": "data/candidates/animals/deer-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/deer-v1.png",
+  "threadings": 6,
+  "mask_rows": [
+   "#######",
+   "##...##",
+   ".#####.",
+   ".#####.",
+   ".####..",
+   "...##.."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 7,
+  "name": "worm",
+  "variant": "worm-v2",
+  "mask": "data/candidates/animals/worm-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/worm-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "####.....",
+   "#..#####.",
+   "#########",
+   "##.######"
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 8,
+  "name": "fox",
+  "variant": "fox-v1",
+  "mask": "data/candidates/animals/fox-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/fox-v1.png",
+  "threadings": 3,
+  "mask_rows": [
+   "#.....#",
+   "#.....#",
+   "#######",
+   "######.",
+   "######.",
+   "..##...",
+   "..##..."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 9,
+  "name": "whale",
+  "variant": "whale-v3",
+  "mask": "data/candidates/animals/whale-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/whale-v3.png",
+  "threadings": 6,
+  "mask_rows": [
+   ".......##",
+   ".....####",
+   ".#######.",
+   "#####.##.",
+   "#######.."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 10,
+  "name": "ant",
+  "variant": "ant-v2",
+  "mask": "data/candidates/animals/ant-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/ant-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "#######.##",
+   "##########",
+   "######.##."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 11,
+  "name": "rabbit",
+  "variant": "rabbit-v2",
+  "mask": "data/candidates/animals/rabbit-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/rabbit-v2.png",
+  "threadings": 3,
+  "mask_rows": [
+   "#.#....",
+   "#.#....",
+   "#.#....",
+   "#.#....",
+   "#######",
+   "####.##",
+   "######."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 12,
+  "name": "duck",
+  "variant": "duck-v1",
+  "mask": "data/candidates/animals/duck-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/duck-v1.png",
+  "threadings": 6,
+  "mask_rows": [
+   ".##....",
+   "####...",
+   ".###...",
+   "#######",
+   "#######",
+   "..####."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 13,
+  "name": "ladybug",
+  "variant": "ladybug-v3",
+  "mask": "data/candidates/animals/ladybug-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/ladybug-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   "######.",
+   "#..####",
+   "##.####",
+   ".######",
+   ".##.##."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 14,
+  "name": "turtle",
+  "variant": "turtle-v2",
+  "mask": "data/candidates/animals/turtle-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/turtle-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   ".....##.",
+   ".######.",
+   "##.####.",
+   "########",
+   "##...###"
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 15,
+  "name": "bat",
+  "variant": "bat-v2",
+  "mask": "data/candidates/animals/bat-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/bat-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##.....",
+   "##...##",
+   "#######",
+   "#######",
+   "#######"
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 16,
+  "name": "whale",
+  "variant": "whale-v2",
+  "mask": "data/candidates/animals/whale-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/whale-v2.png",
+  "threadings": 12,
+  "mask_rows": [
+   "......##",
+   ".....###",
+   "########",
+   "#######.",
+   "#######."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 17,
+  "name": "ladybug",
+  "variant": "ladybug-v1",
+  "mask": "data/candidates/animals/ladybug-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/ladybug-v1.png",
+  "threadings": 6,
+  "mask_rows": [
+   "######.",
+   "####.##",
+   "##.#.##",
+   "######.",
+   "..####."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 18,
+  "name": "swan",
+  "variant": "swan-v2",
+  "mask": "data/candidates/animals/swan-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/swan-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "..##..",
+   "####..",
+   "##....",
+   ".#....",
+   ".#....",
+   ".#####",
+   "######",
+   "######"
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 19,
+  "name": "dinosaur",
+  "variant": "dinosaur-v1",
+  "mask": "data/candidates/animals/dinosaur-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/dinosaur-v1.png",
+  "threadings": 6,
+  "mask_rows": [
+   "....##",
+   "....##",
+   "..###.",
+   "..###.",
+   "#####.",
+   "#####.",
+   "#####.",
+   "##...."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 20,
+  "name": "fish",
+  "variant": "fish-v2",
+  "mask": "data/candidates/animals/fish-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/fish-v2.png",
+  "threadings": 3,
+  "mask_rows": [
+   "...####",
+   "#######",
+   "#.#####",
+   "#.#####",
+   "..##.##"
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 21,
+  "name": "kangaroo",
+  "variant": "kangaroo-v2",
+  "mask": "data/candidates/animals/kangaroo-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/kangaroo-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "....##",
+   "....##",
+   "....##",
+   "...###",
+   ".#####",
+   "######",
+   "###.##",
+   "##...."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 22,
+  "name": "swan",
+  "variant": "swan-v1",
+  "mask": "data/candidates/animals/swan-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/swan-v1.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##....",
+   "##....",
+   ".#....",
+   ".#....",
+   ".#####",
+   "######",
+   "#####.",
+   "#####."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 23,
+  "name": "seahorse",
+  "variant": "seahorse-v1",
+  "mask": "data/candidates/animals/seahorse-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/seahorse-v1.png",
+  "threadings": 3,
+  "mask_rows": [
+   "####..",
+   "####..",
+   "..##..",
+   "..####",
+   "..####",
+   ".###..",
+   ".###..",
+   ".###.."
+  ]
+ },
+ {
+  "sheet": "blind-03",
+  "tile": 24,
+  "name": "pig",
+  "variant": "pig-v3",
+  "mask": "data/candidates/animals/pig-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/pig-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   ".######..",
+   "####.###.",
+   "#########",
+   "##....###"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 1,
+  "name": "monkey",
+  "variant": "monkey-v2",
+  "mask": "data/candidates/animals/monkey-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/monkey-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##..##",
+   "######",
+   "######",
+   ".####.",
+   ".##...",
+   "..#...",
+   ".##...",
+   ".##..."
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 2,
+  "name": "fish",
+  "variant": "fish-v4",
+  "mask": "data/candidates/animals/fish-v4.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/fish-v4.png",
+  "threadings": 6,
+  "mask_rows": [
+   "..#####",
+   "#######",
+   "#######",
+   "..##.##",
+   "...####"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 3,
+  "name": "butterfly",
+  "variant": "butterfly-v2",
+  "mask": "data/candidates/animals/butterfly-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/butterfly-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "#####",
+   "#####",
+   "##.##",
+   ".###.",
+   "#####",
+   "#####"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 4,
+  "name": "sheep",
+  "variant": "sheep-v3",
+  "mask": "data/candidates/animals/sheep-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/sheep-v3.png",
+  "threadings": 6,
+  "mask_rows": [
+   "#######.",
+   "#.#####.",
+   "########",
+   "##....##",
+   "##......"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 5,
+  "name": "elephant",
+  "variant": "elephant-v3",
+  "mask": "data/candidates/animals/elephant-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/elephant-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   ".....####",
+   "######.##",
+   "######.##",
+   "##...####",
+   "........#"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 6,
+  "name": "chicken",
+  "variant": "chicken-v3",
+  "mask": "data/candidates/animals/chicken-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/chicken-v3.png",
+  "threadings": 9,
+  "mask_rows": [
+   ".##....",
+   "###....",
+   "###..##",
+   "###..##",
+   ".######",
+   ".######"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 7,
+  "name": "seahorse",
+  "variant": "seahorse-v3",
+  "mask": "data/candidates/animals/seahorse-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/seahorse-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   "####..",
+   "####..",
+   "..##..",
+   "..###.",
+   "..#.##",
+   ".#####",
+   ".###..",
+   ".###.."
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 8,
+  "name": "penguin",
+  "variant": "penguin-v2",
+  "mask": "data/candidates/animals/penguin-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/penguin-v2.png",
+  "threadings": 3,
+  "mask_rows": [
+   "..##..",
+   "..##..",
+   ".###..",
+   ".###..",
+   "######",
+   "######",
+   ".#####"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 9,
+  "name": "dolphin",
+  "variant": "dolphin-v2",
+  "mask": "data/candidates/animals/dolphin-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/dolphin-v2.png",
+  "threadings": 15,
+  "mask_rows": [
+   "....##...",
+   "...###...",
+   "...######",
+   "#########",
+   "#######.."
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 10,
+  "name": "shark",
+  "variant": "shark-v3",
+  "mask": "data/candidates/animals/shark-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/shark-v3.png",
+  "threadings": 9,
+  "mask_rows": [
+   "....##....",
+   "....##....",
+   "#########.",
+   "#####..##.",
+   ".#######.."
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 11,
+  "name": "camel",
+  "variant": "camel-v3",
+  "mask": "data/candidates/animals/camel-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/camel-v3.png",
+  "threadings": 6,
+  "mask_rows": [
+   ".##.##...",
+   ".##.##...",
+   "########.",
+   "#########",
+   ".......##"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 12,
+  "name": "snail",
+  "variant": "snail-v2",
+  "mask": "data/candidates/animals/snail-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/snail-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "#####...",
+   "#...#.##",
+   "#####.##",
+   "#...###.",
+   "#####...",
+   "##......"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 13,
+  "name": "duck",
+  "variant": "duck-v2",
+  "mask": "data/candidates/animals/duck-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/duck-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "####...",
+   "####...",
+   "..##...",
+   "#######",
+   "###.###",
+   "..####."
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 14,
+  "name": "chicken",
+  "variant": "chicken-v2",
+  "mask": "data/candidates/animals/chicken-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/chicken-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "###....",
+   "###..##",
+   "#######",
+   ".######",
+   ".######"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 15,
+  "name": "owl",
+  "variant": "owl-v1",
+  "mask": "data/candidates/animals/owl-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/owl-v1.png",
+  "threadings": 3,
+  "mask_rows": [
+   "##...##",
+   "#######",
+   "##.#.##",
+   "####.#.",
+   "######."
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 16,
+  "name": "dinosaur",
+  "variant": "dinosaur-v2",
+  "mask": "data/candidates/animals/dinosaur-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/dinosaur-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   ".....#",
+   ".....#",
+   ".....#",
+   "######",
+   "######",
+   "######",
+   "######"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 17,
+  "name": "rabbit",
+  "variant": "rabbit-v4",
+  "mask": "data/candidates/animals/rabbit-v4.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/rabbit-v4.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##....",
+   "##....",
+   "##....",
+   "####..",
+   "######",
+   "######",
+   "#####."
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 18,
+  "name": "flamingo",
+  "variant": "flamingo-v3",
+  "mask": "data/candidates/animals/flamingo-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/flamingo-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   "######",
+   "###...",
+   "..#...",
+   "..####",
+   ".#####",
+   ".####.",
+   "...##.",
+   "...##."
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 19,
+  "name": "mouse",
+  "variant": "mouse-v1",
+  "mask": "data/candidates/animals/mouse-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/mouse-v1.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##......",
+   "##......",
+   ".#####..",
+   "######..",
+   "###..###",
+   "..######"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 20,
+  "name": "elephant",
+  "variant": "elephant-v2",
+  "mask": "data/candidates/animals/elephant-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/elephant-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "....#####",
+   "#######.#",
+   "#########",
+   "##.....##",
+   "........#"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 21,
+  "name": "giraffe",
+  "variant": "giraffe-v2",
+  "mask": "data/candidates/animals/giraffe-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/giraffe-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "....##.",
+   "....##.",
+   "....##.",
+   "######.",
+   "####.#.",
+   "####.##",
+   "##...##"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 22,
+  "name": "mouse",
+  "variant": "mouse-v2",
+  "mask": "data/candidates/animals/mouse-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/mouse-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##......",
+   "##......",
+   ".#####..",
+   ".#####..",
+   ".#######",
+   "..######"
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 23,
+  "name": "owl",
+  "variant": "owl-v2",
+  "mask": "data/candidates/animals/owl-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/owl-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##...##",
+   "##...##",
+   "##.#.#.",
+   "####.#.",
+   "######.",
+   ".####.."
+  ]
+ },
+ {
+  "sheet": "blind-04",
+  "tile": 24,
+  "name": "dolphin",
+  "variant": "dolphin-v3",
+  "mask": "data/candidates/animals/dolphin-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/dolphin-v3.png",
+  "threadings": 12,
+  "mask_rows": [
+   "....##..",
+   "....###.",
+   "#######.",
+   "########",
+   ".#######"
+  ]
+ },
+ {
+  "sheet": "blind-05",
+  "tile": 1,
+  "name": "bear",
+  "variant": "bear-v2",
+  "mask": "data/candidates/animals/bear-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/bear-v2.png",
+  "threadings": 6,
+  "mask_rows": [
+   "##...##",
+   "######.",
+   "#.#.###",
+   "#######",
+   ".#####."
+  ]
+ },
+ {
+  "sheet": "blind-05",
+  "tile": 2,
+  "name": "horse",
+  "variant": "horse-v2",
+  "mask": "data/candidates/animals/horse-v2.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/horse-v2.png",
+  "threadings": 3,
+  "mask_rows": [
+   ".....##.",
+   ".....###",
+   ".....#.#",
+   "######.#",
+   "########",
+   "##...###"
+  ]
+ },
+ {
+  "sheet": "blind-05",
+  "tile": 3,
+  "name": "worm",
+  "variant": "worm-v1",
+  "mask": "data/candidates/animals/worm-v1.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/worm-v1.png",
+  "threadings": 3,
+  "mask_rows": [
+   "##.......",
+   "##.######",
+   "#######.#",
+   "#########"
+  ]
+ },
+ {
+  "sheet": "blind-05",
+  "tile": 4,
+  "name": "frog",
+  "variant": "frog-v3",
+  "mask": "data/candidates/animals/frog-v3.txt",
+  "png": "out/library-20260919/animals/preview-all/tiles/frog-v3.png",
+  "threadings": 3,
+  "mask_rows": [
+   ".....##.",
+   "#######.",
+   "#######.",
+   ".#######",
+   "##...##."
+  ]
+ }
+]

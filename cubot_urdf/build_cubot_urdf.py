@@ -28,9 +28,10 @@ MODULE (all lengths mm, module frame at the cube centre)
     r <= 45.7 falling to 12.6) lies inside the moving half's neck at every
     height, for every servo angle, so the module envelope is complete without it.
     Only the outer profile is modelled: no pockets, bores or internal features.
-  * Servo joint: continuous, axis +<111>/sqrt(3) from the still half into the moving
-    half, right-handed. q = 0 is the straight chain. Detents are 120 deg apart and
-    the servo travels -240..+240 deg; the controller enforces that, not this file.
+  * Servo joint: revolute, axis +<111>/sqrt(3) from the still half into the moving
+    half, right-handed, limited to -120..+120 deg: exactly three positions, -120 / 0 /
+    +120 deg, one per exit face (+X, +Y, +Z) of the module -- the planner's -1 / 0 / +1.
+    q = 0 is the straight chain. Nothing ever winds to +-240 deg.
 
 CHAIN
   * 27 modules along +X.  still(k) -servo- moving(k) =rigid= still(k+1) ...
@@ -40,11 +41,23 @@ CHAIN
   * Roll word (26 digits, CuBot/presets/shipped.json): module k+1 is mounted rolled
     r_k * 90 deg about +X (right-hand, +X points toward module 27) relative to
     module k — the same rule roll.html applies:  M_{k+1} = M_k * Rx^{r_k}.
-  * Zero pose: straight along +X, Z up, every cube resting on its -Z face,
-    module 1 centre at the origin. The MJCF scene lifts the root by 40 mm.
+  * Zero pose: straight along +X, Z up, every cube's -Z face down, module 1 centre
+    at the origin. The MJCF cannot lay it down like that (module 1 would stand on
+    its wires, see WIRES): its free base rolls the straight chain LAY_ROLL quarter
+    turns about +X and lifts module 1's centre 40 mm onto the floor.
+
+WIRES: the chain's cable leaves module 1 through the centre of its BOTTOM face (-Z in
+the zero pose). It is modelled as one rigid keep-out cylinder on m01_still,
+WIRE_DIAMETER across and WIRE_LENGTH long, axis along -Z, standing on the face centre
+(z in [-80, -40] mm of module 1's frame). Nothing may touch it: no other module, and
+not the table, so module 1 can never rest on that face. The whole disc lies on the
+still half (x+y+z <= 10*sqrt(2) - 40 = -25.9 mm on the face), so it never moves
+relative to m01_still. It is in <visual> ("wires_visual") and <collision> ("wires";
+MuJoCo's URDF import keeps the name, and the MJCF geom is "wires" too) and, like
+the spacers, massless.
 
 MASS: 250 g per module, 125 g per half, uniform density; inertia integrated exactly
-over the chamfered polytope. Spacers are massless (part of the 125 g).
+over the chamfered polytope. Spacers and wires are massless (part of the 125 g).
 
 Outputs (next to this script):  cubot_shipped.urdf, cubot_shipped.xml (MJCF),
 scene.xml, meshes/still.stl, meshes/moving.stl   — units: metres, radians.
@@ -68,8 +81,17 @@ MODULE_MASS = 0.250          # kg per module
 HALF_MASS   = MODULE_MASS / 2
 ROLL_WORD   = "12001300133101230333233210"     # presets/shipped.json; digit k = mount roll of module k+2 vs k+1
 
-# Servo limits reported in the URDF <limit> (informational for a continuous joint).
-# 5.8 N·m = the 60 % STS3215 12 V register through 4:1, the planner's default cap.
+# The wires out of module 1's bottom face: a rigid, massless keep-out cylinder on m01_still (see WIRES above).
+WIRE_DIAMETER = 0.020        # m
+WIRE_LENGTH   = 0.040        # m, straight down from the bottom face
+WIRE_CENTRE_Z = -(CUBE / 2 + WIRE_LENGTH / 2)   # m, URDF and MuJoCo cylinders are centred on their origin
+# Lay-down of the MJCF's free base, in quarter turns about +X. 0 would stand module 1 on its wires;
+# 2 (180 deg) puts every cube on its +Z face with the wires pointing straight up.
+LAY_ROLL = 2
+
+# Servo travel: three positions -120 / 0 / +120 deg, the URDF <limit> and the MJCF joint range / ctrlrange.
+# Effort and velocity are informational: 5.8 N·m = the 60 % STS3215 12 V register through 4:1, the planner's default cap.
+SERVO_LIMIT  = np.radians(120.0)
 EFFORT_NM    = 5.8
 VELOCITY_RAD = 1.2
 
@@ -83,6 +105,7 @@ NECK_SIDES = 12                                       # facets of the revolved c
 
 AXIS = np.ones(3) / np.sqrt(3)               # servo axis, still -> moving
 COL_STILL, COL_MOVING, COL_SPACER = "0.85 0.83 0.78 1", "0.91 0.51 0.23 1", "0.45 0.47 0.5 1"  # roll.html colours
+COL_WIRES = "0.86 0.15 0.15 1"                                                                # keep-out red
 
 
 def roll_word():
@@ -166,7 +189,7 @@ def support(V, d):
 
 
 # ----------------------------------------------------------------------------- URDF
-def urdf_link(name, sign, com, I, spacer):
+def urdf_link(name, sign, com, I, spacer, wires=False):
     mesh = "meshes/moving.stl" if sign > 0 else "meshes/still.stl"
     mat = "moving" if sign > 0 else "still"
     sp = ""
@@ -180,6 +203,19 @@ def urdf_link(name, sign, com, I, spacer):
     <collision>
       <origin xyz="{CUBE/2 + sx/2:.6f} 0 0" rpy="0 0 0"/>
       <geometry><box size="{sx} {sy} {sz}"/></geometry>
+    </collision>
+"""
+    if wires:
+        cyl = f'<cylinder radius="{WIRE_DIAMETER/2}" length="{WIRE_LENGTH}"/>'
+        sp += f"""    <!-- wires: {WIRE_DIAMETER*1000:.0f} mm dia x {WIRE_LENGTH*1000:.0f} mm keep-out under the bottom (-Z) face; massless; nothing may touch it -->
+    <visual name="wires_visual">
+      <origin xyz="0 0 {WIRE_CENTRE_Z:.6f}" rpy="0 0 0"/>
+      <geometry>{cyl}</geometry>
+      <material name="wires"/>
+    </visual>
+    <collision name="wires">
+      <origin xyz="0 0 {WIRE_CENTRE_Z:.6f}" rpy="0 0 0"/>
+      <geometry>{cyl}</geometry>
     </collision>
 """
     return f"""  <link name="{name}">
@@ -203,24 +239,27 @@ def build_urdf(roll, props):
     out = ['<?xml version="1.0"?>',
            "<!-- Generated by build_cubot_urdf.py; edit that script, not this file.",
            f"     27 x 80 mm cubes, <111> hinge, 8 mm equatorial chamfers + CAD neck profile, {GAP*1000:.1f} mm gap (pitch {PITCH*1000:.1f} mm),",
-           f"     shipped roll word {ROLL_WORD} (right-hand about +X, toward module 27). Units: m, rad, kg. -->",
+           f"     shipped roll word {ROLL_WORD} (right-hand about +X, toward module 27). Units: m, rad, kg.",
+           f"     Servos are revolute, limited to -120..+120 deg: three positions (-120 / 0 / +120), one per exit face.",
+           f"     Module 01's wires: a {WIRE_DIAMETER*1000:.0f} mm dia x {WIRE_LENGTH*1000:.0f} mm keep-out cylinder under its bottom (-Z) face, on m01_still. -->",
            '<robot name="cubot_shipped">',
            '  <mujoco><compiler meshdir="." discardvisual="false" fusestatic="false" balanceinertia="true"/></mujoco>',
            "",
            f'  <material name="still"><color rgba="{COL_STILL}"/></material>',
            f'  <material name="moving"><color rgba="{COL_MOVING}"/></material>',
-           f'  <material name="spacer"><color rgba="{COL_SPACER}"/></material>', ""]
+           f'  <material name="spacer"><color rgba="{COL_SPACER}"/></material>',
+           f'  <material name="wires"><color rgba="{COL_WIRES}"/></material>', ""]
     for i in range(1, N_MODULES + 1):
         s, m = f"m{i:02d}_still", f"m{i:02d}_moving"
         out.append(f"  <!-- ==================== module {i:02d} ==================== -->")
-        out.append(urdf_link(s, -1, props[-1]["com"], props[-1]["I"], spacer=False))
+        out.append(urdf_link(s, -1, props[-1]["com"], props[-1]["I"], spacer=False, wires=i == 1))
         out.append(urdf_link(m, +1, props[+1]["com"], props[+1]["I"], spacer=i < N_MODULES))
-        out.append(f"""  <joint name="servo{i:02d}" type="continuous">
+        out.append(f"""  <joint name="servo{i:02d}" type="revolute">
     <parent link="{s}"/>
     <child link="{m}"/>
     <origin xyz="0 0 0" rpy="0 0 0"/>
     <axis xyz="{AXIS[0]:.8f} {AXIS[1]:.8f} {AXIS[2]:.8f}"/>
-    <limit effort="{EFFORT_NM}" velocity="{VELOCITY_RAD}"/>
+    <limit lower="{-SERVO_LIMIT:.8f}" upper="{SERVO_LIMIT:.8f}" effort="{EFFORT_NM}" velocity="{VELOCITY_RAD}"/>
   </joint>
 """)
         if i < N_MODULES:
@@ -249,7 +288,9 @@ def build_mjcf(roll, props):
     for i in range(1, N_MODULES + 1):
         s, m = f"m{i:02d}_still", f"m{i:02d}_moving"
         if i == 1:
-            body.append(f'{ind(depth)}<body name="{s}" pos="0 0 {CUBE/2:.4f}">')
+            h = LAY_ROLL * np.pi / 4
+            body.append(f"{ind(depth)}<!-- laid down rolled {LAY_ROLL * 90} deg about +X so module 01's wires stay off the floor -->")
+            body.append(f'{ind(depth)}<body name="{s}" pos="0 0 {CUBE/2:.4f}" quat="{np.cos(h):.8f} {np.sin(h):.8f} 0 0">')
             body.append(f'{ind(depth+1)}<freejoint name="root"/>')
         else:
             r = roll[i - 2]; h = r * np.pi / 4
@@ -257,9 +298,11 @@ def build_mjcf(roll, props):
         depth += 1
         body.append(f'{ind(depth)}{inertial(-1)}')
         body.append(f'{ind(depth)}<geom class="still" mesh="still"/>')
+        if i == 1:
+            body.append(f'{ind(depth)}<geom name="wires" class="wires" pos="0 0 {WIRE_CENTRE_Z:.4f}" size="{WIRE_DIAMETER/2} {WIRE_LENGTH/2}"/>')
         body.append(f'{ind(depth)}<body name="{m}">')
         depth += 1
-        body.append(f'{ind(depth)}<joint name="servo{i:02d}" axis="{AXIS[0]:.8f} {AXIS[1]:.8f} {AXIS[2]:.8f}"/>')
+        body.append(f'{ind(depth)}<joint name="servo{i:02d}" axis="{AXIS[0]:.8f} {AXIS[1]:.8f} {AXIS[2]:.8f}" range="{-SERVO_LIMIT:.8f} {SERVO_LIMIT:.8f}"/>')
         body.append(f'{ind(depth)}{inertial(+1)}')
         body.append(f'{ind(depth)}<geom class="moving" mesh="moving"/>')
         if i < N_MODULES:
@@ -268,7 +311,8 @@ def build_mjcf(roll, props):
         body.append(f"{ind(d)}</body>")
     acts = "\n".join(f'    <position class="servo" name="servo{i:02d}" joint="servo{i:02d}"/>' for i in range(1, N_MODULES + 1))
     return f"""<!-- Generated by build_cubot_urdf.py; edit that script, not this file.
-     Same chain as cubot_shipped.urdf, with a free base so it lies loose on the table. -->
+     Same chain as cubot_shipped.urdf, with a free base so it lies loose on the table.
+     The base lies rolled {LAY_ROLL * 90} deg about +X: in the zero-pose lay-down module 01 would stand on its wires. -->
 <mujoco model="cubot_shipped">
   <compiler angle="radian" meshdir="meshes" autolimits="true"/>
   <option timestep="0.002" integrator="implicitfast"/>
@@ -279,9 +323,10 @@ def build_mjcf(roll, props):
     <default class="still"><geom type="mesh" rgba="{COL_STILL}"/></default>
     <default class="moving"><geom type="mesh" rgba="{COL_MOVING}"/></default>
     <default class="spacer"><geom type="box" rgba="{COL_SPACER}"/></default>
+    <default class="wires"><geom type="cylinder" rgba="{COL_WIRES}"/></default>
     <default class="servo">
       <!-- a stiff position servo holding whatever detent it is commanded; force-capped at the planner's default -->
-      <position kp="30" kv="1" ctrlrange="-4.18879 4.18879" forcerange="-{EFFORT_NM} {EFFORT_NM}"/>
+      <position kp="30" kv="1" ctrlrange="{-SERVO_LIMIT:.5f} {SERVO_LIMIT:.5f}" forcerange="-{EFFORT_NM} {EFFORT_NM}"/>
     </default>
   </default>
 
@@ -341,6 +386,9 @@ def main():
         print(f"{name:6s}: {len(V)} vertices, {len(tris)} tris, volume {vol*1e6:.2f} cm3, "
               f"COM along <111> = {np.dot(com, AXIS)*1000:+.3f} mm, r111 = {r111*1000:.3f} mm, "
               f"support <111> = {support(V, sign*AXIS)*1000:.3f} mm")
+    print(f"wires : {WIRE_DIAMETER*1000:.0f} mm dia x {WIRE_LENGTH*1000:.0f} mm keep-out cylinder on m01_still, "
+          f"z {(WIRE_CENTRE_Z - WIRE_LENGTH/2)*1000:.0f}..{(WIRE_CENTRE_Z + WIRE_LENGTH/2)*1000:.0f} mm; "
+          f"MJCF lay-down rolled {LAY_ROLL * 90} deg about +X")
     with open(os.path.join(HERE, "cubot_shipped.urdf"), "w") as f:
         f.write(build_urdf(roll, props))
     with open(os.path.join(HERE, "cubot_shipped.xml"), "w") as f:
