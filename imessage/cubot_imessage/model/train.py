@@ -17,6 +17,8 @@ is fitted — so a GPU would have nothing to do.
 from __future__ import annotations
 
 import argparse
+import functools
+import sys
 import time
 from typing import Optional
 
@@ -28,14 +30,19 @@ from .encoder import DEFAULT_MODEL, MODELS, build_encoder
 from .head import NONE_LABEL, IntentHead, choose_thresholds
 
 
+# stdout is block-buffered when it is a pipe, which makes a backgrounded run look hung for minutes.
+emit = functools.partial(print, flush=True)
+
+
 def evaluate(corpus, encoder_kind: str, model: str, seeds: tuple[int, ...], epochs: int,
-             lr: float, l2: float, target_precision: float, log=print) -> dict:
+             lr: float, l2: float, target_precision: float, log=emit) -> dict:
     """Fit on each seed's training split, score the held-out split, and pick thresholds."""
     accuracies, accepted_accuracies, coverages = [], [], []
     last_truths: list[str] = []
     last_decisions = []
 
     for seed in seeds:
+        log(f"  seed {seed}: encoding and fitting ...")
         train_idx, test_idx = stratified_split(corpus.labels, seed=seed)
         train_texts = [corpus.texts[i] for i in train_idx]
         train_labels = [corpus.labels[i] for i in train_idx]
@@ -97,7 +104,7 @@ def evaluate(corpus, encoder_kind: str, model: str, seeds: tuple[int, ...], epoc
 def train(corpus_path: str = CORPUS_PATH, head_path: str = HEAD_PATH, encoder_kind: str = "hybrid",
           model: str = DEFAULT_MODEL, seeds: tuple[int, ...] = (0, 1, 2), epochs: int = 600,
           lr: float = 0.05, l2: float = 1e-4, target_precision: float = 0.97,
-          eval_only: bool = False, log=print) -> Optional[str]:
+          eval_only: bool = False, log=emit) -> Optional[str]:
     started = time.perf_counter()
     corpus = load_corpus(corpus_path)
     log(f"corpus {corpus_path}")

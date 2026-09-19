@@ -59,7 +59,6 @@
 {"text": "point towards the stage", "label": "arrow"}
 {"text": "point at the exit", "label": "arrow"}
 {"text": "show us the way to the snacks", "label": "arrow"}
-{"text": "be the traffic cop for this line", "label": "arrow"}
 {"text": "any direction is fine just give me an arrow", "label": "arrow"}
 {"text": "point right", "label": "arrow"}
 {"text": "point to the right", "label": "arrow"}
@@ -289,7 +288,6 @@
 {"text": "shift that arrow west", "label": "arrow_left"}
 {"text": "point toward the left side of the room", "label": "arrow_left"}
 {"text": "back arrow pointing left", "label": "arrow_left"}
-{"text": "point to port side which is left", "label": "arrow_left"}
 {"text": "eyes left arrow left", "label": "arrow_left"}
 {"text": "everybody look left", "label": "arrow_left"}
 {"text": "point at the left wall", "label": "arrow_left"}
@@ -297,3 +295,10 @@
 {"text": "arrow but leftwards", "label": "arrow_left"}
 {"text": "scoot that arrow left", "label": "arrow_left"}
 {"text": "nudge the arrow leftward", "label": "arrow_left"}
+{"text": "hit the left arrow", "label": "arrow_left"}
+{"text": "left arrow key", "label": "arrow_left"}
+{"text": "can u do left arrow", "label": "arrow_left"}
+{"text": "lft arrow pls", "label": "arrow_left"}
+{"text": "which way is left show me", "label": "arrow_left"}
+{"text": "hit the right arrow", "label": "arrow"}
+{"text": "right arrow key", "label": "arrow"}

@@ -39,9 +39,13 @@ def test_tfidf_rows_are_l2_normalised():
 
 
 def test_char_ngrams_survive_a_typo():
-    """The lexical half exists so 'hart' still reaches 'heart'; word grams alone cannot do that."""
+    """The lexical half exists so 'hart' still reaches 'heart'; word grams alone cannot do that.
+
+    min_df=1 here because the production default of 2 would drop almost every feature of a
+    four-document corpus — it is tuned for the real one, where 62% of char n-grams are hapax.
+    """
     corpus = ["make a heart", "make an arrow", "fold a square", "do a triangle"]
-    enc = TfidfEncoder().fit(corpus)
+    enc = TfidfEncoder(min_df=1).fit(corpus)
     X = enc.encode(corpus)
     typo = enc.encode(["mkae a hart"])[0]
     similarities = X @ typo

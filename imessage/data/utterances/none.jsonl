@@ -308,12 +308,9 @@
 {"text": "aaaaaa", "label": "none"}
 {"text": "zzz", "label": "none"}
 {"text": ".", "label": "none"}
-{"text": "..", "label": "none"}
 {"text": "...", "label": "none"}
 {"text": "??", "label": "none"}
-{"text": "???", "label": "none"}
 {"text": "!", "label": "none"}
-{"text": "!!", "label": "none"}
 {"text": "?", "label": "none"}
 {"text": "sent from my iphone", "label": "none"}
 {"text": "oops", "label": "none"}
