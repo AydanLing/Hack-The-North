@@ -614,3 +614,26 @@ def get_icon(name: str) -> PixelTarget:
 
 def icons() -> list[PixelTarget]:
     return [get_icon(name) for name in ICON_NAMES]
+
+
+# One-deep 3-D shells found by the 2026-09-19 volumetric exploration
+# (docs/METHOD.md, "The 3-D variant").  Values are layered masks — z-slices,
+# top layer first, ``---`` between slices — parsed by ``cubot.shapes.parse_layers``.
+# They are exact 27-cell shipped-roll targets with a complete passing plan under
+# ``loose`` (tier 1) or ``platform`` (tier 2); the tier is recorded per entry.
+_LAYERED_PATTERNS: dict[str, tuple[str, ...]] = {}
+LAYERED_TIERS: dict[str, int] = {}
+LAYERED_NAMES = tuple(_LAYERED_PATTERNS)
+
+
+def get_layered_cells(name: str) -> tuple[tuple[int, int, int], ...]:
+    """Cells of a registered one-deep 3-D shell (see ``LAYERED_NAMES``)."""
+
+    from ..shapes import parse_layers
+
+    normalized = name.strip().lower().replace("_", "-").replace(" ", "-")
+    try:
+        rows = _LAYERED_PATTERNS[normalized]
+    except KeyError as error:
+        raise KeyError(f"unknown shell {name!r}; choose from {', '.join(LAYERED_NAMES)}") from error
+    return parse_layers(list(rows))

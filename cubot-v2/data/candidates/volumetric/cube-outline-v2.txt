@@ -1,0 +1,20 @@
+// cube outline v2: lip on the back-right top corner, 2-cell foot on the ground in front, left side (27)
+..#
+...
+...
+...
+---
+###
+#.#
+###
+...
+---
+###
+#.#
+###
+...
+---
+###
+#.#
+###
+##.

@@ -1,0 +1,15 @@
+// half-cube corner v2: 4x4 floor + 4x2 back wall + 3x1 wall on the right edge (16 + 8 + 3 = 27)
+####
+....
+....
+....
+---
+####
+...#
+...#
+...#
+---
+####
+####
+####
+####

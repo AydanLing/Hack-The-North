@@ -1,0 +1,13 @@
+// flask: hollow 3x3 cap, neck 4 left edge, 3x5 body
+###
+#.#
+###
+#..
+#..
+#..
+#..
+###
+###
+###
+###
+###

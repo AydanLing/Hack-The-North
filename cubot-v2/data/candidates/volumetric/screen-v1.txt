@@ -1,0 +1,12 @@
+// corrugated standing screen 3 tall: square-wave 9-cell plan profile, strokes of 3
+#.###
+#.#..
+###..
+---
+#.###
+#.#..
+###..
+---
+#.###
+#.#..
+###..

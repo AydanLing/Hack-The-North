@@ -1,0 +1,15 @@
+// cube outline v4: 3x3 ring x3 + all 3 tabs on the ground: 2 behind the back wall, 1 beside the right wall (24 + 3 = 27)
+....
+###.
+#.#.
+###.
+---
+....
+###.
+#.#.
+###.
+---
+##..
+####
+#.#.
+###.

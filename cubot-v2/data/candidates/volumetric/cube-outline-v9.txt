@@ -1,0 +1,16 @@
+// cube outline sweep: 3x3x3 four walls + tabs outside the well [D lips(0, 0),(0, 1)@z3 foot(-1, 0)]; 3 threadings; dense 12
+....
+.#..
+.#..
+---
+.###
+.#.#
+.###
+---
+.###
+.#.#
+.###
+---
+.###
+.#.#
+####

@@ -1,0 +1,16 @@
+// helix on 3x3 footprint: 7 cells per lap (gap rotates), 4 layers
+..#
+#.#
+###
+---
+###
+#..
+###
+---
+###
+#.#
+#.#
+---
+###
+..#
+###

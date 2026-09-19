@@ -1,0 +1,12 @@
+// arch 3 wide: posts inset, lintel overhangs 1 cell each end
+#####
+#####
+#####
+---
+.#.#.
+.#.#.
+.#.#.
+---
+.#.#.
+.#.#.
+.#.#.

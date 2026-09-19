@@ -1,0 +1,20 @@
+// cube outline / can well: 3x3x3 four walls (24) + lip cell on the back-left top edge + 2-cell foot on the ground in front (27)
+#..
+...
+...
+...
+---
+###
+#.#
+###
+...
+---
+###
+#.#
+###
+...
+---
+###
+#.#
+###
+##.

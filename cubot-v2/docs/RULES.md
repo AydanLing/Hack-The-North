@@ -35,3 +35,9 @@ Search results preserve three separate facts:
 A goal-side escape probe is diagnostic because gravity-based moving-side and
 table rules can make the graph directed. Only exhaustive forward closure from
 the start may be labelled `UNSAT`.
+
+`platform` (``loose`` with the table removed) is the tier-2 acceptance gate for
+one-deep 3-D shells only. It is always recorded beside the `loose` verdict for
+the same route and never replaces it; a shape accepted under `platform` is a
+shape that needs a raised platform or table-edge lay-down. A drawing containing
+a filled 2×2×2 block is rejected before threading (`docs/CUBE_FEASIBILITY.md`).

@@ -1,0 +1,16 @@
+// standing can: ring x3 + 3-cell L lip on one top corner
+##.
+#..
+...
+---
+###
+#.#
+###
+---
+###
+#.#
+###
+---
+###
+#.#
+###
