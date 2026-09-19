@@ -4,7 +4,7 @@
 <title>CuBot URDF Viewer</title>
 <style>
   :root { --bg:#14161a; --panel:#1d2026; --line:#2e323a; --fg:#e8e6e1; --dim:#9a9ca3; --accent:#3b82f6;
-          --r0:#7d8189; --r1:#3b82f6; --r2:#b067f2; --r3:#22c55e; --moving:#e8833a; --still:#d9d4c7; --spacer:#6b7280;
+          --r0:#7d8189; --r1:#3b82f6; --r2:#b067f2; --r3:#22c55e; --moving:#e8833a; --still:#d9d4c7; --spacer:#6b7280; --wires:#db2626;
           --ok:#22c55e; --bad:#ef4444; --mono:ui-monospace,Menlo,Consolas,monospace; }
   * { box-sizing:border-box; }
   html,body { height:100%; margin:0; background:var(--bg); color:var(--fg);
@@ -68,9 +68,11 @@
       <span><i class="sw" style="background:var(--still)"></i>still half</span>
       <span><i class="sw" style="background:var(--moving)"></i>moving half</span>
       <span><i class="sw" style="background:var(--spacer)"></i>spacer</span>
+      <span><i class="sw" style="background:var(--wires)"></i>wires (keep-out)</span>
       <span>roll digit: <i class="sw" style="background:var(--r0)"></i>0° <i class="sw" style="background:var(--r1)"></i>90° <i class="sw" style="background:var(--r2)"></i>180° <i class="sw" style="background:var(--r3)"></i>270°</span>
       <label><input type="checkbox" id="tEdges" checked>edges</label>
       <label><input type="checkbox" id="tSpacer" checked>spacers</label>
+      <label><input type="checkbox" id="tWires" checked>wires</label>
       <label><input type="checkbox" id="tAxis">hinge axes</label>
       <label><input type="checkbox" id="tGhost">ideal 80 mm cube</label>
     </div>
@@ -87,7 +89,9 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
 <script>
 // ------------------------------------------------------------------ what the viewer checks against
-const SHIPPED = { roll: '12001300133101230333233210', pitchMm: 82.2, cubeMm: 80, gapMm: 2.2, modules: 27, massKg: 6.75 };
+const SHIPPED = { roll: '12001300133101230333233210', pitchMm: 82.2, cubeMm: 80, gapMm: 2.2, modules: 27, massKg: 6.75,
+                  limitDeg: 120, wiresMm: { dia: 20, len: 40 } };
+const LIM = SHIPPED.limitDeg;   // servo travel: exactly -120 / 0 / +120 deg
 const STL = { still: '__STL_STILL__', moving: '__STL_MOVING__' };
 const RCOL = ['#7d8189', '#3b82f6', '#b067f2', '#22c55e'];
 const MM = 1000;   // URDF is in metres; the scene is in mm
@@ -100,18 +104,21 @@ for (const L of doc.querySelectorAll('robot > link')) {
   const shapes = [];
   for (const kind of ['visual', 'collision']) for (const el of L.querySelectorAll(`:scope > ${kind}`)) {
     const o = el.querySelector('origin'); const mesh = el.querySelector('geometry > mesh'); const box = el.querySelector('geometry > box');
-    shapes.push({ kind, xyz: nums(o?.getAttribute('xyz')), rpy: nums(o?.getAttribute('rpy')),
-                  mesh: mesh?.getAttribute('filename') || null, box: box ? nums(box.getAttribute('size')) : null });
+    const cyl = el.querySelector('geometry > cylinder');
+    shapes.push({ kind, name: el.getAttribute('name'), xyz: nums(o?.getAttribute('xyz')), rpy: nums(o?.getAttribute('rpy')),
+                  mesh: mesh?.getAttribute('filename') || null, box: box ? nums(box.getAttribute('size')) : null,
+                  cyl: cyl ? [+cyl.getAttribute('radius'), +cyl.getAttribute('length')] : null });
   }
   const inertial = L.querySelector(':scope > inertial');
   links[L.getAttribute('name')] = { name: L.getAttribute('name'), shapes, mass: +(inertial?.querySelector('mass')?.getAttribute('value') || 0),
                                     com: nums(inertial?.querySelector('origin')?.getAttribute('xyz')) };
 }
 for (const J of doc.querySelectorAll('robot > joint')) {
-  const o = J.querySelector('origin');
+  const o = J.querySelector('origin'), lim = J.querySelector('limit');
   joints.push({ name: J.getAttribute('name'), type: J.getAttribute('type'),
                 parent: J.querySelector('parent').getAttribute('link'), child: J.querySelector('child').getAttribute('link'),
-                xyz: nums(o?.getAttribute('xyz')), rpy: nums(o?.getAttribute('rpy')), axis: nums(J.querySelector('axis')?.getAttribute('xyz') || '1 0 0') });
+                xyz: nums(o?.getAttribute('xyz')), rpy: nums(o?.getAttribute('rpy')), axis: nums(J.querySelector('axis')?.getAttribute('xyz') || '1 0 0'),
+                lower: lim?.hasAttribute('lower') ? +lim.getAttribute('lower') : null, upper: lim?.hasAttribute('upper') ? +lim.getAttribute('upper') : null });
 }
 const childNames = new Set(joints.map(j => j.child));
 const rootName = Object.keys(links).find(n => !childNames.has(n));
@@ -131,7 +138,8 @@ function stlGeometry(b64) {
 const geoms = { 'meshes/still.stl': stlGeometry(STL.still), 'meshes/moving.stl': stlGeometry(STL.moving) };
 const mats = { still: new THREE.MeshStandardMaterial({ color: '#d9d4c7', roughness: .8, flatShading: true }),
                moving: new THREE.MeshStandardMaterial({ color: '#e8833a', roughness: .7, flatShading: true }),
-               spacer: new THREE.MeshStandardMaterial({ color: '#6b7280', roughness: .6 }) };
+               spacer: new THREE.MeshStandardMaterial({ color: '#6b7280', roughness: .6 }),
+               wires: new THREE.MeshStandardMaterial({ color: '#db2626', roughness: .5 }) };
 const edgeMat = new THREE.LineBasicMaterial({ color: 0x1a1a1a });
 const edgeGeoms = {}; for (const k in geoms) edgeGeoms[k] = new THREE.EdgesGeometry(geoms[k], 20);
 
@@ -147,7 +155,7 @@ const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(900, 
 const grid = new THREE.GridHelper(4000, 48, 0x2a2e36, 0x22252b); grid.rotation.x = Math.PI / 2; grid.position.set(1070, 0, -41); scene.add(grid);
 
 // build the kinematic tree exactly as the joints describe it
-const linkObj = {}, edgeObjs = [], spacerObjs = [], axisObjs = [], ghostObjs = [];
+const linkObj = {}, edgeObjs = [], spacerObjs = [], wireObjs = [], axisObjs = [], ghostObjs = [];
 const urdfRot = rpy => new THREE.Quaternion().setFromEuler(new THREE.Euler(rpy[0], rpy[1], rpy[2], 'ZYX'));   // URDF rpy = Rz·Ry·Rx
 for (const name in links) {
   const L = links[name], g = new THREE.Group(); g.name = name; linkObj[name] = g;
@@ -164,6 +172,9 @@ for (const name in links) {
       }
     } else if (s.box) {
       obj = new THREE.Mesh(new THREE.BoxGeometry(s.box[0] * MM, s.box[1] * MM, s.box[2] * MM), mats.spacer); spacerObjs.push(obj);
+    } else if (s.cyl) {   // URDF cylinders run along their local Z, three.js builds them along Y
+      obj = new THREE.Mesh(new THREE.CylinderGeometry(s.cyl[0] * MM, s.cyl[0] * MM, s.cyl[1] * MM, 32).rotateX(Math.PI / 2), mats.wires); wireObjs.push(obj);
+      const e = new THREE.LineSegments(new THREE.EdgesGeometry(obj.geometry, 20), edgeMat); obj.add(e); edgeObjs.push(e);
     }
     if (!obj) continue;
     obj.position.set(s.xyz[0] * MM, s.xyz[1] * MM, s.xyz[2] * MM); obj.quaternion.copy(urdfRot(s.rpy)); g.add(obj);
@@ -196,6 +207,9 @@ const pitches = mounts.map(m => m.xyz[0] * MM), offAxis = mounts.map(m => Math.h
 check(`every mount is ${SHIPPED.pitchMm} mm along +X, 0 off-axis`, pitches.every(p => Math.abs(p - SHIPPED.pitchMm) < 1e-6) && offAxis.every(o => o < 1e-9), `pitch ${Math.min(...pitches).toFixed(2)}…${Math.max(...pitches).toFixed(2)} mm → gap ${(Math.min(...pitches) - SHIPPED.cubeMm).toFixed(2)} mm`);
 const s3 = 1 / Math.sqrt(3);
 check('every servo axis is +⟨111⟩/√3, still → moving', servos.every(s => s.axis.distanceTo(new THREE.Vector3(s3, s3, s3)) < 1e-6 && s.joint.parent.endsWith('_still') && s.joint.child.endsWith('_moving')), servos[0] ? servos[0].joint.axis.map(v => v.toFixed(5)).join(' ') : '—');
+const limRad = THREE.MathUtils.degToRad(LIM);
+check(`every servo is revolute, −${LIM}…+${LIM}° (positions −${LIM} / 0 / +${LIM})`, servos.every(s => s.joint.type === 'revolute' && Math.abs(s.joint.lower + limRad) < 1e-6 && Math.abs(s.joint.upper - limRad) < 1e-6),
+      servos[0] ? `${servos[0].joint.type} ${THREE.MathUtils.radToDeg(servos[0].joint.lower ?? NaN).toFixed(2)}…${THREE.MathUtils.radToDeg(servos[0].joint.upper ?? NaN).toFixed(2)}°` : '—');
 const chainOk = mounts.every(m => m.parent.endsWith('_moving') && m.child.endsWith('_still'));
 check('chain is still → servo → moving → mount → next still', chainOk, `${servos[0]?.joint.name} … ${mounts.at(-1)?.name}`);
 const mass = Object.values(links).reduce((a, l) => a + l.mass, 0);
@@ -207,6 +221,13 @@ for (const k of ['meshes/still.stl', 'meshes/moving.stl']) {
 }
 const spacerCount = spacerObjs.length;
 check(`${SHIPPED.modules - 1} spacers of 2.2 × 50 × 50 mm on the moving halves`, spacerCount === SHIPPED.modules - 1 && links[servos[0]?.joint.child]?.shapes.some(s => s.box && Math.abs(s.box[0] * MM - 2.2) < 1e-6 && Math.abs(s.box[1] * MM - 50) < 1e-6), `${spacerCount} found`);
+// the wires: one keep-out cylinder, visual + collision, standing on the centre of module 1's bottom (-Z) face
+const W = SHIPPED.wiresMm, wires = Object.values(links).flatMap(l => l.shapes.filter(s => s.cyl).map(s => ({ link: l.name, ...s })));
+const wireOk = wires.length === 2 && wires.some(w => w.kind === 'visual') && wires.some(w => w.kind === 'collision') && wires.every(w => w.link === rootName
+  && Math.abs(w.cyl[0] * 2 * MM - W.dia) < 1e-6 && Math.abs(w.cyl[1] * MM - W.len) < 1e-6 && Math.hypot(w.xyz[0], w.xyz[1]) < 1e-9
+  && Math.abs(w.xyz[2] * MM + (SHIPPED.cubeMm + W.len) / 2) < 1e-6 && w.rpy.every(v => Math.abs(v) < 1e-9));
+check(`wires: ${W.dia} mm dia × ${W.len} mm keep-out under module 1's bottom face`, wireOk,
+      wires.length ? `${wires.length} cylinders on ${wires[0].link}, z ${((wires[0].xyz[2] - wires[0].cyl[1] / 2) * MM).toFixed(0)}…${((wires[0].xyz[2] + wires[0].cyl[1] / 2) * MM).toFixed(0)} mm · module 1 must never rest on that face` : 'none found');
 scene.updateMatrixWorld(true);
 const centre = name => new THREE.Vector3().setFromMatrixPosition(linkObj[name].matrixWorld);
 const first = centre(rootName), last = centre(mounts.at(-1)?.child || rootName), span = first.distanceTo(last);
@@ -226,7 +247,7 @@ sum.textContent = allOk ? `${checks.length}/${checks.length} checks pass` : `${c
 document.getElementById('meta').innerHTML = `<b>${N}</b> servos · roll <b class="num">${rollRead}</b> · pitch <b class="num">${SHIPPED.pitchMm}</b> mm · gap <b class="num">${SHIPPED.gapMm}</b> mm`;
 
 // ------------------------------------------------------------------ strip: module | digit | module | ...
-let sel = 12, sweeping = false;
+let sel = 12, sweeping = false, sweepDir = 1;
 const strip = document.getElementById('strip');
 function buildStrip() {
   strip.innerHTML = '';
@@ -247,13 +268,13 @@ function renderCard() {
   const nd = Math.round(deg / 120) * 120;
   card.innerHTML = `<h2>Module ${sel + 1} · <span class="num">${s.joint.name}</span></h2>
     <div class="big num">${deg.toFixed(0)}° <span>${Math.abs(deg - nd) < 0.5 ? (nd === 0 ? 'straight' : 'detent') : 'between detents'}</span></div>
-    <input type="range" id="angle" min="-240" max="240" step="1" value="${deg.toFixed(0)}" aria-label="servo angle">
+    <input type="range" id="angle" min="${-LIM}" max="${LIM}" step="1" value="${deg.toFixed(0)}" aria-label="servo angle">
     <div class="btns">
-      ${[-240, -120, 0, 120, 240].map(v => `<button data-v="${v}" class="${Math.abs(deg - v) < 0.5 ? 'on' : ''}">${v > 0 ? '+' : ''}${v}°</button>`).join('')}
+      ${[-LIM, 0, LIM].map(v => `<button data-v="${v}" class="${Math.abs(deg - v) < 0.5 ? 'on' : ''}">${v > 0 ? '+' : ''}${v}°</button>`).join('')}
       <button id="sweep" class="text ${sweeping ? 'on' : ''}">${sweeping ? 'stop' : 'sweep'}</button>
       <button id="resetAll" class="text">reset all</button>
     </div>
-    <p>Turns the moving half and every module after it about this cube's ⟨111⟩ diagonal. Detents are 120° apart; ±240° reaches the same shape as ∓120° by the other route.</p>`;
+    <p>Turns the moving half and every module after it about this cube's ⟨111⟩ diagonal. Three positions, −${LIM}°, 0° and +${LIM}°, one per exit face; the servo never goes past ±${LIM}°.</p>`;
   card.querySelector('#angle').oninput = e => { setQ(sel, +e.target.value); refresh(false); };
   card.querySelectorAll('button[data-v]').forEach(b => b.onclick = () => { sweeping = false; setQ(sel, +b.dataset.v); refresh(); });
   card.querySelector('#sweep').onclick = () => { sweeping = !sweeping; refresh(); };
@@ -279,14 +300,15 @@ function select(k, focus = true) {
 }
 document.getElementById('tEdges').onchange = e => edgeObjs.forEach(o => o.visible = e.target.checked);
 document.getElementById('tSpacer').onchange = e => spacerObjs.forEach(o => o.visible = e.target.checked);
+document.getElementById('tWires').onchange = e => wireObjs.forEach(o => o.visible = e.target.checked);
 document.getElementById('tAxis').onchange = e => axisObjs.forEach(o => o.visible = e.target.checked);
 document.getElementById('tGhost').onchange = e => ghostObjs.forEach(o => o.visible = e.target.checked);
 addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' && e.target.type === 'range' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) return;
   if (e.key === 'ArrowRight') select(Math.min(N - 1, sel + 1));
   else if (e.key === 'ArrowLeft') select(Math.max(0, sel - 1));
-  else if (e.key === 'ArrowUp') { setQ(sel, Math.min(240, Math.round(THREE.MathUtils.radToDeg(servos[sel].q) / 120) * 120 + 120)); refresh(); }
-  else if (e.key === 'ArrowDown') { setQ(sel, Math.max(-240, Math.round(THREE.MathUtils.radToDeg(servos[sel].q) / 120) * 120 - 120)); refresh(); }
+  else if (e.key === 'ArrowUp') { setQ(sel, Math.min(LIM, Math.round(THREE.MathUtils.radToDeg(servos[sel].q) / LIM) * LIM + LIM)); refresh(); }
+  else if (e.key === 'ArrowDown') { setQ(sel, Math.max(-LIM, Math.round(THREE.MathUtils.radToDeg(servos[sel].q) / LIM) * LIM - LIM)); refresh(); }
   else if (e.key === '0') { setQ(sel, 0); refresh(); }
   else if (e.key === 'Escape') { sweeping = false; refresh(); whole(); }
 });
@@ -298,7 +320,11 @@ let tPrev = performance.now();
 (function loop(now) {
   requestAnimationFrame(loop);
   const dt = Math.min(0.05, (now - tPrev) / 1000); tPrev = now;
-  if (sweeping) { const s = servos[sel]; let deg = THREE.MathUtils.radToDeg(s.q) + 45 * dt; if (deg > 240) deg = -240; setQ(sel, deg); refresh(false); const r = card.querySelector('#angle'); if (r) r.value = deg.toFixed(0); }
+  if (sweeping) {   // back and forth between the two limits
+    const s = servos[sel]; let deg = THREE.MathUtils.radToDeg(s.q) + sweepDir * 45 * dt;
+    if (Math.abs(deg) >= LIM) { deg = Math.sign(deg) * LIM; sweepDir = -Math.sign(deg); }
+    setQ(sel, deg); refresh(false); const r = card.querySelector('#angle'); if (r) r.value = deg.toFixed(0);
+  }
   if (view.anim) { camera.position.lerp(view.pos, 0.12); controls.target.lerp(view.target, 0.12); if (camera.position.distanceTo(view.pos) < 1) view.anim = 0; }
   controls.update(); renderer.render(scene, camera);
 })(tPrev);
