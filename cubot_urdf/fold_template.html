@@ -4,7 +4,7 @@
 <title>CuBot Fold Viewer</title>
 <style>
   :root { --bg:#14161a; --panel:#1d2026; --line:#2e323a; --fg:#e8e6e1; --dim:#9a9ca3; --accent:#3b82f6;
-          --moving:#e8833a; --still:#d9d4c7; --spacer:#6b7280; --base:#3b82f6; --mA:#2b6cb0; --mB:#ec7048;
+          --moving:#e8833a; --still:#d9d4c7; --spacer:#6b7280; --base:#3b82f6; --wires:#db2626; --mA:#2b6cb0; --mB:#ec7048;
           --ok:#22c55e; --bad:#ef4444; --mono:ui-monospace,Menlo,Consolas,monospace; }
   * { box-sizing:border-box; }
   html,body { height:100%; margin:0; background:var(--bg); color:var(--fg);
@@ -87,6 +87,7 @@
       <span><i class="sw" style="background:var(--still)"></i>still half</span>
       <span><i class="sw" style="background:var(--moving)"></i>moving half</span>
       <span><i class="sw" style="background:var(--base)"></i>module 0 (base)</span>
+      <span title="keep-out: nothing may touch it; not part of the table settle"><i class="sw" style="background:var(--wires)"></i>wires</span>
       <label>colour <select id="colorMode"><option value="halves">still / moving</option><option value="modules">alternating modules</option></select></label>
       <label><input type="checkbox" id="tEdges" checked>edges</label>
       <label><input type="checkbox" id="tSpacer" checked>spacers</label>
@@ -123,8 +124,10 @@ for (const L of doc.querySelectorAll('robot > link')) {
   const shapes = [];
   for (const el of L.querySelectorAll(':scope > visual')) {
     const o = el.querySelector('origin'); const mesh = el.querySelector('geometry > mesh'); const box = el.querySelector('geometry > box');
+    const cyl = el.querySelector('geometry > cylinder');
     shapes.push({ xyz: nums(o?.getAttribute('xyz')), rpy: nums(o?.getAttribute('rpy')),
-                  mesh: mesh?.getAttribute('filename') || null, box: box ? nums(box.getAttribute('size')) : null });
+                  mesh: mesh?.getAttribute('filename') || null, box: box ? nums(box.getAttribute('size')) : null,
+                  cyl: cyl ? [+cyl.getAttribute('radius'), +cyl.getAttribute('length')] : null });
   }
   links[L.getAttribute('name')] = { name: L.getAttribute('name'), shapes };
 }
@@ -155,6 +158,7 @@ const geoms = { 'meshes/still.stl': stlGeometry(STL.still), 'meshes/moving.stl':
 const edgeGeoms = {}; for (const k in geoms) edgeGeoms[k] = new THREE.EdgesGeometry(geoms[k], 20);
 const edgeMat = new THREE.LineBasicMaterial({ color: 0x1a1a1a });
 const spacerMat = new THREE.MeshStandardMaterial({ color: '#6b7280', roughness: .6 });
+const wireMat = new THREE.MeshStandardMaterial({ color: '#db2626', roughness: .5 });
 const mkMat = c => new THREE.MeshStandardMaterial({ color: c, roughness: .75, flatShading: true, emissive: c, emissiveIntensity: 0 });
 
 // ------------------------------------------------------------------ scene
@@ -187,6 +191,10 @@ for (const name in links) {
     } else if (s.box) {
       obj = new THREE.Mesh(new THREE.BoxGeometry(s.box[0] * MM, s.box[1] * MM, s.box[2] * MM), spacerMat); spacerObjs.push(obj);
       obj.userData.verts = [-1, 1].flatMap(a => [-1, 1].flatMap(b => [-1, 1].map(c => new THREE.Vector3(a * s.box[0] * MM / 2, b * s.box[1] * MM / 2, c * s.box[2] * MM / 2))));
+    } else if (s.cyl) {   // module 1's wires (URDF cylinders run along local Z). Drawn, but deliberately NOT settled on:
+      // rest poses sit on the cubes like the planner's, so a path that puts module 1 down on its wires shows them in the table.
+      obj = new THREE.Mesh(new THREE.CylinderGeometry(s.cyl[0] * MM, s.cyl[0] * MM, s.cyl[1] * MM, 32).rotateX(Math.PI / 2), wireMat);
+      const e = new THREE.LineSegments(new THREE.EdgesGeometry(obj.geometry, 20), edgeMat); obj.add(e); edgeObjs.push(e);
     }
     if (!obj) continue;
     obj.position.set(s.xyz[0] * MM, s.xyz[1] * MM, s.xyz[2] * MM); obj.quaternion.copy(urdfRot(s.rpy)); g.add(obj);
