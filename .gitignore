@@ -23,3 +23,5 @@ CUBOT_V2_PLAN.md
 # Secrets — never commit
 .env
 **/.env
+
+*.egg-info/

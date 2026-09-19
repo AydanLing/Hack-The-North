@@ -75,6 +75,9 @@ def extract_who(text: str) -> Optional[str]:
 # Per-label captions: (addressed to someone, addressed to nobody).
 TEMPLATES: dict[str, tuple[str, str]] = {
     "heart": ("Showing {who} some love with a heart", "Folding into a heart, with love"),
+    # letter jokes the head learns from paraphrases (Jerry→J, creator→U/"you")
+    "letter_j": ("A J for {who}", "Making a J — as in Jerry"),
+    "letter_u": ("A U for {who}", "Making a U — as in you"),
     "arrow": ("Pointing the way for {who}", "Pointing the way with an arrow"),
     "arrow_up": ("Pointing up for {who}", "Pointing up"),
     "arrow_down": ("Pointing down for {who}", "Pointing down"),

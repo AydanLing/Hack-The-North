@@ -333,6 +333,11 @@ class MujocoExecutor:
         pkg_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         env["PYTHONPATH"] = pkg_root + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
         env["PYTHONUNBUFFERED"] = "1"
+        # launchd / minimal PATH lacks /usr/sbin; mjpython imports mujoco which shells out to `sysctl`.
+        env["PATH"] = (
+            "/tmp/cubot-venv/bin:/opt/homebrew/bin:/usr/local/bin:"
+            "/usr/bin:/bin:/usr/sbin:/sbin:" + env.get("PATH", "")
+        )
 
         cmd = [
             self.python_exe, "-u", "-m", "cubot_imessage.mujoco_replay",

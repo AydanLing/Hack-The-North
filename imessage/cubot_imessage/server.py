@@ -269,7 +269,7 @@ def serve(settings: Settings, bridge: Optional[Bridge] = None, log=print) -> Non
         log(f"[boot] WARNING: intent model not ready: {e}")
     log(f"[boot] playable shapes: {', '.join(bridge.vocab.playable)}")
     log(f"[boot] executor={bridge.executor.name} auto_reply={settings.auto_reply} "
-        f"react={'like' if settings.react_on_receive else 'off'}")
+        f"react={'👍/🤔' if settings.react_on_receive else 'off'}")
     log(f"[boot] fold viewer at http://{settings.host}:{settings.port}{SIM_PREFIX}/fold_viewer.html")
     if settings.webhook_secret:
         log("[boot] webhook signatures will be verified (LINQ_WEBHOOK_SECRET is set)")

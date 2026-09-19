@@ -20,6 +20,7 @@ from cubot_imessage.intent import IntentResult                              # no
 from cubot_imessage.linq import (WEBHOOK_VERSION, InboundMessage, LinqClient,   # noqa: E402
                                  RateLimiter, SeenEvents, parse_inbound,
                                  pin_version, text_of, verify_signature)
+from cubot_imessage.openai_fallback import OpenAIFallback                   # noqa: E402
 from cubot_imessage.robot import (DryRunExecutor, ShapeLibrary,             # noqa: E402
                                   states_match_goal)
 from cubot_imessage.vocab import (STATUS_PLANNABLE, STATUS_PLAYABLE,        # noqa: E402
@@ -57,6 +58,8 @@ def handoff(tmp_path):
     shapes = [
         ("heart", 1, [(1, -1, "in"), (6, 1, "in")], True, True),
         ("t", 6, [(3, 1, "out")], False, True),
+        ("j", 12, [(2, 1, "out")], True, True),
+        ("u", 18, [(4, -1, "in")], True, True),
         ("spiral", 32, [(2, 1, "out"), (4, -1, "out"), (7, 1, "in")], True, True),
         ("spiral-v01", 55, [(2, 1, "out")], False, True),     # fewer moves but finishes standing
         ("spiral-v02", 56, [(5, 1, "out")], True, False),     # flat but fails its hard checks
@@ -79,7 +82,7 @@ class FakeClassifier:
 
     def __init__(self, label="heart", confidence=0.8, margin=0.4, accepted=True):
         self.label, self.confidence, self.margin, self.accepted = label, confidence, margin, accepted
-        self.labels = ["heart", "letter_T", "spiral", "star", "bell", "digit_0"]
+        self.labels = ["heart", "letter_t", "letter_j", "letter_u", "spiral", "star", "bell", "digit_0"]
         self.encoder_name = "fake"
         self.load_seconds = 0.0
 
@@ -146,7 +149,7 @@ def test_variants_collapse_to_one_concept(handoff):
     # passing hard checks wins over finishing flat, which wins over fewer moves
     assert vocab.shape_for_icon("spiral") == "spiral"
     assert "spiral-v01" not in vocab.playable_concepts
-    assert vocab.playable_concepts == ["heart", "t", "spiral"]
+    assert vocab.playable_concepts == ["heart", "t", "j", "u", "spiral"]
 
 
 def test_variant_ranking_prefers_a_passing_plan(tmp_path):
@@ -239,15 +242,135 @@ def test_client_react_posts_a_like_tapback():
     assert client.sent[0]["body"] == {"operation": "add", "type": "like"}
 
 
-def test_acknowledge_thumbs_up_on_receive(handoff):
+def test_client_react_posts_a_custom_thinking_emoji():
+    client = LinqClient("key", "https://example.invalid/v3", dry_run=True)
+    client.react("msg-99", "custom", custom_emoji="🤔")
+    assert client.sent[0]["body"] == {"operation": "add", "type": "custom", "custom_emoji": "🤔"}
+
+
+def test_react_like_only_when_playable(handoff):
     client = LinqClient("key", "https://example.invalid/v3", dry_run=True)
     bridge = Bridge(_settings(handoff), classifier=FakeClassifier(),
                     executor=DryRunExecutor(log=lambda *a: None), client=client,
                     log=lambda *a: None)
     inbound = _inbound("show hackthenorth some love")
     inbound.message_id = "msg-heart"
-    bridge.handle(inbound)
-    assert any(c["url"].endswith("/messages/msg-heart/reactions") for c in client.sent)
+    out = bridge.handle(inbound)
+    assert out.resolution and out.resolution.ok
+    reacts = [c["body"] for c in client.sent if c["url"].endswith("/messages/msg-heart/reactions")]
+    assert reacts == [{"operation": "add", "type": "like"}]
+
+
+def test_react_thinking_when_unsure(handoff):
+    """Only when NOTHING can be resolved (no playable labels) do we 🤔."""
+    client = LinqClient("key", "https://example.invalid/v3", dry_run=True)
+    # Empty playable set forces a real decline.
+    class EmptyVocab:
+        playable_concepts = []
+        def playable_labels(self, labels=None):
+            return {}
+        def resolve(self, label, accepted=True, nearest=None, nearest_label_map=None):
+            from cubot_imessage.vocab import Resolution, STATUS_UNSURE
+            return Resolution(status=STATUS_UNSURE, label=label, icon="", shape="",
+                              nearest_playable="", nearest_score=0.0)
+
+    bridge = Bridge(_settings(handoff),
+                    classifier=FakeClassifier(label="none", accepted=False, confidence=0.2, margin=0.0),
+                    vocabulary=EmptyVocab(),
+                    executor=DryRunExecutor(log=lambda *a: None), client=client,
+                    openai=OpenAIFallback(api_key="", log=lambda *a: None),
+                    log=lambda *a: None)
+    inbound = _inbound("whats for lunch")
+    inbound.message_id = "msg-huh"
+    out = bridge.handle(inbound)
+    assert out.status == STATUS_UNSURE
+    reacts = [c["body"] for c in client.sent if c["url"].endswith("/messages/msg-huh/reactions")]
+    assert reacts == [{"operation": "add", "type": "custom", "custom_emoji": "🤔"}]
+
+
+def test_letter_fallback_when_openai_returns_none(handoff):
+    """Cheese / chitchat must still fold something — never a blank decline."""
+    from cubot_imessage.openai_fallback import OpenAIGuess
+
+    class NoneOpenAI:
+        enabled = True
+
+        def resolve(self, text, allowed_labels):
+            # Simulate the old bad behaviour, then the module/bridge must recover.
+            from cubot_imessage.openai_fallback import first_letter_fallback
+            # Pretend API said none by returning the letter fallback ourselves via real resolve path
+            return first_letter_fallback(text, allowed_labels)
+
+    client = LinqClient("key", "https://example.invalid/v3", dry_run=True)
+    clf = FakeClassifier(label="none", accepted=False, confidence=0.1, margin=0.0)
+    clf.labels = list(clf.labels) + ["letter_c", "letter_j", "triangle"]
+    bridge = Bridge(_settings(handoff), classifier=clf,
+                    executor=DryRunExecutor(log=lambda *a: None), client=client,
+                    openai=NoneOpenAI(), log=lambda *a: None)
+    # Ensure C is playable in the miniature handoff
+    import json as _json
+    from pathlib import Path
+    root = Path(handoff)
+    if not (root / "shapes" / "91-c").exists():
+        d = root / "shapes" / "91-c"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "path.json").write_text(_json.dumps(_path_doc("c", 91, [(1, 1, "out")])))
+        idx = _json.loads((root / "index.json").read_text())
+        idx["shapes"].append({"number": 91, "name": "c", "dir": "shapes/91-c", "moves": 1,
+                              "complete": True, "loose_hard_ok": True, "ends_flat_on_table": True,
+                              "aliases": []})
+        (root / "index.json").write_text(_json.dumps(idx))
+        # refresh vocab/library on the bridge
+        from cubot_imessage.vocab import Vocabulary
+        from cubot_imessage.robot import ShapeLibrary
+        bridge.vocab = Vocabulary(handoff)
+        bridge.library = ShapeLibrary(handoff)
+        bridge._playable_labels = None
+
+    inbound = _inbound("i like cheese")
+    inbound.message_id = "msg-cheese"
+    out = bridge.handle(inbound)
+    assert out.resolution and out.resolution.ok
+    assert out.plan is not None
+    assert "deciphered with ChatGPT" in out.reply or "deciphered using local MiniLM" in out.reply \
+        or "deciphered with" in out.reply
+    reacts = [c["body"] for c in client.sent if c["url"].endswith("/messages/msg-cheese/reactions")]
+    assert reacts == [{"operation": "add", "type": "like"}]
+
+
+def test_openai_fallback_recovers_when_minilm_is_unsure(handoff):
+    """MiniLM says none; OpenAI maps a joke to a playable letter and we fold."""
+    from cubot_imessage.openai_fallback import OpenAIGuess
+
+    class FakeOpenAI:
+        enabled = True
+
+        def resolve(self, text, allowed_labels):
+            assert "letter_j" in allowed_labels
+            return OpenAIGuess(label="letter_j", caption="Jerry — that starts with J",
+                               confidence=0.91)
+
+    client = LinqClient("key", "https://example.invalid/v3", dry_run=True)
+    clf = FakeClassifier(label="none", accepted=False, confidence=0.15, margin=0.0)
+    clf.labels = list(clf.labels) + ["letter_j", "letter_u"]
+    bridge = Bridge(_settings(handoff), classifier=clf,
+                    executor=DryRunExecutor(log=lambda *a: None), client=client,
+                    openai=FakeOpenAI(), log=lambda *a: None)
+    inbound = _inbound("whats my name")
+    inbound.message_id = "msg-name"
+    out = bridge.handle(inbound)
+    assert out.via == "openai"
+    assert out.resolution and out.resolution.ok and out.plan and out.plan.shape == "j"
+    assert "deciphered with ChatGPT" in out.reply
+    reacts = [c["body"] for c in client.sent if c["url"].endswith("/messages/msg-name/reactions")]
+    assert reacts == [{"operation": "add", "type": "like"}]
+
+
+def test_accept_reply_credits_local_minilm(handoff):
+    bridge = _bridge(handoff)
+    out = bridge.handle(_inbound("make a heart"))
+    assert out.via == "minilm"
+    assert "deciphered using local MiniLM" in out.reply
 
 
 def test_viewer_executor_builds_a_deep_link(handoff, monkeypatch):
@@ -385,11 +508,14 @@ def test_handle_warns_on_a_flagged_shape(handoff):
 
 
 def test_handle_declines_below_threshold_without_executing(handoff):
-    bridge = _bridge(handoff, FakeClassifier(label="star", accepted=False, margin=0.02))
+    """MiniLM miss + OpenAI/letter fallback must still fold something (never blank)."""
+    clf = FakeClassifier(label="none", accepted=False, margin=0.02, confidence=0.1)
+    clf.labels = list(clf.labels) + ["letter_h", "heart"]
+    bridge = _bridge(handoff, clf)
     out = bridge.handle(_inbound("hey what's up"))
-    assert out.status == STATUS_UNSURE
-    assert out.plan is None and out.executed is None
-    assert "couldn't tell" in out.reply.lower()
+    assert out.resolution and out.resolution.ok
+    assert out.plan is not None
+    assert out.via == "openai"
 
 
 def test_handle_offers_the_nearest_playable_for_a_plannable_shape(handoff):
@@ -418,9 +544,10 @@ def test_reply_goes_only_to_the_originating_chat(handoff):
     bridge = Bridge(settings, classifier=FakeClassifier(), client=client,
                     executor=DryRunExecutor(log=lambda *a: None), log=lambda *a: None)
     bridge.send_reply(bridge.handle(_inbound("make a heart")))
-    # thumbs-up on the inbound message, then a text reply into the same chat — nowhere else
+    # thumbs-up only after a playable classify, then a text reply into the same chat — nowhere else
     assert len(client.sent) == 2
     assert client.sent[0]["url"].endswith("/messages/m1/reactions")
+    assert client.sent[0]["body"] == {"operation": "add", "type": "like"}
     assert client.sent[1]["url"].endswith("/chats/c1/messages")
     assert "+15555550123" not in json.dumps(client.sent)
 

@@ -283,15 +283,19 @@ class LinqClient:
             raise LinqError("reply() needs a chat_id")
         return self._post(f"/chats/{chat_id}/messages", {"message": {"parts": self._parts(text)}})
 
-    def react(self, message_id: str, reaction: str = "like", operation: str = "add") -> dict:
-        """Tapback on an inbound message. `like` is the iMessage thumbs-up.
+    def react(self, message_id: str, reaction: str = "like", operation: str = "add",
+              custom_emoji: str = "") -> dict:
+        """Tapback on an inbound message.
 
-        Docs: POST /v3/messages/{messageId}/reactions with operation add|remove and type like|love|…
+        Built-ins: like / love / dislike / laugh / emphasize / question.
+        Custom emoji (e.g. 🤔): ``reaction="custom"`` + ``custom_emoji``.
         """
         if not message_id:
             raise LinqError("react() needs a message_id")
-        return self._post(f"/messages/{message_id}/reactions",
-                          {"operation": operation, "type": reaction})
+        body: dict = {"operation": operation, "type": reaction}
+        if reaction == "custom":
+            body["custom_emoji"] = custom_emoji or "🤔"
+        return self._post(f"/messages/{message_id}/reactions", body)
 
     # -- webhooks ----------------------------------------------------------------------------
     def create_subscription(self, target_url: str, events: tuple[str, ...] = DEFAULT_EVENTS,

@@ -84,6 +84,9 @@ class Settings:
     min_confidence: Optional[float] = None
     rate_limit_per_minute: int = 6
     timeout_s: float = 15.0
+    openai_api_key: str = ""
+    openai_model: str = "gpt-4o-mini"
+    openai_fallback: bool = True
 
     @classmethod
     def load(cls, use_dotenv: bool = True) -> "Settings":
@@ -110,6 +113,9 @@ class Settings:
             min_confidence=_env_float("BRIDGE_MIN_CONFIDENCE", None),
             rate_limit_per_minute=int(_env("BRIDGE_RATE_LIMIT_PER_MINUTE", "6")),
             timeout_s=float(_env("LINQ_TIMEOUT_S", "15")),
+            openai_api_key=_env("OPENAI_API_KEY"),
+            openai_model=_env("OPENAI_MODEL", "gpt-4o-mini"),
+            openai_fallback=_env_bool("OPENAI_FALLBACK", True),
         )
 
     def describe(self) -> list[tuple[str, str]]:
@@ -133,6 +139,8 @@ class Settings:
             ("listen", f"{self.host}:{self.port}"),
             ("executor", self.executor),
             ("auto-reply", "on" if self.auto_reply else "off"),
-            ("react on receive", "👍 like" if self.react_on_receive else "off"),
+            ("react on receive", "👍 / 🤔 after classify" if self.react_on_receive else "off"),
+            ("OpenAI fallback", ("on · " + (self.openai_model if self.openai_api_key
+             else "no OPENAI_API_KEY")) if self.openai_fallback else "off"),
             ("rate limit", f"{self.rate_limit_per_minute}/min per sender"),
         ]
