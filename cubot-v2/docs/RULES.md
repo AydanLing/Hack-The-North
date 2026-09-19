@@ -14,6 +14,14 @@ Recognizability is an earlier gate than mechanics. Demo candidates are reviewed
 as clean, unlabeled silhouettes. Matching must preserve the concept's defining
 landmarks; foldability cannot compensate for an unreadable icon.
 
+Shape discovery is mask-first unless a task says otherwise (`docs/METHOD.md`):
+a target enters the fold search as an exact hand-drawn 27-cell mask that has
+passed the structural screen and has a proven shipped-roll threading. Fold
+results count for a mask only when the folded goal is the mask itself
+(`goal_is_mask`); a pass on a nearby family substitute is evidence about the
+substitute. Generated atlases and family rescoring are breadth and repair
+tools; their rankings never stand in for the blind pick.
+
 `loose` defines the working acceptance gate. `strict` is always reported and
 does not silently replace the working result. MuJoCo remains the eventual
 physics verdict.

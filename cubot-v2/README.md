@@ -39,17 +39,27 @@ The finalized seven demo paths are exported to `handoff/` — a self-contained,
 dependency-free folder (JSON, CSV, PNG, one pure-Python verifier) meant to be
 handed to the MuJoCo sim owner. See `handoff/README.md` for the conventions and
 `handoff/PATHS.md` for the move lists. Regenerate it with
-`uv run python tools/export_handoff.py` after a new planner run.
+`uv run python tools/export_handoff.py` after a new planner run; add
+exploration winners with `--manifest` or `--shape NAME=RUN_DIR`.
 
-New shapes are discovered with `tools/discover_glyphs.py`: a glyph atlas
-(letters, digits, symbols, icons) is expanded into tens of thousands of exact
-27-cell masks by four generators (parametric thick strokes, bitmap size
-ladders, compass-run templates, boundary perturbation), every mask is solved
-for an exact shipped-roll threading, the threadable ones are ranked offline
-by recognition distance and legibility, and a shortlist is folded through the
-standard pipeline within a wall-clock budget. See `docs/DISCOVERY.md` for the
-latest sweep and `uv run python tools/discover_glyphs.py --help` for the
-stages. Recognizability is still decided by a human blind pick.
+New shapes are found with the **mask-first method** (`docs/METHOD.md`), the
+preferred way unless a task says otherwise: draw a few recognizable 27-cell
+ASCII masks per concept under `data/candidates/<category>/`, gate them in
+seconds (`tools/explore_shape.py --gate-only` — structural screen plus exact
+shipped-roll threading, every verdict a proof), fold only the exact threadings
+of the masks that survive, summarize with `tools/explore_summary.py`, blind-pick
+from the unlabeled contact sheet, and export the picks with
+`tools/export_handoff.py --manifest <out>/handoff-manifest.json`. Exploration
+winners land in `handoff/` numbered after the demo seven, through the same
+replay and consistency checks. The 2026-09-19 run took 47 concepts to 42
+loose-passing exact masks (`docs/EXPLORATION-20260919.md`).
+
+`tools/discover_glyphs.py` (the glyph atlas: generators → threading → offline
+rank → fold, `docs/DISCOVERY.md`) remains available for breadth sweeps and for
+boundary-perturbation *repair* of a hand-drawn concept that is roll-UNSAT, but
+its ranking is a threadability filter, not a recognizability judgment; only
+1.6 % of generated masks thread versus 39 % of hand-drawn ones.
+Recognizability is always decided by a human blind pick.
 
 MuJoCo, hardware drivers, voice, and LLM generation are deliberately not
 dependencies of this project. The optional `judge` extra
