@@ -1,0 +1,484 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CuBot Fold Viewer</title>
+<style>
+  :root { --bg:#14161a; --panel:#1d2026; --line:#2e323a; --fg:#e8e6e1; --dim:#9a9ca3; --accent:#3b82f6;
+          --moving:#e8833a; --still:#d9d4c7; --spacer:#6b7280; --base:#3b82f6; --mA:#2b6cb0; --mB:#ec7048;
+          --ok:#22c55e; --bad:#ef4444; --mono:ui-monospace,Menlo,Consolas,monospace; }
+  * { box-sizing:border-box; }
+  html,body { height:100%; margin:0; background:var(--bg); color:var(--fg);
+              font:14px/1.4 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+  #app { display:grid; grid-template-rows:auto 1fr; grid-template-columns:minmax(0,1fr); height:100%; overflow:hidden; }
+  header { padding:10px 16px 10px; border-bottom:1px solid var(--line); background:var(--panel); min-width:0; }
+  .row { display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; }
+  h1 { font-size:15px; margin:0; font-weight:600; }
+  h1 code { font:600 14px var(--mono); color:var(--fg); }
+  .stat { color:var(--dim); font-size:12.5px; font-variant-numeric:tabular-nums; }
+  .stat b { color:var(--fg); font-weight:600; }
+  .stat.ok { color:var(--ok); } .stat.bad { color:var(--bad); }
+  .num { font-family:var(--mono); font-variant-numeric:tabular-nums; }
+  #tabs { display:flex; gap:6px; flex-wrap:wrap; margin-top:9px; }
+  #tabs button { background:transparent; color:var(--dim); border:1px solid var(--line); border-radius:6px; padding:5px 11px;
+                 font:600 12.5px var(--mono); cursor:pointer; line-height:1.15; }
+  #tabs button small { color:var(--dim); font-weight:400; margin-right:5px; }
+  #tabs button:hover { border-color:#4a5263; background:#2b3140; color:var(--fg); }
+  #tabs button.on { background:#2b3140; border-color:var(--accent); color:var(--fg); }
+  #tabs button.warn { border-color:#5a2a2a; } #tabs button.warn.on { border-color:var(--bad); }
+  #status { margin-top:8px; display:flex; flex-wrap:wrap; gap:6px 16px; }
+  .legend { display:flex; gap:12px; font-size:12px; color:var(--dim); flex-wrap:wrap; margin-top:8px; align-items:center; }
+  .sw { display:inline-block; width:10px; height:10px; border-radius:2px; vertical-align:-1px; margin-right:4px; }
+  .legend label { cursor:pointer; user-select:none; } .legend input { vertical-align:-1px; margin:0 3px 0 0; accent-color:var(--accent); }
+  .legend select { background:var(--panel); color:var(--fg); border:1px solid var(--line); border-radius:4px; font:12px inherit; padding:2px 4px; }
+  main { position:relative; min-height:0; min-width:0; overflow:hidden; }
+  canvas { display:block; }
+  .card { position:absolute; background:rgba(29,32,38,.94); border:1px solid var(--line); border-radius:8px; padding:12px 14px; }
+  .card h2 { margin:0 0 6px; font-size:13px; font-weight:600; }
+  .card h2 span { color:var(--dim); font-weight:400; }
+  .card p { margin:4px 0 0; color:var(--dim); font-size:12.5px; }
+  /* transport */
+  #transport { left:14px; bottom:14px; width:min(440px, calc(100% - 28px)); }
+  #transport .big { font:600 26px var(--mono); font-variant-numeric:tabular-nums; line-height:1.1; }
+  #transport .big span { font-size:13px; color:var(--dim); font-weight:400; }
+  #transport .big em { font-style:normal; color:var(--moving); }
+  #scrub { width:100%; margin:8px 0 6px; accent-color:var(--moving); }
+  .btns { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .btns button { background:transparent; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:5px 10px;
+                 font:600 12px var(--mono); cursor:pointer; min-width:34px; }
+  .btns button:hover { border-color:#4a5263; background:#2b3140; }
+  .btns button.on { background:#3a2a1e; border-color:var(--moving); color:var(--moving); }
+  .btns button.play { min-width:74px; }
+  .btns button.text { font-family:inherit; font-weight:500; color:var(--dim); }
+  .btns select { background:var(--panel); color:var(--fg); border:1px solid var(--line); border-radius:6px; font:600 12px var(--mono); padding:5px 6px; }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  /* moves */
+  #moves { right:14px; top:14px; width:min(300px, calc(100% - 28px)); max-height:calc(58% - 14px); display:flex; flex-direction:column; }
+  #moveList { list-style:none; margin:0; padding:0; overflow:auto; display:grid; gap:2px; min-height:0; }
+  #moveList li { display:grid; grid-template-columns:26px 1fr auto; gap:8px; font:12px var(--mono); font-variant-numeric:tabular-nums;
+                 padding:3px 6px; border-radius:4px; cursor:pointer; color:var(--dim); border:1px solid transparent; }
+  #moveList li:hover { background:#2b3140; color:var(--fg); }
+  #moveList li.done { color:var(--fg); }
+  #moveList li.active { background:#3a2a1e; border-color:var(--moving); color:var(--fg); }
+  #moveList li .side { color:var(--dim); } #moveList li.active .side, #moveList li .in { color:var(--accent); }
+  #moveList li .bad { color:var(--bad); font-weight:700; }
+  #moveList li .t { color:var(--dim); font-size:11px; }
+  /* silhouette */
+  #sil { left:14px; top:14px; width:auto; }
+  #silCanvas { display:block; margin-top:4px; }
+  #hint { position:absolute; right:14px; bottom:14px; color:var(--dim); font-size:12px; text-align:right; }
+  @media (max-width: 760px) {
+    #moves { max-height:38%; width:min(260px, 55%); }
+    #sil { display:none; }
+    #transport { width:calc(100% - 28px); }
+    #hint { display:none; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+
+<div id="app">
+  <header>
+    <div class="row">
+      <h1>CuBot fold viewer · <code>cubot_shipped.urdf</code></h1>
+      <span class="stat" id="verify">checking…</span>
+    </div>
+    <div id="tabs"></div>
+    <div id="status"></div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--still)"></i>still half</span>
+      <span><i class="sw" style="background:var(--moving)"></i>moving half</span>
+      <span><i class="sw" style="background:var(--base)"></i>module 0 (base)</span>
+      <label>colour <select id="colorMode"><option value="halves">still / moving</option><option value="modules">alternating modules</option></select></label>
+      <label><input type="checkbox" id="tEdges" checked>edges</label>
+      <label><input type="checkbox" id="tSpacer" checked>spacers</label>
+      <label><input type="checkbox" id="tAxis" checked>hinge axis</label>
+      <label><input type="checkbox" id="tFollow" checked>camera follows</label>
+    </div>
+  </header>
+  <main id="stage">
+    <div class="card" id="sil"><h2>Silhouette <span id="silLabel"></span></h2><canvas id="silCanvas" width="260" height="120"></canvas></div>
+    <div class="card" id="moves"><h2>Moves <span id="movesMeta"></span></h2><ul id="moveList"></ul></div>
+    <div class="card" id="transport"></div>
+    <div id="hint">drag to orbit · scroll to zoom · space play/pause · ←/→ step · U unfold · F re-frame · 1–7 shapes</div>
+  </main>
+</div>
+
+<script type="text/plain" id="urdf">__URDF__</script>
+<script type="application/json" id="shapes">__SHAPES__</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+// ------------------------------------------------------------------ data
+const SHAPES = JSON.parse(document.getElementById('shapes').textContent);
+const STL = { still: '__STL_STILL__', moving: '__STL_MOVING__' };
+const MM = 1000;                       // URDF is in metres; the scene is in mm
+const DETENT = 2 * Math.PI / 3;        // one joint detent = 120 deg
+const S3 = 1 / Math.sqrt(3);
+const JOINT_AXIS = new THREE.Vector3(S3, S3, S3);
+
+// ------------------------------------------------------------------ parse the URDF text (same as viewer.html)
+const doc = new DOMParser().parseFromString(document.getElementById('urdf').textContent, 'application/xml');
+const nums = s => (s || '0 0 0').trim().split(/\s+/).map(Number);
+const links = {}, joints = [];
+for (const L of doc.querySelectorAll('robot > link')) {
+  const shapes = [];
+  for (const el of L.querySelectorAll(':scope > visual')) {
+    const o = el.querySelector('origin'); const mesh = el.querySelector('geometry > mesh'); const box = el.querySelector('geometry > box');
+    shapes.push({ xyz: nums(o?.getAttribute('xyz')), rpy: nums(o?.getAttribute('rpy')),
+                  mesh: mesh?.getAttribute('filename') || null, box: box ? nums(box.getAttribute('size')) : null });
+  }
+  links[L.getAttribute('name')] = { name: L.getAttribute('name'), shapes };
+}
+for (const J of doc.querySelectorAll('robot > joint')) {
+  const o = J.querySelector('origin');
+  joints.push({ name: J.getAttribute('name'), type: J.getAttribute('type'),
+                parent: J.querySelector('parent').getAttribute('link'), child: J.querySelector('child').getAttribute('link'),
+                xyz: nums(o?.getAttribute('xyz')), rpy: nums(o?.getAttribute('rpy')), axis: nums(J.querySelector('axis')?.getAttribute('xyz') || '1 0 0') });
+}
+const childNames = new Set(joints.map(j => j.child));
+const rootName = Object.keys(links).find(n => !childNames.has(n));
+const mounts = joints.filter(j => j.type === 'fixed').sort((a, b) => a.name.localeCompare(b.name));
+const PITCH = mounts[0].xyz[0] * MM;   // 82.2 mm in the shipped URDF (the planner checked at 82; only the scale differs)
+
+// ------------------------------------------------------------------ decode the STLs (binary, metres)
+function stlGeometry(b64) {
+  const bin = atob(b64), buf = new ArrayBuffer(bin.length), u8 = new Uint8Array(buf);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  const dv = new DataView(buf), n = dv.getUint32(80, true), pos = new Float32Array(n * 9);
+  for (let i = 0; i < n; i++) for (let k = 0; k < 9; k++) pos[i * 9 + k] = dv.getFloat32(84 + i * 50 + 12 + k * 4, true) * MM;
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.computeVertexNormals();
+  const uniq = new Map();
+  for (let i = 0; i < pos.length; i += 3) uniq.set(`${pos[i].toFixed(3)},${pos[i+1].toFixed(3)},${pos[i+2].toFixed(3)}`, new THREE.Vector3(pos[i], pos[i+1], pos[i+2]));
+  g.userData.verts = [...uniq.values()];   // hull vertices, for settling the pose onto the table
+  return g;
+}
+const geoms = { 'meshes/still.stl': stlGeometry(STL.still), 'meshes/moving.stl': stlGeometry(STL.moving) };
+const edgeGeoms = {}; for (const k in geoms) edgeGeoms[k] = new THREE.EdgesGeometry(geoms[k], 20);
+const edgeMat = new THREE.LineBasicMaterial({ color: 0x1a1a1a });
+const spacerMat = new THREE.MeshStandardMaterial({ color: '#6b7280', roughness: .6 });
+const mkMat = c => new THREE.MeshStandardMaterial({ color: c, roughness: .75, flatShading: true, emissive: c, emissiveIntensity: 0 });
+
+// ------------------------------------------------------------------ scene
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); stage.prepend(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color('#14161a');
+const camera = new THREE.PerspectiveCamera(35, 1, 5, 30000); camera.up.set(0, 0, 1);
+const controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x303038, 0.75));
+const sun = new THREE.DirectionalLight(0xffffff, 0.8); sun.position.set(-600, -1400, 2000); scene.add(sun);
+const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(900, 1500, -300); scene.add(fill);
+const grid = new THREE.GridHelper(6000, 72, 0x2a2e36, 0x22252b); grid.rotation.x = Math.PI / 2; grid.position.set(1000, 0, -0.5); scene.add(grid);
+
+// build the kinematic tree exactly as the joints describe it, under a root group we place in the world
+const robot = new THREE.Group(); scene.add(robot);
+const linkObj = {}, edgeObjs = [], spacerObjs = [];
+const urdfRot = rpy => new THREE.Quaternion().setFromEuler(new THREE.Euler(rpy[0], rpy[1], rpy[2], 'ZYX'));   // URDF rpy = Rz·Ry·Rx
+const pieces = [];   // every half-cube mesh: { module, half, mesh, mats:{halves, modules} }
+for (const name in links) {
+  const L = links[name], g = new THREE.Group(); g.name = name; linkObj[name] = g;
+  const module = parseInt(name.slice(1, 3), 10) - 1, half = name.endsWith('_still') ? 'still' : 'moving';
+  for (const s of L.shapes) {
+    let obj;
+    if (s.mesh) {
+      const halves = mkMat(module === 0 ? '#3b82f6' : half === 'still' ? '#d9d4c7' : '#e8833a');
+      const modules = mkMat(module === 0 ? '#93c5fd' : module % 2 ? '#ec7048' : '#2b6cb0');
+      obj = new THREE.Mesh(geoms[s.mesh], halves);
+      const e = new THREE.LineSegments(edgeGeoms[s.mesh], edgeMat); obj.add(e); edgeObjs.push(e);
+      pieces.push({ module, half, mesh: obj, mats: { halves, modules } });
+    } else if (s.box) {
+      obj = new THREE.Mesh(new THREE.BoxGeometry(s.box[0] * MM, s.box[1] * MM, s.box[2] * MM), spacerMat); spacerObjs.push(obj);
+      obj.userData.verts = [-1, 1].flatMap(a => [-1, 1].flatMap(b => [-1, 1].map(c => new THREE.Vector3(a * s.box[0] * MM / 2, b * s.box[1] * MM / 2, c * s.box[2] * MM / 2))));
+    }
+    if (!obj) continue;
+    obj.position.set(s.xyz[0] * MM, s.xyz[1] * MM, s.xyz[2] * MM); obj.quaternion.copy(urdfRot(s.rpy)); g.add(obj);
+  }
+}
+const servos = [];   // index k = handoff joint k = hinge inside module k (URDF servo{k+1})
+for (const j of joints) {
+  const frame = new THREE.Group(); frame.name = j.name;
+  frame.position.set(j.xyz[0] * MM, j.xyz[1] * MM, j.xyz[2] * MM); frame.quaternion.copy(urdfRot(j.rpy));
+  linkObj[j.parent].add(frame);
+  const motion = new THREE.Group(); frame.add(motion); motion.add(linkObj[j.child]);
+  if (j.type === 'continuous' || j.type === 'revolute') servos.push({ name: j.name, motion, axis: new THREE.Vector3(...j.axis).normalize() });
+}
+servos.sort((a, b) => a.name.localeCompare(b.name));
+robot.add(linkObj[rootName]);
+const N_MODULES = servos.length;   // 27
+const stillLink = k => linkObj[`m${String(k + 1).padStart(2, '0')}_still`];
+const settleVerts = [...pieces.map(p => p.mesh), ...spacerObjs];
+
+// hinge axis marker, shown through the active joint during a move
+const axisLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, -160), new THREE.Vector3(0, 0, 160)]),
+                                new THREE.LineBasicMaterial({ color: 0x3b82f6 }));
+axisLine.visible = false; scene.add(axisLine);
+
+// ------------------------------------------------------------------ orientation group (replay.py::group_closure — BFS order IS the base index)
+const I3 = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+const JM = [[0, 0, 1], [1, 0, 0], [0, 1, 0]];      // +120 deg about (1,1,1): x->y->z->x
+const RXM = [[1, 0, 0], [0, 0, -1], [0, 1, 0]];    // +90 deg about local +x
+const mmul = (a, b) => a.map((r, i) => [0, 1, 2].map(j => r[0] * b[0][j] + r[1] * b[1][j] + r[2] * b[2][j]));
+const mkey = m => m.flat().join(',');
+const ORIENTS = [I3]; const ORIENT_INDEX = new Map([[mkey(I3), 0]]);
+for (let cursor = 0; cursor < ORIENTS.length; cursor++) for (const g of [JM, RXM]) {
+  const c = mmul(ORIENTS[cursor], g); if (!ORIENT_INDEX.has(mkey(c))) { ORIENT_INDEX.set(mkey(c), ORIENTS.length); ORIENTS.push(c); }
+}
+console.assert(ORIENTS.length === 24, 'cube rotation group should have 24 elements');
+const orientQuat = i => { const m = ORIENTS[i], M = new THREE.Matrix4(); M.set(m[0][0], m[0][1], m[0][2], 0, m[1][0], m[1][1], m[1][2], 0, m[2][0], m[2][1], m[2][2], 0, 0, 0, 0, 1); return new THREE.Quaternion().setFromRotationMatrix(M); };
+function quatOrient(q) {   // which group element a (lattice-aligned) quaternion is
+  const e = new THREE.Matrix4().makeRotationFromQuaternion(q).elements;
+  const m = [[e[0], e[4], e[8]], [e[1], e[5], e[9]], [e[2], e[6], e[10]]].map(r => r.map(v => Math.round(v) || 0));
+  return ORIENT_INDEX.has(mkey(m)) ? ORIENT_INDEX.get(mkey(m)) : -1;
+}
+
+// ------------------------------------------------------------------ pose primitives
+const q = new Float64Array(N_MODULES);   // servo angles, rad
+function applyQ() { for (let k = 0; k < N_MODULES; k++) servos[k].motion.quaternion.setFromAxisAngle(servos[k].axis, q[k]); }
+function setPose(qs, pos, quat) { q.set(qs); robot.position.copy(pos); robot.quaternion.copy(quat); applyQ(); }
+const _v = new THREE.Vector3();
+function minZ() {
+  robot.updateMatrixWorld(true); let z = Infinity;
+  for (const o of settleVerts) for (const v of o.geometry.userData?.verts || o.userData.verts) { _v.copy(v).applyMatrix4(o.matrixWorld); if (_v.z < z) z = _v.z; }
+  return z;
+}
+function centres() { robot.updateMatrixWorld(true); return Array.from({ length: N_MODULES }, (_, k) => new THREE.Vector3().setFromMatrixPosition(stillLink(k).matrixWorld)); }
+const _q = new THREE.Quaternion();
+function rotateRobotAbout(axis, pivot, angle) {   // world rotation applied to the root: keeps the other side of the hinge fixed
+  _q.setFromAxisAngle(axis, angle);
+  robot.position.sub(pivot).applyQuaternion(_q).add(pivot);
+  robot.quaternion.premultiply(_q);
+}
+
+// Rest poses of a shape: rest[0] is the start, rest[m] is after move m.  Each is built from the previous one with the
+// physically static side held fixed (tail pinned on `in` moves), then settled onto z = 0 like geometry.py::_pose_frames.
+function buildRests(shape) {
+  const rests = [];
+  q.fill(0); shape.start.states.forEach((s, k) => q[k] = s * DETENT);
+  robot.position.set(0, 0, 0); robot.quaternion.copy(orientQuat(shape.start.base)); applyQ();
+  robot.position.z -= minZ();
+  rests.push({ q: Float64Array.from(q), pos: robot.position.clone(), quat: robot.quaternion.clone(), settleDz: 0, pivot: null, axis: null, centres: centres() });
+  for (const mv of shape.moves) {
+    const pivot = new THREE.Vector3().setFromMatrixPosition(stillLink(mv.joint).matrixWorld);
+    const axis = JOINT_AXIS.clone().applyQuaternion(new THREE.Quaternion().setFromRotationMatrix(stillLink(mv.joint).matrixWorld)).normalize();
+    const theta = mv.delta * DETENT;
+    q[mv.joint] += theta;
+    if (mv.side === 'in') rotateRobotAbout(axis, pivot, -theta);
+    applyQ();
+    const dz = -minZ(); robot.position.z += dz;
+    rests.push({ q: Float64Array.from(q), pos: robot.position.clone(), quat: robot.quaternion.clone(), settleDz: dz, pivot, axis, centres: centres() });
+  }
+  return rests;
+}
+
+// Self-check: every rest pose must reproduce the planner's certified cells_after / base_after
+function verifyShape(shape, rests) {
+  const problems = [];
+  const expect = (m, cells, base) => {
+    const r = rests[m], c0 = r.centres[0];
+    for (let k = 0; k < N_MODULES; k++) {
+      const d = r.centres[k].clone().sub(c0).divideScalar(PITCH);
+      const got = [d.x, d.y, d.z].map(v => Math.round(v) || 0);
+      if (got.some((v, i) => v !== cells[k][i]) || [d.x, d.y, d.z].some((v, i) => Math.abs(v - got[i]) > 1e-3)) { problems.push(`pose ${m} module ${k}: ${got} vs ${cells[k]}`); break; }
+    }
+    if (quatOrient(r.quat) !== base) problems.push(`pose ${m}: base ${quatOrient(r.quat)} vs ${base}`);
+    const dup = new Set(cells.map(c => c.join(','))); if (dup.size !== N_MODULES) problems.push(`pose ${m}: not self-avoiding`);
+  };
+  expect(0, shape.start.cells, shape.start.base);
+  shape.moves.forEach((mv, i) => expect(i + 1, mv.cells_after, mv.base_after));
+  const last = shape.moves[shape.moves.length - 1];
+  if (last.base_after !== shape.final_tracked.base) problems.push('final base disagrees with final_tracked');
+  return problems;
+}
+
+// ------------------------------------------------------------------ silhouette (replay.py::silhouette) of a rest pose
+function silhouette(cells) {
+  const lo = [0, 1, 2].map(i => Math.min(...cells.map(c => c[i]))), hi = [0, 1, 2].map(i => Math.max(...cells.map(c => c[i])));
+  const axes = [0, 1, 2].filter(i => hi[i] > lo[i]);
+  if (axes.length === 1) axes.push((axes[0] + 1) % 3);   // a straight line is a one-row drawing
+  if (axes.length !== 2) return null;
+  const [a, b] = axes, occ = new Set(cells.map(c => `${c[a]},${c[b]}`)), rows = [];
+  for (let j = hi[b]; j >= lo[b]; j--) { let s = ''; for (let i = lo[a]; i <= hi[a]; i++) s += occ.has(`${i},${j}`) ? '#' : '.'; rows.push(s); }
+  rows.plane = 'xyz'[a] + 'xyz'[b];   // which lattice plane the drawing lies in (xz / yz = standing)
+  return rows;
+}
+const silCanvas = document.getElementById('silCanvas'), silCtx = silCanvas.getContext('2d');
+function drawSil(current, goal, label) {
+  const W = silCanvas.width, H = silCanvas.height; silCtx.clearRect(0, 0, W, H);
+  const panel = (rows, x0, w, title) => {
+    silCtx.fillStyle = '#9a9ca3'; silCtx.font = '11px ui-monospace, Menlo, monospace'; silCtx.fillText(title, x0, 12);
+    if (!rows) { silCtx.fillText('not planar', x0, 40); return; }
+    const cols = rows[0].length, cell = Math.floor(Math.min((w - 4) / cols, (H - 22) / rows.length));
+    const ox = x0 + Math.floor((w - cols * cell) / 2), oy = 18 + Math.floor((H - 22 - rows.length * cell) / 2);
+    rows.forEach((r, j) => [...r].forEach((ch, i) => { silCtx.fillStyle = ch === '#' ? '#e8e6e1' : '#23262c'; silCtx.fillRect(ox + i * cell, oy + j * cell, cell - 1, cell - 1); }));
+  };
+  panel(current, 4, W / 2 - 8, label); panel(goal, W / 2 + 4, W / 2 - 8, 'goal');
+}
+
+// ------------------------------------------------------------------ timeline
+const ease = u => u * u * (3 - 2 * u);
+const smooth = (u, a, b) => ease(Math.min(1, Math.max(0, (u - a) / (b - a))));
+let shape, rests, cum;   // cum[m] = time at rest pose m
+let t = 0, playing = false, dir = 1, speed = 1, cur = { m: 0, u: 0 };
+const T_END = () => cum[cum.length - 1];
+
+function setTime(time) {
+  t = Math.min(Math.max(0, time), T_END());
+  let m = 0; while (m < shape.moves.length && t >= cum[m + 1]) m++;
+  const u = m < shape.moves.length ? (t - cum[m]) / shape.moves[m].duration_s : 0;
+  const r = rests[m]; setPose(r.q, r.pos, r.quat);
+  for (const p of pieces) p.mesh.material.emissiveIntensity = 0;
+  axisLine.visible = false;
+  if (u > 0) {
+    const mv = shape.moves[m], nr = rests[m + 1], theta = mv.delta * DETENT * ease(u);
+    q[mv.joint] += theta;
+    if (mv.side === 'in') rotateRobotAbout(nr.axis, nr.pivot, -theta);
+    robot.position.z += nr.settleDz * smooth(u, 0.8, 1);
+    applyQ();
+    const swings = p => mv.side === 'out' ? (p.module > mv.joint || (p.module === mv.joint && p.half === 'moving'))
+                                          : (p.module < mv.joint || (p.module === mv.joint && p.half === 'still'));
+    for (const p of pieces) if (swings(p)) p.mesh.material.emissiveIntensity = 0.35;
+    if (document.getElementById('tAxis').checked) {   // the hinge line lives on the still half of the joint module
+      robot.updateMatrixWorld(true);
+      axisLine.position.setFromMatrixPosition(stillLink(mv.joint).matrixWorld);
+      axisLine.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), JOINT_AXIS.clone().applyQuaternion(new THREE.Quaternion().setFromRotationMatrix(stillLink(mv.joint).matrixWorld)));
+      axisLine.visible = true;
+    }
+  }
+  cur = { m, u };
+  updateTransport(); updateMoves(); updateSil();
+}
+
+// ------------------------------------------------------------------ UI: tabs + status
+const tabs = document.getElementById('tabs'), statusEl = document.getElementById('status');
+SHAPES.forEach((s, i) => {
+  const b = document.createElement('button'); b.className = s.loose_hard_ok ? '' : 'warn';
+  b.innerHTML = `<small>${s.demo_number}</small>${s.name}`; b.title = `${s.moves.length} moves`; b.onclick = () => selectShape(i); tabs.appendChild(b);
+});
+function selectShape(i) {
+  shape = SHAPES[i]; rests = buildRests(shape);
+  cum = [0]; shape.moves.forEach(mv => cum.push(cum[cum.length - 1] + mv.duration_s));
+  [...tabs.children].forEach((b, k) => b.classList.toggle('on', k === i));
+  const ft = shape.final_tracked;
+  statusEl.innerHTML = `<span class="stat"><b>${shape.moves.length}</b> moves · <b class="num">${shape.total_time_s.toFixed(1)} s</b> nominal</span>
+    <span class="stat"><b>${shape.moves.filter(m => m.side === 'in').length}</b> in · <b>${shape.moves.filter(m => m.side === 'out').length}</b> out</span>
+    <span class="stat">finishes <b>${ft.ends_flat_on_table ? 'flat on the table' : 'standing on edge'}</b> (span <span class="num">${ft.lattice_span.join('×')}</span>, base ${shape.start.base} → ${ft.base})</span>
+    <span class="stat ${shape.loose_hard_ok ? 'ok' : 'bad'}">${shape.loose_hard_ok ? '✓ loose hard checks pass' : `✗ ${shape.loose_violations.length} loose violation${shape.loose_violations.length === 1 ? '' : 's'} — still kinematically complete`}</span>`;
+  buildMoves(); playing = false; dir = 1; follow = true;
+  setTime(0); frameWhole();
+}
+
+// ------------------------------------------------------------------ UI: moves list
+const moveList = document.getElementById('moveList');
+function buildMoves() {
+  document.getElementById('movesMeta').textContent = `(joint · Δ · side · peak N·m)`;
+  moveList.innerHTML = shape.moves.map(mv => `<li data-step="${mv.step}" title="after this move: base ${mv.base_after}">
+      <span>${mv.step}</span><span>j${mv.joint} ${mv.delta > 0 ? '+1' : '−1'} <span class="side ${mv.side}">${mv.side}</span></span>
+      <span class="t">${mv.hard_ok ? '' : `<span class="bad">✗ ${mv.failed_checks.join(', ')}</span> `}${mv.peak_demand_nm == null ? '' : mv.peak_demand_nm.toFixed(1)}</span></li>`).join('');
+  [...moveList.children].forEach(li => li.onclick = () => { playing = false; setTime(cum[+li.dataset.step]); });
+}
+let lastActive = -1;
+function updateMoves() {
+  const active = cur.u > 0 ? cur.m + 1 : cur.m;
+  [...moveList.children].forEach((li, i) => { li.classList.toggle('active', i + 1 === active && cur.u > 0); li.classList.toggle('done', i + 1 <= active && !(i + 1 === active && cur.u > 0)); });
+  if (active !== lastActive && active > 0) { moveList.children[active - 1].scrollIntoView({ block: 'nearest' }); lastActive = active; }
+}
+function updateSil() {
+  const cells = cur.m === 0 ? shape.start.cells : shape.moves[cur.m - 1].cells_after;
+  const rows = silhouette(cells);
+  drawSil(rows, shape.goal.silhouette, (cur.m === 0 ? 'start' : `after move ${cur.m}`) + (rows && rows.plane !== 'xy' ? ` · ${rows.plane} plane` : ''));
+  document.getElementById('silLabel').textContent = cur.u > 0 ? '(moving)' : '';
+}
+
+// ------------------------------------------------------------------ UI: transport
+const transport = document.getElementById('transport');
+transport.innerHTML = `
+  <div class="big num"><span id="tMove"></span></div>
+  <input type="range" id="scrub" min="0" max="1" step="0.01" value="0" aria-label="path time">
+  <div class="btns">
+    <button id="bStart" title="start (Home)">⏮</button><button id="bBack" title="previous rest pose (←)">◀</button>
+    <button id="bPlay" class="play" title="play / pause (space)">Play</button>
+    <button id="bFwd" title="next rest pose (→)">▶</button><button id="bEnd" title="end (End)">⏭</button>
+    <button id="bUnfold" class="text" title="play the moves in reverse">Unfold</button>
+    <select id="speed" title="playback speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+  </div>
+  <p id="tNote"></p>`;
+const scrub = document.getElementById('scrub'), tMove = document.getElementById('tMove'), tNote = document.getElementById('tNote'), bPlay = document.getElementById('bPlay'), bUnfold = document.getElementById('bUnfold');
+function updateTransport() {
+  scrub.max = T_END().toFixed(2); scrub.value = t.toFixed(2);
+  const mv = cur.u > 0 ? shape.moves[cur.m] : null;
+  tMove.innerHTML = mv
+    ? `move <em>${cur.m + 1}</em><span>/${shape.moves.length}</span> <span>· joint ${mv.joint} ${mv.delta > 0 ? '+' : '−'}120° · ${mv.side} · ${Math.round(cur.u * 100)}%</span>`
+    : `${cur.m === 0 ? 'start' : cur.m === shape.moves.length ? 'goal' : `after ${cur.m}`}<span>${cur.m === 0 ? ' · straight chain' : ` · ${cur.m}/${shape.moves.length} moves`} · ${t.toFixed(1)} s</span>`;
+  tNote.textContent = mv
+    ? (mv.side === 'out' ? `Modules ${mv.joint + 1}–26 and the moving half of ${mv.joint} swing about module ${mv.joint}'s ⟨111⟩ diagonal; the base side stays put.`
+                         : `Modules 0–${Math.max(0, mv.joint - 1)} and the still half of ${mv.joint} swing; the tail side stays put, so the base re-orients.`)
+    : (cur.m === shape.moves.length ? `Done: ${shape.final_tracked.ends_flat_on_table ? 'the drawing lies flat on the table.' : 'the drawing stands on edge (drawing plane vertical).'}` : 'Rest pose: every joint at a detent (−120°, 0°, +120°).');
+  bPlay.textContent = playing ? 'Pause' : 'Play';
+  bUnfold.classList.toggle('on', dir < 0);
+}
+scrub.oninput = e => { playing = false; setTime(+e.target.value); updateTransport(); };
+document.getElementById('bStart').onclick = () => { playing = false; setTime(0); };
+document.getElementById('bEnd').onclick = () => { playing = false; setTime(T_END()); };
+document.getElementById('bBack').onclick = () => { playing = false; setTime(cum[cur.u > 0 ? cur.m : Math.max(0, cur.m - 1)]); };
+document.getElementById('bFwd').onclick = () => { playing = false; setTime(cum[Math.min(shape.moves.length, cur.m + 1)]); };
+function togglePlay() {
+  if (!playing) { if (dir > 0 && t >= T_END()) setTime(0); if (dir < 0 && t <= 0) setTime(T_END()); }
+  playing = !playing; updateTransport();
+}
+bPlay.onclick = togglePlay;
+bUnfold.onclick = () => { dir = -dir; if (playing) { /* keep playing, now the other way */ } updateTransport(); };
+document.getElementById('speed').onchange = e => speed = +e.target.value;
+document.getElementById('colorMode').onchange = e => pieces.forEach(p => p.mesh.material = p.mats[e.target.value]);
+document.getElementById('tEdges').onchange = e => edgeObjs.forEach(o => o.visible = e.target.checked);
+document.getElementById('tSpacer').onchange = e => spacerObjs.forEach(o => o.visible = e.target.checked);
+document.getElementById('tAxis').onchange = () => setTime(t);
+document.getElementById('tFollow').onchange = e => follow = e.target.checked;
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'SELECT') return;
+  if (e.target.tagName === 'INPUT' && e.target.type === 'range' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) return;
+  if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+  else if (e.key === 'ArrowRight') document.getElementById('bFwd').click();
+  else if (e.key === 'ArrowLeft') document.getElementById('bBack').click();
+  else if (e.key === 'Home') document.getElementById('bStart').click();
+  else if (e.key === 'End') document.getElementById('bEnd').click();
+  else if (e.key === 'u' || e.key === 'U') bUnfold.click();
+  else if (e.key === 'Escape' || e.key === 'f' || e.key === 'F') { follow = true; document.getElementById('tFollow').checked = true; frameWhole(); }
+  else if (e.key >= '1' && e.key <= '7') selectShape(+e.key - 1);
+});
+
+// ------------------------------------------------------------------ camera
+let follow = true;
+const view = { target: new THREE.Vector3(), pos: new THREE.Vector3(), anim: 0 };
+function centroid() { const c = centres(), s = new THREE.Vector3(); c.forEach(v => s.add(v)); return s.divideScalar(c.length); }
+function frameWhole() {   // fit the current pose: distance from the bounding radius of the module centres
+  const c = centroid(), r = Math.max(...centres().map(v => v.distanceTo(c))) + 60;
+  const wide = stage.clientWidth / Math.max(stage.clientHeight, 1), dist = Math.max(700, 2.4 * r) / Math.min(1, wide / 1.6);
+  view.target.copy(c); view.pos.set(c.x - dist * .15, c.y - dist, c.z + dist * .5); view.anim = 1;
+}
+controls.addEventListener('start', () => { view.anim = 0; follow = false; document.getElementById('tFollow').checked = false; });
+function resize() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize);
+
+// ------------------------------------------------------------------ boot: verify every shape, then show the first
+(function boot() {
+  const report = []; let poses = 0;
+  for (const s of SHAPES) { const r = buildRests(s); poses += r.length; const p = verifyShape(s, r); if (p.length) report.push(`${s.name}: ${p.join('; ')}`); }
+  const el = document.getElementById('verify'); el.className = 'stat ' + (report.length ? 'bad' : 'ok');
+  el.textContent = report.length ? `✗ ${report.length} of ${SHAPES.length} shapes disagree with the planner` : `✓ ${SHAPES.length}/${SHAPES.length} shapes · ${poses} rest poses reproduce cells_after / base_after`;
+  el.title = report.join('\n') || `URDF pitch ${PITCH} mm`;
+  console.log('[fold-viewer]', el.textContent, report);
+  resize(); selectShape(0); camera.position.copy(view.pos); controls.target.copy(view.target);
+})();
+
+let tPrev = performance.now();
+(function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.05, (now - tPrev) / 1000); tPrev = now;
+  if (playing) {
+    const next = t + dir * speed * dt;
+    if (next <= 0 || next >= T_END()) { playing = false; setTime(next <= 0 ? 0 : T_END()); }
+    else setTime(next);
+  }
+  if (view.anim) { camera.position.lerp(view.pos, 0.12); controls.target.lerp(view.target, 0.12); if (camera.position.distanceTo(view.pos) < 1) view.anim = 0; }
+  else if (follow) { const d = centroid().sub(controls.target).multiplyScalar(0.06); controls.target.add(d); camera.position.add(d); }
+  controls.update(); renderer.render(scene, camera);
+})(tPrev);
+</script>

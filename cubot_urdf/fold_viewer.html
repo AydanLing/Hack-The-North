@@ -1,0 +1,1965 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CuBot Fold Viewer</title>
+<style>
+  :root { --bg:#14161a; --panel:#1d2026; --line:#2e323a; --fg:#e8e6e1; --dim:#9a9ca3; --accent:#3b82f6;
+          --moving:#e8833a; --still:#d9d4c7; --spacer:#6b7280; --base:#3b82f6; --mA:#2b6cb0; --mB:#ec7048;
+          --ok:#22c55e; --bad:#ef4444; --mono:ui-monospace,Menlo,Consolas,monospace; }
+  * { box-sizing:border-box; }
+  html,body { height:100%; margin:0; background:var(--bg); color:var(--fg);
+              font:14px/1.4 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+  #app { display:grid; grid-template-rows:auto 1fr; grid-template-columns:minmax(0,1fr); height:100%; overflow:hidden; }
+  header { padding:10px 16px 10px; border-bottom:1px solid var(--line); background:var(--panel); min-width:0; }
+  .row { display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; }
+  h1 { font-size:15px; margin:0; font-weight:600; }
+  h1 code { font:600 14px var(--mono); color:var(--fg); }
+  .stat { color:var(--dim); font-size:12.5px; font-variant-numeric:tabular-nums; }
+  .stat b { color:var(--fg); font-weight:600; }
+  .stat.ok { color:var(--ok); } .stat.bad { color:var(--bad); }
+  .num { font-family:var(--mono); font-variant-numeric:tabular-nums; }
+  #tabs { display:flex; gap:6px; flex-wrap:wrap; margin-top:9px; }
+  #tabs button { background:transparent; color:var(--dim); border:1px solid var(--line); border-radius:6px; padding:5px 11px;
+                 font:600 12.5px var(--mono); cursor:pointer; line-height:1.15; }
+  #tabs button small { color:var(--dim); font-weight:400; margin-right:5px; }
+  #tabs button:hover { border-color:#4a5263; background:#2b3140; color:var(--fg); }
+  #tabs button.on { background:#2b3140; border-color:var(--accent); color:var(--fg); }
+  #tabs button.warn { border-color:#5a2a2a; } #tabs button.warn.on { border-color:var(--bad); }
+  #status { margin-top:8px; display:flex; flex-wrap:wrap; gap:6px 16px; }
+  .legend { display:flex; gap:12px; font-size:12px; color:var(--dim); flex-wrap:wrap; margin-top:8px; align-items:center; }
+  .sw { display:inline-block; width:10px; height:10px; border-radius:2px; vertical-align:-1px; margin-right:4px; }
+  .legend label { cursor:pointer; user-select:none; } .legend input { vertical-align:-1px; margin:0 3px 0 0; accent-color:var(--accent); }
+  .legend select { background:var(--panel); color:var(--fg); border:1px solid var(--line); border-radius:4px; font:12px inherit; padding:2px 4px; }
+  main { position:relative; min-height:0; min-width:0; overflow:hidden; }
+  canvas { display:block; }
+  .card { position:absolute; background:rgba(29,32,38,.94); border:1px solid var(--line); border-radius:8px; padding:12px 14px; }
+  .card h2 { margin:0 0 6px; font-size:13px; font-weight:600; }
+  .card h2 span { color:var(--dim); font-weight:400; }
+  .card p { margin:4px 0 0; color:var(--dim); font-size:12.5px; }
+  /* transport */
+  #transport { left:14px; bottom:14px; width:min(440px, calc(100% - 28px)); }
+  #transport .big { font:600 26px var(--mono); font-variant-numeric:tabular-nums; line-height:1.1; }
+  #transport .big span { font-size:13px; color:var(--dim); font-weight:400; }
+  #transport .big em { font-style:normal; color:var(--moving); }
+  #scrub { width:100%; margin:8px 0 6px; accent-color:var(--moving); }
+  .btns { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+  .btns button { background:transparent; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:5px 10px;
+                 font:600 12px var(--mono); cursor:pointer; min-width:34px; }
+  .btns button:hover { border-color:#4a5263; background:#2b3140; }
+  .btns button.on { background:#3a2a1e; border-color:var(--moving); color:var(--moving); }
+  .btns button.play { min-width:74px; }
+  .btns button.text { font-family:inherit; font-weight:500; color:var(--dim); }
+  .btns select { background:var(--panel); color:var(--fg); border:1px solid var(--line); border-radius:6px; font:600 12px var(--mono); padding:5px 6px; }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  /* moves */
+  #moves { right:14px; top:14px; width:min(300px, calc(100% - 28px)); max-height:calc(58% - 14px); display:flex; flex-direction:column; }
+  #moveList { list-style:none; margin:0; padding:0; overflow:auto; display:grid; gap:2px; min-height:0; }
+  #moveList li { display:grid; grid-template-columns:26px 1fr auto; gap:8px; font:12px var(--mono); font-variant-numeric:tabular-nums;
+                 padding:3px 6px; border-radius:4px; cursor:pointer; color:var(--dim); border:1px solid transparent; }
+  #moveList li:hover { background:#2b3140; color:var(--fg); }
+  #moveList li.done { color:var(--fg); }
+  #moveList li.active { background:#3a2a1e; border-color:var(--moving); color:var(--fg); }
+  #moveList li .side { color:var(--dim); } #moveList li.active .side, #moveList li .in { color:var(--accent); }
+  #moveList li .bad { color:var(--bad); font-weight:700; }
+  #moveList li .t { color:var(--dim); font-size:11px; }
+  /* silhouette */
+  #sil { left:14px; top:14px; width:auto; }
+  #silCanvas { display:block; margin-top:4px; }
+  #hint { position:absolute; right:14px; bottom:14px; color:var(--dim); font-size:12px; text-align:right; }
+  @media (max-width: 760px) {
+    #moves { max-height:38%; width:min(260px, 55%); }
+    #sil { display:none; }
+    #transport { width:calc(100% - 28px); }
+    #hint { display:none; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+
+<div id="app">
+  <header>
+    <div class="row">
+      <h1>CuBot fold viewer · <code>cubot_shipped.urdf</code></h1>
+      <span class="stat" id="verify">checking…</span>
+    </div>
+    <div id="tabs"></div>
+    <div id="status"></div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--still)"></i>still half</span>
+      <span><i class="sw" style="background:var(--moving)"></i>moving half</span>
+      <span><i class="sw" style="background:var(--base)"></i>module 0 (base)</span>
+      <label>colour <select id="colorMode"><option value="halves">still / moving</option><option value="modules">alternating modules</option></select></label>
+      <label><input type="checkbox" id="tEdges" checked>edges</label>
+      <label><input type="checkbox" id="tSpacer" checked>spacers</label>
+      <label><input type="checkbox" id="tAxis" checked>hinge axis</label>
+      <label><input type="checkbox" id="tFollow" checked>camera follows</label>
+    </div>
+  </header>
+  <main id="stage">
+    <div class="card" id="sil"><h2>Silhouette <span id="silLabel"></span></h2><canvas id="silCanvas" width="260" height="120"></canvas></div>
+    <div class="card" id="moves"><h2>Moves <span id="movesMeta"></span></h2><ul id="moveList"></ul></div>
+    <div class="card" id="transport"></div>
+    <div id="hint">drag to orbit · scroll to zoom · space play/pause · ←/→ step · U unfold · F re-frame · 1–7 shapes</div>
+  </main>
+</div>
+
+<script type="text/plain" id="urdf"><?xml version="1.0"?>
+<!-- Generated by build_cubot_urdf.py; edit that script, not this file.
+     27 x 80 mm cubes, <111> hinge, 8 mm equatorial chamfers + CAD neck profile, 2.2 mm gap (pitch 82.2 mm),
+     shipped roll word 12001300133101230333233210 (right-hand about +X, toward module 27). Units: m, rad, kg. -->
+<robot name="cubot_shipped">
+  <mujoco><compiler meshdir="." discardvisual="false" fusestatic="false" balanceinertia="true"/></mujoco>
+
+  <material name="still"><color rgba="0.85 0.83 0.78 1"/></material>
+  <material name="moving"><color rgba="0.91 0.51 0.23 1"/></material>
+  <material name="spacer"><color rgba="0.45 0.47 0.5 1"/></material>
+
+  <!-- ==================== module 01 ==================== -->
+  <link name="m01_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m01_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo01" type="continuous">
+    <parent link="m01_still"/>
+    <child link="m01_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount01_02" type="fixed">
+    <!-- roll digit 1: module 2 mounted 90 deg about +X relative to module 1 -->
+    <parent link="m01_moving"/>
+    <child link="m02_still"/>
+    <origin xyz="0.0822 0 0" rpy="1.57079633 0 0"/>
+  </joint>
+
+  <!-- ==================== module 02 ==================== -->
+  <link name="m02_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m02_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo02" type="continuous">
+    <parent link="m02_still"/>
+    <child link="m02_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount02_03" type="fixed">
+    <!-- roll digit 2: module 3 mounted 180 deg about +X relative to module 2 -->
+    <parent link="m02_moving"/>
+    <child link="m03_still"/>
+    <origin xyz="0.0822 0 0" rpy="3.14159265 0 0"/>
+  </joint>
+
+  <!-- ==================== module 03 ==================== -->
+  <link name="m03_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m03_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo03" type="continuous">
+    <parent link="m03_still"/>
+    <child link="m03_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount03_04" type="fixed">
+    <!-- roll digit 0: module 4 mounted 0 deg about +X relative to module 3 -->
+    <parent link="m03_moving"/>
+    <child link="m04_still"/>
+    <origin xyz="0.0822 0 0" rpy="0.00000000 0 0"/>
+  </joint>
+
+  <!-- ==================== module 04 ==================== -->
+  <link name="m04_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m04_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo04" type="continuous">
+    <parent link="m04_still"/>
+    <child link="m04_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount04_05" type="fixed">
+    <!-- roll digit 0: module 5 mounted 0 deg about +X relative to module 4 -->
+    <parent link="m04_moving"/>
+    <child link="m05_still"/>
+    <origin xyz="0.0822 0 0" rpy="0.00000000 0 0"/>
+  </joint>
+
+  <!-- ==================== module 05 ==================== -->
+  <link name="m05_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m05_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo05" type="continuous">
+    <parent link="m05_still"/>
+    <child link="m05_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount05_06" type="fixed">
+    <!-- roll digit 1: module 6 mounted 90 deg about +X relative to module 5 -->
+    <parent link="m05_moving"/>
+    <child link="m06_still"/>
+    <origin xyz="0.0822 0 0" rpy="1.57079633 0 0"/>
+  </joint>
+
+  <!-- ==================== module 06 ==================== -->
+  <link name="m06_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m06_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo06" type="continuous">
+    <parent link="m06_still"/>
+    <child link="m06_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount06_07" type="fixed">
+    <!-- roll digit 3: module 7 mounted 270 deg about +X relative to module 6 -->
+    <parent link="m06_moving"/>
+    <child link="m07_still"/>
+    <origin xyz="0.0822 0 0" rpy="4.71238898 0 0"/>
+  </joint>
+
+  <!-- ==================== module 07 ==================== -->
+  <link name="m07_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m07_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo07" type="continuous">
+    <parent link="m07_still"/>
+    <child link="m07_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount07_08" type="fixed">
+    <!-- roll digit 0: module 8 mounted 0 deg about +X relative to module 7 -->
+    <parent link="m07_moving"/>
+    <child link="m08_still"/>
+    <origin xyz="0.0822 0 0" rpy="0.00000000 0 0"/>
+  </joint>
+
+  <!-- ==================== module 08 ==================== -->
+  <link name="m08_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m08_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo08" type="continuous">
+    <parent link="m08_still"/>
+    <child link="m08_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount08_09" type="fixed">
+    <!-- roll digit 0: module 9 mounted 0 deg about +X relative to module 8 -->
+    <parent link="m08_moving"/>
+    <child link="m09_still"/>
+    <origin xyz="0.0822 0 0" rpy="0.00000000 0 0"/>
+  </joint>
+
+  <!-- ==================== module 09 ==================== -->
+  <link name="m09_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m09_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo09" type="continuous">
+    <parent link="m09_still"/>
+    <child link="m09_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount09_10" type="fixed">
+    <!-- roll digit 1: module 10 mounted 90 deg about +X relative to module 9 -->
+    <parent link="m09_moving"/>
+    <child link="m10_still"/>
+    <origin xyz="0.0822 0 0" rpy="1.57079633 0 0"/>
+  </joint>
+
+  <!-- ==================== module 10 ==================== -->
+  <link name="m10_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m10_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo10" type="continuous">
+    <parent link="m10_still"/>
+    <child link="m10_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount10_11" type="fixed">
+    <!-- roll digit 3: module 11 mounted 270 deg about +X relative to module 10 -->
+    <parent link="m10_moving"/>
+    <child link="m11_still"/>
+    <origin xyz="0.0822 0 0" rpy="4.71238898 0 0"/>
+  </joint>
+
+  <!-- ==================== module 11 ==================== -->
+  <link name="m11_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m11_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo11" type="continuous">
+    <parent link="m11_still"/>
+    <child link="m11_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount11_12" type="fixed">
+    <!-- roll digit 3: module 12 mounted 270 deg about +X relative to module 11 -->
+    <parent link="m11_moving"/>
+    <child link="m12_still"/>
+    <origin xyz="0.0822 0 0" rpy="4.71238898 0 0"/>
+  </joint>
+
+  <!-- ==================== module 12 ==================== -->
+  <link name="m12_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m12_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo12" type="continuous">
+    <parent link="m12_still"/>
+    <child link="m12_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount12_13" type="fixed">
+    <!-- roll digit 1: module 13 mounted 90 deg about +X relative to module 12 -->
+    <parent link="m12_moving"/>
+    <child link="m13_still"/>
+    <origin xyz="0.0822 0 0" rpy="1.57079633 0 0"/>
+  </joint>
+
+  <!-- ==================== module 13 ==================== -->
+  <link name="m13_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m13_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo13" type="continuous">
+    <parent link="m13_still"/>
+    <child link="m13_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount13_14" type="fixed">
+    <!-- roll digit 0: module 14 mounted 0 deg about +X relative to module 13 -->
+    <parent link="m13_moving"/>
+    <child link="m14_still"/>
+    <origin xyz="0.0822 0 0" rpy="0.00000000 0 0"/>
+  </joint>
+
+  <!-- ==================== module 14 ==================== -->
+  <link name="m14_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m14_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo14" type="continuous">
+    <parent link="m14_still"/>
+    <child link="m14_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount14_15" type="fixed">
+    <!-- roll digit 1: module 15 mounted 90 deg about +X relative to module 14 -->
+    <parent link="m14_moving"/>
+    <child link="m15_still"/>
+    <origin xyz="0.0822 0 0" rpy="1.57079633 0 0"/>
+  </joint>
+
+  <!-- ==================== module 15 ==================== -->
+  <link name="m15_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m15_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo15" type="continuous">
+    <parent link="m15_still"/>
+    <child link="m15_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount15_16" type="fixed">
+    <!-- roll digit 2: module 16 mounted 180 deg about +X relative to module 15 -->
+    <parent link="m15_moving"/>
+    <child link="m16_still"/>
+    <origin xyz="0.0822 0 0" rpy="3.14159265 0 0"/>
+  </joint>
+
+  <!-- ==================== module 16 ==================== -->
+  <link name="m16_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m16_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo16" type="continuous">
+    <parent link="m16_still"/>
+    <child link="m16_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount16_17" type="fixed">
+    <!-- roll digit 3: module 17 mounted 270 deg about +X relative to module 16 -->
+    <parent link="m16_moving"/>
+    <child link="m17_still"/>
+    <origin xyz="0.0822 0 0" rpy="4.71238898 0 0"/>
+  </joint>
+
+  <!-- ==================== module 17 ==================== -->
+  <link name="m17_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m17_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo17" type="continuous">
+    <parent link="m17_still"/>
+    <child link="m17_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount17_18" type="fixed">
+    <!-- roll digit 0: module 18 mounted 0 deg about +X relative to module 17 -->
+    <parent link="m17_moving"/>
+    <child link="m18_still"/>
+    <origin xyz="0.0822 0 0" rpy="0.00000000 0 0"/>
+  </joint>
+
+  <!-- ==================== module 18 ==================== -->
+  <link name="m18_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m18_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo18" type="continuous">
+    <parent link="m18_still"/>
+    <child link="m18_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount18_19" type="fixed">
+    <!-- roll digit 3: module 19 mounted 270 deg about +X relative to module 18 -->
+    <parent link="m18_moving"/>
+    <child link="m19_still"/>
+    <origin xyz="0.0822 0 0" rpy="4.71238898 0 0"/>
+  </joint>
+
+  <!-- ==================== module 19 ==================== -->
+  <link name="m19_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m19_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo19" type="continuous">
+    <parent link="m19_still"/>
+    <child link="m19_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount19_20" type="fixed">
+    <!-- roll digit 3: module 20 mounted 270 deg about +X relative to module 19 -->
+    <parent link="m19_moving"/>
+    <child link="m20_still"/>
+    <origin xyz="0.0822 0 0" rpy="4.71238898 0 0"/>
+  </joint>
+
+  <!-- ==================== module 20 ==================== -->
+  <link name="m20_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m20_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo20" type="continuous">
+    <parent link="m20_still"/>
+    <child link="m20_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount20_21" type="fixed">
+    <!-- roll digit 3: module 21 mounted 270 deg about +X relative to module 20 -->
+    <parent link="m20_moving"/>
+    <child link="m21_still"/>
+    <origin xyz="0.0822 0 0" rpy="4.71238898 0 0"/>
+  </joint>
+
+  <!-- ==================== module 21 ==================== -->
+  <link name="m21_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m21_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo21" type="continuous">
+    <parent link="m21_still"/>
+    <child link="m21_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount21_22" type="fixed">
+    <!-- roll digit 2: module 22 mounted 180 deg about +X relative to module 21 -->
+    <parent link="m21_moving"/>
+    <child link="m22_still"/>
+    <origin xyz="0.0822 0 0" rpy="3.14159265 0 0"/>
+  </joint>
+
+  <!-- ==================== module 22 ==================== -->
+  <link name="m22_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m22_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo22" type="continuous">
+    <parent link="m22_still"/>
+    <child link="m22_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount22_23" type="fixed">
+    <!-- roll digit 3: module 23 mounted 270 deg about +X relative to module 22 -->
+    <parent link="m22_moving"/>
+    <child link="m23_still"/>
+    <origin xyz="0.0822 0 0" rpy="4.71238898 0 0"/>
+  </joint>
+
+  <!-- ==================== module 23 ==================== -->
+  <link name="m23_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m23_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo23" type="continuous">
+    <parent link="m23_still"/>
+    <child link="m23_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount23_24" type="fixed">
+    <!-- roll digit 3: module 24 mounted 270 deg about +X relative to module 23 -->
+    <parent link="m23_moving"/>
+    <child link="m24_still"/>
+    <origin xyz="0.0822 0 0" rpy="4.71238898 0 0"/>
+  </joint>
+
+  <!-- ==================== module 24 ==================== -->
+  <link name="m24_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m24_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo24" type="continuous">
+    <parent link="m24_still"/>
+    <child link="m24_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount24_25" type="fixed">
+    <!-- roll digit 2: module 25 mounted 180 deg about +X relative to module 24 -->
+    <parent link="m24_moving"/>
+    <child link="m25_still"/>
+    <origin xyz="0.0822 0 0" rpy="3.14159265 0 0"/>
+  </joint>
+
+  <!-- ==================== module 25 ==================== -->
+  <link name="m25_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m25_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo25" type="continuous">
+    <parent link="m25_still"/>
+    <child link="m25_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount25_26" type="fixed">
+    <!-- roll digit 1: module 26 mounted 90 deg about +X relative to module 25 -->
+    <parent link="m25_moving"/>
+    <child link="m26_still"/>
+    <origin xyz="0.0822 0 0" rpy="1.57079633 0 0"/>
+  </joint>
+
+  <!-- ==================== module 26 ==================== -->
+  <link name="m26_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m26_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <visual>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+      <material name="spacer"/>
+    </visual>
+    <collision>
+      <origin xyz="0.041100 0 0" rpy="0 0 0"/>
+      <geometry><box size="0.0022 0.05 0.05"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo26" type="continuous">
+    <parent link="m26_still"/>
+    <child link="m26_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+  <joint name="mount26_27" type="fixed">
+    <!-- roll digit 0: module 27 mounted 0 deg about +X relative to module 26 -->
+    <parent link="m26_moving"/>
+    <child link="m27_still"/>
+    <origin xyz="0.0822 0 0" rpy="0.00000000 0 0"/>
+  </joint>
+
+  <!-- ==================== module 27 ==================== -->
+  <link name="m27_still">
+    <visual>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+      <material name="still"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/still.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="-0.01103093 -0.01103093 -0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <link name="m27_moving">
+    <visual>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+      <material name="moving"/>
+    </visual>
+    <collision>
+      <geometry><mesh filename="meshes/moving.stl"/></geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0.01103093 0.01103093 0.01103093" rpy="0 0 0"/>
+      <mass value="0.125"/>
+      <inertia ixx="9.83829037e-05" ixy="1.31849188e-05" ixz="1.31849188e-05" iyy="9.83829037e-05" iyz="1.31849188e-05" izz="9.83829037e-05"/>
+    </inertial>
+  </link>
+
+  <joint name="servo27" type="continuous">
+    <parent link="m27_still"/>
+    <child link="m27_moving"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0.57735027 0.57735027 0.57735027"/>
+    <limit effort="5.8" velocity="1.2"/>
+  </joint>
+
+</robot>
+</script>
+<script type="application/json" id="shapes">[{"name":"heart","demo_number":1,"roll":"12001300133101230333233210","pitch_mm":82.0,"loose_hard_ok":true,"loose_violations":[],"total_time_s":32.0,"start":{"states":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base":6,"cells":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0],[25,0,0],[26,0,0]]},"goal":{"states":[0,-1,1,0,-1,0,1,0,-1,-1,-1,-1,-1,1,0,0,-1,1,1,0,-1,0,0,1,-1,0],"base":6,"silhouette":[".##..##","#######","#######","..####.","..###..","...##.."]},"final_tracked":{"base":6,"ends_flat_on_table":true,"lattice_span":[6,5,0]},"moves":[{"step":1,"joint":1,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.12111635159907644,"failed_checks":[],"states_after":[0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base_after":15,"cells_after":[[0,0,0],[0,0,-1],[1,0,-1],[2,0,-1],[3,0,-1],[4,0,-1],[5,0,-1],[6,0,-1],[7,0,-1],[8,0,-1],[9,0,-1],[10,0,-1],[11,0,-1],[12,0,-1],[13,0,-1],[14,0,-1],[15,0,-1],[16,0,-1],[17,0,-1],[18,0,-1],[19,0,-1],[20,0,-1],[21,0,-1],[22,0,-1],[23,0,-1],[24,0,-1],[25,0,-1]]},{"step":2,"joint":6,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.4007536889442926,"failed_checks":[],"states_after":[0,-1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-1,-1,0],[-1,-2,0],[-1,-3,0],[-1,-4,0],[-1,-5,0],[0,-5,0],[1,-5,0],[2,-5,0],[3,-5,0],[4,-5,0],[5,-5,0],[6,-5,0],[7,-5,0],[8,-5,0],[9,-5,0],[10,-5,0],[11,-5,0],[12,-5,0],[13,-5,0],[14,-5,0],[15,-5,0],[16,-5,0],[17,-5,0],[18,-5,0],[19,-5,0]]},{"step":3,"joint":16,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":6.696827165148639,"failed_checks":[],"states_after":[0,-1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-1,-1,0],[-1,-2,0],[-1,-3,0],[-1,-4,0],[-1,-5,0],[0,-5,0],[1,-5,0],[2,-5,0],[3,-5,0],[4,-5,0],[5,-5,0],[6,-5,0],[7,-5,0],[8,-5,0],[9,-5,0],[9,-4,0],[9,-3,0],[9,-2,0],[9,-1,0],[9,0,0],[9,1,0],[9,2,0],[9,3,0],[9,4,0],[9,5,0]]},{"step":4,"joint":17,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":5.4022377188286965,"failed_checks":[],"states_after":[0,-1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,-1,1,0,0,0,0,0,0,0,0],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-1,-1,0],[-1,-2,0],[-1,-3,0],[-1,-4,0],[-1,-5,0],[0,-5,0],[1,-5,0],[2,-5,0],[3,-5,0],[4,-5,0],[5,-5,0],[6,-5,0],[7,-5,0],[8,-5,0],[9,-5,0],[9,-4,0],[10,-4,0],[11,-4,0],[12,-4,0],[13,-4,0],[14,-4,0],[15,-4,0],[16,-4,0],[17,-4,0],[18,-4,0]]},{"step":5,"joint":20,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.6402054965716037,"failed_checks":[],"states_after":[0,-1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,-1,1,0,0,-1,0,0,0,0,0],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-1,-1,0],[-1,-2,0],[-1,-3,0],[-1,-4,0],[-1,-5,0],[0,-5,0],[1,-5,0],[2,-5,0],[3,-5,0],[4,-5,0],[5,-5,0],[6,-5,0],[7,-5,0],[8,-5,0],[9,-5,0],[9,-4,0],[10,-4,0],[11,-4,0],[12,-4,0],[12,-4,1],[12,-4,2],[12,-4,3],[12,-4,4],[12,-4,5],[12,-4,6]]},{"step":6,"joint":23,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.7365905316049645,"failed_checks":[],"states_after":[0,-1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,-1,1,0,0,-1,0,0,1,0,0],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-1,-1,0],[-1,-2,0],[-1,-3,0],[-1,-4,0],[-1,-5,0],[0,-5,0],[1,-5,0],[2,-5,0],[3,-5,0],[4,-5,0],[5,-5,0],[6,-5,0],[7,-5,0],[8,-5,0],[9,-5,0],[9,-4,0],[10,-4,0],[11,-4,0],[12,-4,0],[12,-4,1],[12,-4,2],[12,-4,3],[13,-4,3],[14,-4,3],[15,-4,3]]},{"step":7,"joint":18,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":4.136312171384955,"failed_checks":[],"states_after":[0,-1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,-1,1,1,0,-1,0,0,1,0,0],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-1,-1,0],[-1,-2,0],[-1,-3,0],[-1,-4,0],[-1,-5,0],[0,-5,0],[1,-5,0],[2,-5,0],[3,-5,0],[4,-5,0],[5,-5,0],[6,-5,0],[7,-5,0],[8,-5,0],[9,-5,0],[9,-4,0],[10,-4,0],[10,-5,0],[10,-6,0],[9,-6,0],[8,-6,0],[7,-6,0],[7,-7,0],[7,-8,0],[7,-9,0]]},{"step":8,"joint":24,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.32484886598834334,"failed_checks":[],"states_after":[0,-1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,-1,1,1,0,-1,0,0,1,-1,0],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-1,-1,0],[-1,-2,0],[-1,-3,0],[-1,-4,0],[-1,-5,0],[0,-5,0],[1,-5,0],[2,-5,0],[3,-5,0],[4,-5,0],[5,-5,0],[6,-5,0],[7,-5,0],[8,-5,0],[9,-5,0],[9,-4,0],[10,-4,0],[10,-5,0],[10,-6,0],[9,-6,0],[8,-6,0],[7,-6,0],[7,-7,0],[8,-7,0],[9,-7,0]]},{"step":9,"joint":4,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":1.1078806794953928,"failed_checks":[],"states_after":[0,-1,0,0,-1,0,1,0,0,0,0,0,0,0,0,0,-1,1,1,0,-1,0,0,1,-1,0],"base_after":15,"cells_after":[[0,0,0],[0,0,-1],[1,0,-1],[2,0,-1],[3,0,-1],[3,-1,-1],[3,-2,-1],[4,-2,-1],[5,-2,-1],[6,-2,-1],[7,-2,-1],[8,-2,-1],[9,-2,-1],[10,-2,-1],[11,-2,-1],[12,-2,-1],[13,-2,-1],[13,-1,-1],[14,-1,-1],[14,-2,-1],[14,-3,-1],[13,-3,-1],[12,-3,-1],[11,-3,-1],[11,-4,-1],[12,-4,-1],[13,-4,-1]]},{"step":10,"joint":2,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.32226595356718596,"failed_checks":[],"states_after":[0,-1,1,0,-1,0,1,0,0,0,0,0,0,0,0,0,-1,1,1,0,-1,0,0,1,-1,0],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-1,-1,0],[0,-1,0],[1,-1,0],[1,-2,0],[1,-3,0],[2,-3,0],[3,-3,0],[4,-3,0],[5,-3,0],[6,-3,0],[7,-3,0],[8,-3,0],[9,-3,0],[10,-3,0],[11,-3,0],[11,-2,0],[12,-2,0],[12,-3,0],[12,-4,0],[11,-4,0],[10,-4,0],[9,-4,0],[9,-5,0],[10,-5,0],[11,-5,0]]},{"step":11,"joint":11,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":7.632139922684272,"failed_checks":[],"states_after":[0,-1,1,0,-1,0,1,0,0,0,0,-1,0,0,0,0,-1,1,1,0,-1,0,0,1,-1,0],"base_after":16,"cells_after":[[0,0,0],[0,-1,0],[0,-1,-1],[0,0,-1],[0,1,-1],[0,1,-2],[0,1,-3],[0,2,-3],[0,3,-3],[0,4,-3],[0,5,-3],[0,6,-3],[1,6,-3],[2,6,-3],[3,6,-3],[4,6,-3],[5,6,-3],[5,7,-3],[6,7,-3],[6,6,-3],[6,5,-3],[5,5,-3],[4,5,-3],[3,5,-3],[3,4,-3],[4,4,-3],[5,4,-3]]},{"step":12,"joint":13,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":8.920098969534322,"failed_checks":[],"states_after":[0,-1,1,0,-1,0,1,0,0,0,0,-1,0,1,0,0,-1,1,1,0,-1,0,0,1,-1,0],"base_after":3,"cells_after":[[0,0,0],[0,0,1],[-1,0,1],[-1,0,0],[-1,0,-1],[-2,0,-1],[-3,0,-1],[-3,0,-2],[-3,0,-3],[-3,0,-4],[-3,0,-5],[-3,0,-6],[-3,-1,-6],[-3,-2,-6],[-2,-2,-6],[-1,-2,-6],[0,-2,-6],[0,-1,-6],[1,-1,-6],[1,-2,-6],[1,-3,-6],[0,-3,-6],[-1,-3,-6],[-2,-3,-6],[-2,-4,-6],[-1,-4,-6],[0,-4,-6]]},{"step":13,"joint":8,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.3167468056593874,"failed_checks":[],"states_after":[0,-1,1,0,-1,0,1,0,-1,0,0,-1,0,1,0,0,-1,1,1,0,-1,0,0,1,-1,0],"base_after":1,"cells_after":[[0,0,0],[0,1,0],[0,1,-1],[0,0,-1],[0,-1,-1],[0,-1,-2],[0,-1,-3],[0,-2,-3],[0,-3,-3],[0,-3,-4],[0,-3,-5],[0,-3,-6],[0,-4,-6],[0,-5,-6],[1,-5,-6],[2,-5,-6],[3,-5,-6],[3,-4,-6],[4,-4,-6],[4,-5,-6],[4,-6,-6],[3,-6,-6],[2,-6,-6],[1,-6,-6],[1,-7,-6],[2,-7,-6],[3,-7,-6]]},{"step":14,"joint":10,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":3.3300248975902713,"failed_checks":[],"states_after":[0,-1,1,0,-1,0,1,0,-1,0,-1,-1,0,1,0,0,-1,1,1,0,-1,0,0,1,-1,0],"base_after":0,"cells_after":[[0,0,0],[1,0,0],[1,-1,0],[0,-1,0],[-1,-1,0],[-1,-2,0],[-1,-3,0],[-2,-3,0],[-3,-3,0],[-3,-4,0],[-3,-5,0],[-3,-5,-1],[-3,-6,-1],[-3,-7,-1],[-2,-7,-1],[-1,-7,-1],[0,-7,-1],[0,-6,-1],[1,-6,-1],[1,-7,-1],[1,-8,-1],[0,-8,-1],[-1,-8,-1],[-2,-8,-1],[-2,-9,-1],[-1,-9,-1],[0,-9,-1]]},{"step":15,"joint":12,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":7.762152019292241,"failed_checks":[],"states_after":[0,-1,1,0,-1,0,1,0,-1,0,-1,-1,-1,1,0,0,-1,1,1,0,-1,0,0,1,-1,0],"base_after":13,"cells_after":[[0,0,0],[0,0,1],[1,0,1],[1,0,0],[1,0,-1],[2,0,-1],[3,0,-1],[3,0,-2],[3,0,-3],[4,0,-3],[5,0,-3],[5,1,-3],[6,1,-3],[6,0,-3],[7,0,-3],[8,0,-3],[9,0,-3],[9,1,-3],[10,1,-3],[10,0,-3],[10,-1,-3],[9,-1,-3],[8,-1,-3],[7,-1,-3],[7,-2,-3],[8,-2,-3],[9,-2,-3]]},{"step":16,"joint":9,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":4.9523072330604085,"failed_checks":[],"states_after":[0,-1,1,0,-1,0,1,0,-1,-1,-1,-1,-1,1,0,0,-1,1,1,0,-1,0,0,1,-1,0],"base_after":6,"cells_after":[[0,0,0],[1,0,0],[1,1,0],[0,1,0],[-1,1,0],[-1,2,0],[-1,3,0],[-2,3,0],[-3,3,0],[-3,4,0],[-2,4,0],[-2,5,0],[-1,5,0],[-1,4,0],[0,4,0],[1,4,0],[2,4,0],[2,5,0],[3,5,0],[3,4,0],[3,3,0],[2,3,0],[1,3,0],[0,3,0],[0,2,0],[1,2,0],[2,2,0]]}]},{"name":"arrow","demo_number":2,"roll":"12001300133101230333233210","pitch_mm":82.0,"loose_hard_ok":true,"loose_violations":[],"total_time_s":46.0,"start":{"states":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base":0,"cells":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0],[25,0,0],[26,0,0]]},"goal":{"states":[1,0,0,0,1,1,0,1,-1,0,0,-1,0,0,1,0,1,-1,-1,-1,0,-1,-1,0,0,0],"base":4,"silhouette":["....###...","#####.##..",".......###",".........#",".........#","#####.####","....###..."]},"final_tracked":{"base":0,"ends_flat_on_table":true,"lattice_span":[6,9,0]},"moves":[{"step":1,"joint":0,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.0,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0],[25,0,0],[26,0,0]]},{"step":2,"joint":21,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":1.8709371340010292,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[21,0,1],[21,0,2],[21,0,3],[21,0,4],[21,0,5]]},{"step":3,"joint":8,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":4.598114322749025,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0],"base_after":11,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,0,-4],[0,0,-5],[0,0,-6],[0,0,-7],[0,0,-8],[1,0,-8],[2,0,-8],[3,0,-8],[4,0,-8],[5,0,-8],[6,0,-8],[7,0,-8],[8,0,-8],[9,0,-8],[10,0,-8],[11,0,-8],[12,0,-8],[13,0,-8],[13,0,-7],[13,0,-6],[13,0,-5],[13,0,-4],[13,0,-3]]},{"step":4,"joint":22,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":1.2374109442315604,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1,0,0,0],"base_after":11,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,0,-4],[0,0,-5],[0,0,-6],[0,0,-7],[0,0,-8],[1,0,-8],[2,0,-8],[3,0,-8],[4,0,-8],[5,0,-8],[6,0,-8],[7,0,-8],[8,0,-8],[9,0,-8],[10,0,-8],[11,0,-8],[12,0,-8],[13,0,-8],[13,0,-7],[14,0,-7],[15,0,-7],[16,0,-7],[17,0,-7]]},{"step":5,"joint":7,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":3.54825242760152,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,1,-1,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1,0,0,0],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[7,0,-1],[8,0,-1],[9,0,-1],[10,0,-1],[11,0,-1],[12,0,-1],[13,0,-1],[14,0,-1],[15,0,-1],[16,0,-1],[17,0,-1],[18,0,-1],[19,0,-1],[20,0,-1],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0]]},{"step":6,"joint":16,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":6.170466024394395,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,1,-1,0,0,0,0,0,0,0,1,0,0,0,0,-1,-1,0,0,0],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[7,0,-1],[8,0,-1],[9,0,-1],[10,0,-1],[11,0,-1],[12,0,-1],[13,0,-1],[14,0,-1],[15,0,-1],[15,0,0],[15,0,1],[15,0,2],[15,0,3],[15,0,4],[15,-1,4],[15,-1,5],[15,-1,6],[15,-1,7],[15,-1,8]]},{"step":7,"joint":17,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":4.847529958513304,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,1,-1,0,0,0,0,0,0,0,1,-1,0,0,0,-1,-1,0,0,0],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[7,0,-1],[8,0,-1],[9,0,-1],[10,0,-1],[11,0,-1],[12,0,-1],[13,0,-1],[14,0,-1],[15,0,-1],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[19,0,1],[20,0,1],[21,0,1],[22,0,1],[23,0,1]]},{"step":8,"joint":18,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":3.679092390109294,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,1,-1,0,0,0,0,0,0,0,1,-1,-1,0,0,-1,-1,0,0,0],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[7,0,-1],[8,0,-1],[9,0,-1],[10,0,-1],[11,0,-1],[12,0,-1],[13,0,-1],[14,0,-1],[15,0,-1],[15,0,0],[16,0,0],[16,0,1],[16,0,2],[16,0,3],[16,1,3],[16,1,4],[16,1,5],[16,1,6],[16,1,7]]},{"step":9,"joint":19,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":3.21265422215251,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,1,-1,0,0,0,0,0,0,0,1,-1,-1,-1,0,-1,-1,0,0,0],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[7,0,-1],[8,0,-1],[9,0,-1],[10,0,-1],[11,0,-1],[12,0,-1],[13,0,-1],[14,0,-1],[15,0,-1],[15,0,0],[16,0,0],[16,0,1],[17,0,1],[18,0,1],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0]]},{"step":10,"joint":6,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.6402054965716,"failed_checks":[],"states_after":[1,0,0,0,0,0,-1,1,-1,0,0,0,0,0,0,0,1,-1,-1,-1,0,-1,-1,0,0,0],"base_after":11,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,0,-4],[0,0,-5],[0,0,-6],[1,0,-6],[1,0,-7],[2,0,-7],[3,0,-7],[4,0,-7],[5,0,-7],[6,0,-7],[7,0,-7],[8,0,-7],[9,0,-7],[9,0,-6],[10,0,-6],[10,0,-5],[11,0,-5],[12,0,-5],[12,0,-6],[13,0,-6],[14,0,-6],[15,0,-6],[16,0,-6]]},{"step":11,"joint":4,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":1.2374109442315606,"failed_checks":[],"states_after":[1,0,0,0,1,0,-1,1,-1,0,0,0,0,0,0,0,1,-1,-1,-1,0,-1,-1,0,0,0],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[4,0,-1],[4,0,-2],[5,0,-2],[5,0,-3],[6,0,-3],[7,0,-3],[8,0,-3],[9,0,-3],[10,0,-3],[11,0,-3],[12,0,-3],[13,0,-3],[13,0,-2],[14,0,-2],[14,0,-1],[15,0,-1],[16,0,-1],[16,0,-2],[17,0,-2],[18,0,-2],[19,0,-2],[20,0,-2]]},{"step":12,"joint":5,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":1.103329467959719,"failed_checks":[],"states_after":[1,0,0,0,1,1,-1,1,-1,0,0,0,0,0,0,0,1,-1,-1,-1,0,-1,-1,0,0,0],"base_after":9,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,0,-4],[0,-1,-4],[0,-1,-5],[1,-1,-5],[1,-1,-6],[2,-1,-6],[3,-1,-6],[4,-1,-6],[5,-1,-6],[6,-1,-6],[7,-1,-6],[8,-1,-6],[9,-1,-6],[9,-1,-5],[10,-1,-5],[10,-1,-4],[11,-1,-4],[12,-1,-4],[12,-1,-5],[13,-1,-5],[14,-1,-5],[15,-1,-5],[16,-1,-5]]},{"step":13,"joint":12,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":6.240629030973631,"failed_checks":[],"states_after":[1,0,0,0,1,1,-1,1,-1,0,0,0,-1,0,0,0,1,-1,-1,-1,0,-1,-1,0,0,0],"base_after":0,"cells_after":[[0,0,0],[0,1,0],[0,2,0],[0,3,0],[0,4,0],[-1,4,0],[-1,5,0],[-1,5,-1],[-1,6,-1],[-1,6,-2],[-1,6,-3],[-1,6,-4],[-1,6,-5],[0,6,-5],[1,6,-5],[2,6,-5],[3,6,-5],[3,6,-4],[4,6,-4],[4,6,-3],[5,6,-3],[6,6,-3],[6,6,-4],[7,6,-4],[8,6,-4],[9,6,-4],[10,6,-4]]},{"step":14,"joint":11,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":3.5818223917821985,"failed_checks":[],"states_after":[1,0,0,0,1,1,-1,1,-1,0,0,-1,-1,0,0,0,1,-1,-1,-1,0,-1,-1,0,0,0],"base_after":11,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,0,-4],[0,1,-4],[0,1,-5],[-1,1,-5],[-1,1,-6],[-2,1,-6],[-3,1,-6],[-4,1,-6],[-4,1,-7],[-3,1,-7],[-2,1,-7],[-1,1,-7],[0,1,-7],[0,1,-6],[1,1,-6],[1,1,-5],[2,1,-5],[3,1,-5],[3,1,-6],[4,1,-6],[5,1,-6],[6,1,-6],[7,1,-6]]},{"step":15,"joint":12,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":8.660437527381559,"failed_checks":[],"states_after":[1,0,0,0,1,1,-1,1,-1,0,0,-1,0,0,0,0,1,-1,-1,-1,0,-1,-1,0,0,0],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[4,0,-1],[5,0,-1],[5,-1,-1],[6,-1,-1],[6,-2,-1],[6,-3,-1],[6,-4,-1],[7,-4,-1],[8,-4,-1],[9,-4,-1],[10,-4,-1],[11,-4,-1],[11,-4,0],[12,-4,0],[12,-4,1],[13,-4,1],[14,-4,1],[14,-4,0],[15,-4,0],[16,-4,0],[17,-4,0],[18,-4,0]]},{"step":16,"joint":6,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.3749245647327193,"failed_checks":[],"states_after":[1,0,0,0,1,1,0,1,-1,0,0,-1,0,0,0,0,1,-1,-1,-1,0,-1,-1,0,0,0],"base_after":6,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[0,-4,0],[-1,-4,0],[-1,-5,0],[-1,-6,0],[0,-6,0],[0,-7,0],[0,-8,0],[0,-9,0],[1,-9,0],[2,-9,0],[3,-9,0],[4,-9,0],[5,-9,0],[5,-9,1],[6,-9,1],[6,-9,2],[7,-9,2],[8,-9,2],[8,-9,1],[9,-9,1],[10,-9,1],[11,-9,1],[12,-9,1]]},{"step":17,"joint":20,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.333220320717003,"failed_checks":[],"states_after":[1,0,0,0,1,1,0,1,-1,0,0,-1,0,0,0,0,1,-1,-1,-1,-1,-1,-1,0,0,0],"base_after":6,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[0,-4,0],[-1,-4,0],[-1,-5,0],[-1,-6,0],[0,-6,0],[0,-7,0],[0,-8,0],[0,-9,0],[1,-9,0],[2,-9,0],[3,-9,0],[4,-9,0],[5,-9,0],[5,-9,1],[6,-9,1],[6,-9,2],[7,-9,2],[7,-9,3],[7,-10,3],[7,-10,4],[7,-10,5],[7,-10,6],[7,-10,7]]},{"step":18,"joint":6,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":6.31938041750999,"failed_checks":[],"states_after":[1,0,0,0,1,1,-1,1,-1,0,0,-1,0,0,0,0,1,-1,-1,-1,-1,-1,-1,0,0,0],"base_after":6,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[0,-4,0],[-1,-4,0],[-1,-5,0],[-1,-5,1],[-1,-6,1],[-1,-6,2],[-1,-6,3],[-1,-6,4],[-1,-7,4],[-1,-8,4],[-1,-9,4],[-1,-10,4],[-1,-11,4],[0,-11,4],[0,-12,4],[1,-12,4],[1,-13,4],[2,-13,4],[2,-13,5],[3,-13,5],[4,-13,5],[5,-13,5],[6,-13,5]]},{"step":19,"joint":14,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":5.237456328992372,"failed_checks":[],"states_after":[1,0,0,0,1,1,-1,1,-1,0,0,-1,0,0,1,0,1,-1,-1,-1,-1,-1,-1,0,0,0],"base_after":6,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[0,-4,0],[-1,-4,0],[-1,-5,0],[-1,-5,1],[-1,-6,1],[-1,-6,2],[-1,-6,3],[-1,-6,4],[-1,-7,4],[-1,-8,4],[-1,-9,4],[-1,-9,3],[-1,-9,2],[-1,-10,2],[-1,-10,1],[-1,-11,1],[-1,-11,0],[-1,-12,0],[-2,-12,0],[-2,-13,0],[-2,-14,0],[-2,-15,0],[-2,-16,0]]},{"step":20,"joint":12,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":7.5604902135523915,"failed_checks":[],"states_after":[1,0,0,0,1,1,-1,1,-1,0,0,-1,1,0,1,0,1,-1,-1,-1,-1,-1,-1,0,0,0],"base_after":9,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,0,-4],[0,-1,-4],[0,-1,-5],[1,-1,-5],[1,-1,-6],[2,-1,-6],[3,-1,-6],[4,-1,-6],[4,-1,-7],[4,-2,-7],[4,-3,-7],[4,-3,-8],[4,-3,-9],[4,-4,-9],[4,-4,-10],[4,-5,-10],[4,-5,-11],[4,-6,-11],[3,-6,-11],[3,-7,-11],[3,-8,-11],[3,-9,-11],[3,-10,-11]]},{"step":21,"joint":6,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.3332203207170013,"failed_checks":[],"states_after":[1,0,0,0,1,1,0,1,-1,0,0,-1,1,0,1,0,1,-1,-1,-1,-1,-1,-1,0,0,0],"base_after":17,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[4,0,1],[5,0,1],[6,0,1],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[9,0,-1],[9,-1,-1],[9,-2,-1],[9,-2,-2],[9,-2,-3],[9,-3,-3],[9,-3,-4],[9,-4,-4],[9,-4,-5],[9,-5,-5],[8,-5,-5],[8,-6,-5],[8,-7,-5],[8,-8,-5],[8,-9,-5]]},{"step":22,"joint":20,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":3.3827954300785326,"failed_checks":[],"states_after":[1,0,0,0,1,1,0,1,-1,0,0,-1,1,0,1,0,1,-1,-1,-1,0,-1,-1,0,0,0],"base_after":11,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,0,-4],[0,1,-4],[0,1,-5],[0,1,-6],[0,0,-6],[0,0,-7],[0,0,-8],[0,0,-9],[0,-1,-9],[1,-1,-9],[2,-1,-9],[2,-2,-9],[2,-3,-9],[3,-3,-9],[3,-4,-9],[4,-4,-9],[4,-5,-9],[4,-6,-9],[3,-6,-9],[3,-7,-9],[3,-8,-9],[3,-9,-9],[3,-10,-9]]},{"step":23,"joint":12,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":8.2038533674469,"failed_checks":[],"states_after":[1,0,0,0,1,1,0,1,-1,0,0,-1,0,0,1,0,1,-1,-1,-1,0,-1,-1,0,0,0],"base_after":0,"cells_after":[[0,0,0],[0,1,0],[0,2,0],[0,3,0],[0,4,0],[-1,4,0],[-1,5,0],[-1,6,0],[0,6,0],[0,7,0],[0,8,0],[0,9,0],[1,9,0],[2,9,0],[3,9,0],[3,8,0],[3,7,0],[4,7,0],[4,6,0],[5,6,0],[5,5,0],[5,4,0],[4,4,0],[4,3,0],[4,2,0],[4,1,0],[4,0,0]]}]},{"name":"lightning","demo_number":3,"roll":"12001300133101230333233210","pitch_mm":82.0,"loose_hard_ok":false,"loose_violations":["move 2 ground: early sampled table incursion 48.726 mm (limit 40.000 mm)","move 3 ground: early sampled table incursion 76.060 mm (limit 40.000 mm)","move 4 ground: early sampled table incursion 246.000 mm (limit 40.000 mm)","move 7 ground: early sampled table incursion 78.671 mm (limit 40.000 mm)","move 9 ground: early sampled table incursion 51.337 mm (limit 40.000 mm)","move 11 ground: early sampled table incursion 328.000 mm (limit 40.000 mm)"],"total_time_s":28.0,"start":{"states":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base":0,"cells":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0],[25,0,0],[26,0,0]]},"goal":{"states":[1,0,1,0,-1,0,1,-1,1,1,0,-1,0,0,0,1,0,1,0,0,1,0,1,0,1,1],"base":6,"silhouette":["......#","......#","....###","....#..","...##..","..##...","..#....","..#####","......#","...####","...#...",".###...","##....."]},"final_tracked":{"base":17,"ends_flat_on_table":false,"lattice_span":[12,0,6]},"moves":[{"step":1,"joint":0,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.0,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0],[25,0,0],[26,0,0]]},{"step":2,"joint":25,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.12111635159907629,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0],[25,0,0],[25,0,1]]},{"step":3,"joint":24,"delta":1,"side":"out","duration_s":2.0,"hard_ok":false,"peak_demand_nm":null,"failed_checks":["ground"],"states_after":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0],[24,1,0],[25,1,0]]},{"step":4,"joint":2,"delta":1,"side":"in","duration_s":2.0,"hard_ok":false,"peak_demand_nm":null,"failed_checks":["ground"],"states_after":[1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1],"base_after":20,"cells_after":[[0,0,0],[0,1,0],[0,2,0],[1,2,0],[2,2,0],[3,2,0],[4,2,0],[5,2,0],[6,2,0],[7,2,0],[8,2,0],[9,2,0],[10,2,0],[11,2,0],[12,2,0],[13,2,0],[14,2,0],[15,2,0],[16,2,0],[17,2,0],[18,2,0],[19,2,0],[20,2,0],[21,2,0],[22,2,0],[22,3,0],[23,3,0]]},{"step":5,"joint":22,"delta":1,"side":"out","duration_s":2.0,"hard_ok":false,"peak_demand_nm":null,"failed_checks":["ground"],"states_after":[1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1],"base_after":20,"cells_after":[[0,0,0],[0,1,0],[0,2,0],[1,2,0],[2,2,0],[3,2,0],[4,2,0],[5,2,0],[6,2,0],[7,2,0],[8,2,0],[9,2,0],[10,2,0],[11,2,0],[12,2,0],[13,2,0],[14,2,0],[15,2,0],[16,2,0],[17,2,0],[18,2,0],[19,2,0],[20,2,0],[20,2,-1],[20,2,-2],[21,2,-2],[21,2,-3]]},{"step":6,"joint":4,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.7302337703216994,"failed_checks":[],"states_after":[1,0,1,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,1],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[2,0,-1],[2,0,-2],[3,0,-2],[4,0,-2],[5,0,-2],[6,0,-2],[7,0,-2],[8,0,-2],[9,0,-2],[10,0,-2],[11,0,-2],[12,0,-2],[13,0,-2],[14,0,-2],[15,0,-2],[16,0,-2],[17,0,-2],[18,0,-2],[19,0,-2],[20,0,-2],[20,0,-3],[20,0,-4],[21,0,-4],[21,0,-5]]},{"step":7,"joint":20,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":1.425840499453297,"failed_checks":[],"states_after":[1,0,1,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,1],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[2,0,-1],[2,0,-2],[3,0,-2],[4,0,-2],[5,0,-2],[6,0,-2],[7,0,-2],[8,0,-2],[9,0,-2],[10,0,-2],[11,0,-2],[12,0,-2],[13,0,-2],[14,0,-2],[15,0,-2],[16,0,-2],[17,0,-2],[18,0,-2],[18,-1,-2],[18,-2,-2],[19,-2,-2],[20,-2,-2],[20,-3,-2],[21,-3,-2]]},{"step":8,"joint":6,"delta":1,"side":"in","duration_s":2.0,"hard_ok":false,"peak_demand_nm":null,"failed_checks":["ground"],"states_after":[1,0,1,0,-1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,1],"base_after":20,"cells_after":[[0,0,0],[0,1,0],[0,2,0],[1,2,0],[2,2,0],[2,3,0],[2,4,0],[3,4,0],[4,4,0],[5,4,0],[6,4,0],[7,4,0],[8,4,0],[9,4,0],[10,4,0],[11,4,0],[12,4,0],[13,4,0],[14,4,0],[15,4,0],[16,4,0],[16,3,0],[16,2,0],[17,2,0],[18,2,0],[18,1,0],[19,1,0]]},{"step":9,"joint":7,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":1.6242467250227584,"failed_checks":[],"states_after":[1,0,1,0,-1,0,1,-1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,1],"base_after":3,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[2,0,-1],[2,0,-2],[3,0,-2],[4,0,-2],[4,0,-3],[5,0,-3],[6,0,-3],[7,0,-3],[8,0,-3],[9,0,-3],[10,0,-3],[11,0,-3],[12,0,-3],[13,0,-3],[14,0,-3],[15,0,-3],[16,0,-3],[17,0,-3],[17,-1,-3],[17,-2,-3],[18,-2,-3],[19,-2,-3],[19,-3,-3],[20,-3,-3]]},{"step":10,"joint":8,"delta":1,"side":"in","duration_s":2.0,"hard_ok":false,"peak_demand_nm":null,"failed_checks":["ground"],"states_after":[1,0,1,0,-1,0,1,-1,1,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,1],"base_after":20,"cells_after":[[0,0,0],[0,1,0],[0,2,0],[1,2,0],[2,2,0],[2,3,0],[2,4,0],[3,4,0],[3,5,0],[4,5,0],[5,5,0],[6,5,0],[7,5,0],[8,5,0],[9,5,0],[10,5,0],[11,5,0],[12,5,0],[13,5,0],[14,5,0],[15,5,0],[15,4,0],[15,3,0],[16,3,0],[17,3,0],[17,2,0],[18,2,0]]},{"step":11,"joint":17,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":3.3701363605834915,"failed_checks":[],"states_after":[1,0,1,0,-1,0,1,-1,1,0,0,0,0,0,0,0,0,1,0,0,1,0,1,0,1,1],"base_after":20,"cells_after":[[0,0,0],[0,1,0],[0,2,0],[1,2,0],[2,2,0],[2,3,0],[2,4,0],[3,4,0],[3,5,0],[4,5,0],[5,5,0],[6,5,0],[7,5,0],[8,5,0],[9,5,0],[10,5,0],[11,5,0],[12,5,0],[12,5,1],[12,5,2],[12,5,3],[13,5,3],[14,5,3],[14,5,4],[14,5,5],[15,5,5],[15,5,6]]},{"step":12,"joint":9,"delta":1,"side":"in","duration_s":2.0,"hard_ok":false,"peak_demand_nm":null,"failed_checks":["ground"],"states_after":[1,0,1,0,-1,0,1,-1,1,1,0,0,0,0,0,0,0,1,0,0,1,0,1,0,1,1],"base_after":17,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[2,0,1],[2,0,2],[3,0,2],[4,0,2],[4,0,3],[5,0,3],[5,0,4],[6,0,4],[7,0,4],[8,0,4],[9,0,4],[10,0,4],[11,0,4],[12,0,4],[13,0,4],[13,0,5],[13,0,6],[13,0,7],[14,0,7],[15,0,7],[15,0,8],[15,0,9],[16,0,9],[16,0,10]]},{"step":13,"joint":15,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":7.828944991179159,"failed_checks":[],"states_after":[1,0,1,0,-1,0,1,-1,1,1,0,0,0,0,0,1,0,1,0,0,1,0,1,0,1,1],"base_after":17,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[2,0,1],[2,0,2],[3,0,2],[4,0,2],[4,0,3],[5,0,3],[5,0,4],[6,0,4],[7,0,4],[8,0,4],[9,0,4],[10,0,4],[11,0,4],[11,-1,4],[11,-2,4],[10,-2,4],[9,-2,4],[8,-2,4],[8,-3,4],[8,-4,4],[7,-4,4],[6,-4,4],[6,-5,4],[5,-5,4]]},{"step":14,"joint":11,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":4.036794243198214,"failed_checks":[],"states_after":[1,0,1,0,-1,0,1,-1,1,1,0,-1,0,0,0,1,0,1,0,0,1,0,1,0,1,1],"base_after":17,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[2,0,1],[2,0,2],[3,0,2],[4,0,2],[4,0,3],[5,0,3],[5,0,4],[6,0,4],[7,0,4],[7,0,3],[7,0,2],[7,0,1],[7,0,0],[8,0,0],[9,0,0],[9,0,1],[9,0,2],[9,0,3],[10,0,3],[11,0,3],[11,0,4],[11,0,5],[12,0,5],[12,0,6]]}]},{"name":"plus","demo_number":4,"roll":"12001300133101230333233210","pitch_mm":82.0,"loose_hard_ok":true,"loose_violations":[],"total_time_s":44.0,"start":{"states":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base":0,"cells":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0],[25,0,0],[26,0,0]]},"goal":{"states":[0,0,0,1,0,1,1,0,-1,0,0,-1,-1,1,1,-1,-1,0,0,0,-1,1,0,0,-1,-1],"base":0,"silhouette":["...##...",".######.",".#######","########","...##...","...##..."]},"final_tracked":{"base":11,"ends_flat_on_table":true,"lattice_span":[5,7,0]},"moves":[{"step":1,"joint":24,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.36562466056506665,"failed_checks":[],"states_after":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0],"base_after":0,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0],[24,0,1],[24,0,2]]},{"step":2,"joint":8,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":4.5981143227490255,"failed_checks":[],"states_after":[0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0],"base_after":17,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,0,-4],[0,0,-5],[0,0,-6],[0,0,-7],[0,0,-8],[1,0,-8],[2,0,-8],[3,0,-8],[4,0,-8],[5,0,-8],[6,0,-8],[7,0,-8],[8,0,-8],[9,0,-8],[10,0,-8],[11,0,-8],[12,0,-8],[13,0,-8],[14,0,-8],[15,0,-8],[16,0,-8],[16,0,-7],[16,0,-6]]},{"step":3,"joint":3,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.7365905316049633,"failed_checks":[],"states_after":[0,0,0,1,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0],"base_after":0,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[3,0,-1],[3,0,-2],[3,0,-3],[3,0,-4],[3,0,-5],[4,0,-5],[5,0,-5],[6,0,-5],[7,0,-5],[8,0,-5],[9,0,-5],[10,0,-5],[11,0,-5],[12,0,-5],[13,0,-5],[14,0,-5],[15,0,-5],[16,0,-5],[17,0,-5],[18,0,-5],[19,0,-5],[19,0,-4],[19,0,-3]]},{"step":4,"joint":25,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.12111635159907655,"failed_checks":[],"states_after":[0,0,0,1,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1],"base_after":0,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[3,0,-1],[3,0,-2],[3,0,-3],[3,0,-4],[3,0,-5],[4,0,-5],[5,0,-5],[6,0,-5],[7,0,-5],[8,0,-5],[9,0,-5],[10,0,-5],[11,0,-5],[12,0,-5],[13,0,-5],[14,0,-5],[15,0,-5],[16,0,-5],[17,0,-5],[18,0,-5],[19,0,-5],[19,0,-4],[18,0,-4]]},{"step":5,"joint":5,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.9842636343430174,"failed_checks":[],"states_after":[0,0,0,1,0,1,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1],"base_after":15,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,-1,-3],[0,-2,-3],[0,-2,-4],[0,-2,-5],[0,-2,-6],[1,-2,-6],[2,-2,-6],[3,-2,-6],[4,-2,-6],[5,-2,-6],[6,-2,-6],[7,-2,-6],[8,-2,-6],[9,-2,-6],[10,-2,-6],[11,-2,-6],[12,-2,-6],[13,-2,-6],[14,-2,-6],[15,-2,-6],[16,-2,-6],[16,-2,-5],[15,-2,-5]]},{"step":6,"joint":6,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.2001456532224193,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1],"base_after":6,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[3,0,1],[3,0,2],[4,0,2],[4,0,1],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[20,0,1],[19,0,1]]},{"step":7,"joint":12,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":6.582506043715619,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,-1,-1],"base_after":15,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,-1,-3],[0,-2,-3],[0,-2,-4],[0,-1,-4],[0,0,-4],[0,0,-5],[0,0,-6],[0,0,-7],[0,0,-8],[1,0,-8],[2,0,-8],[3,0,-8],[4,0,-8],[5,0,-8],[6,0,-8],[7,0,-8],[8,0,-8],[9,0,-8],[10,0,-8],[11,0,-8],[12,0,-8],[12,0,-7],[11,0,-7]]},{"step":8,"joint":11,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":5.017359160413772,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,0,-1,-1,0,0,0,0,0,0,0,0,0,0,0,-1,-1],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-2,0,0],[-3,0,0],[-3,0,1],[-3,0,2],[-4,0,2],[-4,0,1],[-4,0,0],[-5,0,0],[-6,0,0],[-7,0,0],[-7,0,-1],[-6,0,-1],[-5,0,-1],[-4,0,-1],[-3,0,-1],[-2,0,-1],[-1,0,-1],[0,0,-1],[1,0,-1],[2,0,-1],[3,0,-1],[4,0,-1],[5,0,-1],[5,0,0],[4,0,0]]},{"step":9,"joint":20,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.1367928974993164,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,0,-1,-1,0,0,0,0,0,0,0,1,0,0,0,-1,-1],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-2,0,0],[-3,0,0],[-3,0,1],[-3,0,2],[-4,0,2],[-4,0,1],[-4,0,0],[-5,0,0],[-6,0,0],[-7,0,0],[-7,0,-1],[-6,0,-1],[-5,0,-1],[-4,0,-1],[-3,0,-1],[-2,0,-1],[-1,0,-1],[0,0,-1],[1,0,-1],[1,-1,-1],[1,-2,-1],[1,-3,-1],[1,-4,-1],[0,-4,-1],[0,-3,-1]]},{"step":10,"joint":21,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":1.2365992644549135,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,0,-1,-1,0,0,0,0,0,0,0,1,1,0,0,-1,-1],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-2,0,0],[-3,0,0],[-3,0,1],[-3,0,2],[-4,0,2],[-4,0,1],[-4,0,0],[-5,0,0],[-6,0,0],[-7,0,0],[-7,0,-1],[-6,0,-1],[-5,0,-1],[-4,0,-1],[-3,0,-1],[-2,0,-1],[-1,0,-1],[0,0,-1],[1,0,-1],[1,-1,-1],[1,-1,0],[1,-1,1],[1,-1,2],[1,-2,2],[1,-2,1]]},{"step":11,"joint":20,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.113546685708902,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,0,-1,-1,0,0,0,0,0,0,0,0,1,0,0,-1,-1],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-2,0,0],[-3,0,0],[-3,0,1],[-3,0,2],[-4,0,2],[-4,0,1],[-4,0,0],[-5,0,0],[-6,0,0],[-7,0,0],[-7,0,-1],[-6,0,-1],[-5,0,-1],[-4,0,-1],[-3,0,-1],[-2,0,-1],[-1,0,-1],[0,0,-1],[1,0,-1],[2,0,-1],[2,1,-1],[2,2,-1],[2,3,-1],[3,3,-1],[3,2,-1]]},{"step":12,"joint":10,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":3.6156031643034883,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,-1,-1,-1,0,0,0,0,0,0,0,0,1,0,0,-1,-1],"base_after":17,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,1,-3],[0,2,-3],[0,2,-4],[0,1,-4],[0,0,-4],[0,0,-5],[0,0,-6],[-1,0,-6],[-1,0,-7],[0,0,-7],[1,0,-7],[2,0,-7],[3,0,-7],[4,0,-7],[5,0,-7],[6,0,-7],[7,0,-7],[8,0,-7],[8,1,-7],[8,2,-7],[8,3,-7],[9,3,-7],[9,2,-7]]},{"step":13,"joint":15,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":4.223519524251942,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,-1,-1,-1,0,0,1,0,0,0,0,0,1,0,0,-1,-1],"base_after":11,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[-1,-3,0],[-2,-3,0],[-2,-4,0],[-1,-4,0],[0,-4,0],[0,-5,0],[0,-6,0],[0,-6,1],[0,-7,1],[0,-7,0],[0,-7,-1],[0,-7,-2],[1,-7,-2],[2,-7,-2],[3,-7,-2],[4,-7,-2],[5,-7,-2],[6,-7,-2],[6,-6,-2],[6,-5,-2],[6,-4,-2],[7,-4,-2],[7,-5,-2]]},{"step":14,"joint":13,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":8.195667716635795,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,-1,-1,-1,1,0,1,0,0,0,0,0,1,0,0,-1,-1],"base_after":11,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[-1,-3,0],[-2,-3,0],[-2,-4,0],[-1,-4,0],[0,-4,0],[0,-5,0],[0,-6,0],[0,-6,1],[0,-7,1],[0,-7,0],[0,-8,0],[0,-9,0],[0,-9,1],[0,-9,2],[0,-9,3],[0,-9,4],[0,-9,5],[0,-9,6],[1,-9,6],[2,-9,6],[3,-9,6],[3,-9,7],[2,-9,7]]},{"step":15,"joint":20,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":1.9677988227054146,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,-1,-1,-1,1,0,1,0,0,0,0,-1,1,0,0,-1,-1],"base_after":11,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[-1,-3,0],[-2,-3,0],[-2,-4,0],[-1,-4,0],[0,-4,0],[0,-5,0],[0,-6,0],[0,-6,1],[0,-7,1],[0,-7,0],[0,-8,0],[0,-9,0],[0,-9,1],[0,-9,2],[0,-9,3],[0,-9,4],[0,-9,5],[0,-10,5],[0,-10,4],[0,-10,3],[0,-10,2],[0,-11,2],[0,-11,3]]},{"step":16,"joint":15,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":3.768913597726155,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,-1,-1,-1,1,0,0,0,0,0,0,-1,1,0,0,-1,-1],"base_after":11,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[-1,-3,0],[-2,-3,0],[-2,-4,0],[-1,-4,0],[0,-4,0],[0,-5,0],[0,-6,0],[0,-6,1],[0,-7,1],[0,-7,0],[0,-8,0],[0,-9,0],[0,-10,0],[0,-11,0],[0,-12,0],[0,-13,0],[0,-14,0],[-1,-14,0],[-1,-13,0],[-1,-12,0],[-1,-11,0],[-2,-11,0],[-2,-12,0]]},{"step":17,"joint":16,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":3.523172657249582,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,-1,-1,-1,1,0,0,-1,0,0,0,-1,1,0,0,-1,-1],"base_after":11,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[-1,-3,0],[-2,-3,0],[-2,-4,0],[-1,-4,0],[0,-4,0],[0,-5,0],[0,-6,0],[0,-6,1],[0,-7,1],[0,-7,0],[0,-8,0],[0,-9,0],[0,-10,0],[0,-10,1],[0,-10,2],[0,-10,3],[0,-10,4],[0,-9,4],[0,-9,3],[0,-9,2],[0,-9,1],[0,-8,1],[0,-8,2]]},{"step":18,"joint":11,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":4.960872244456715,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,-1,0,-1,1,0,0,-1,0,0,0,-1,1,0,0,-1,-1],"base_after":11,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[-1,-3,0],[-2,-3,0],[-2,-4,0],[-1,-4,0],[0,-4,0],[0,-5,0],[0,-6,0],[0,-6,1],[0,-6,2],[1,-6,2],[1,-6,3],[1,-6,4],[1,-6,5],[0,-6,5],[-1,-6,5],[-2,-6,5],[-3,-6,5],[-3,-6,4],[-2,-6,4],[-1,-6,4],[0,-6,4],[0,-6,3],[-1,-6,3]]},{"step":19,"joint":15,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.702354254787689,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,-1,0,-1,1,0,-1,-1,0,0,0,-1,1,0,0,-1,-1],"base_after":11,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[-1,-3,0],[-2,-3,0],[-2,-4,0],[-1,-4,0],[0,-4,0],[0,-5,0],[0,-6,0],[0,-6,1],[0,-6,2],[1,-6,2],[1,-6,3],[1,-6,4],[1,-7,4],[1,-7,5],[1,-7,6],[1,-7,7],[1,-7,8],[1,-6,8],[1,-6,7],[1,-6,6],[1,-6,5],[1,-5,5],[1,-5,6]]},{"step":20,"joint":10,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":9.184221107019177,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,0,0,-1,1,0,-1,-1,0,0,0,-1,1,0,0,-1,-1],"base_after":11,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[-1,-3,0],[-2,-3,0],[-2,-4,0],[-1,-4,0],[0,-4,0],[0,-5,0],[0,-6,0],[0,-7,0],[0,-8,0],[0,-8,1],[0,-9,1],[0,-10,1],[1,-10,1],[1,-11,1],[1,-12,1],[1,-13,1],[1,-14,1],[0,-14,1],[0,-13,1],[0,-12,1],[0,-11,1],[-1,-11,1],[-1,-12,1]]},{"step":21,"joint":14,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":4.59803019296136,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,0,0,-1,1,1,-1,-1,0,0,0,-1,1,0,0,-1,-1],"base_after":11,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[-1,-3,0],[-2,-3,0],[-2,-4,0],[-1,-4,0],[0,-4,0],[0,-5,0],[0,-6,0],[0,-7,0],[0,-8,0],[0,-8,1],[0,-9,1],[0,-9,2],[0,-8,2],[0,-8,3],[0,-8,4],[0,-8,5],[0,-8,6],[0,-9,6],[0,-9,5],[0,-9,4],[0,-9,3],[0,-10,3],[0,-10,4]]},{"step":22,"joint":11,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":8.569156178441343,"failed_checks":[],"states_after":[0,0,0,1,0,1,1,0,-1,0,0,-1,-1,1,1,-1,-1,0,0,0,-1,1,0,0,-1,-1],"base_after":11,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[-1,-3,0],[-2,-3,0],[-2,-4,0],[-1,-4,0],[0,-4,0],[0,-5,0],[0,-6,0],[0,-7,0],[1,-7,0],[1,-6,0],[2,-6,0],[2,-5,0],[1,-5,0],[1,-4,0],[1,-3,0],[1,-2,0],[1,-1,0],[2,-1,0],[2,-2,0],[2,-3,0],[2,-4,0],[3,-4,0],[3,-3,0]]}]},{"name":"h","demo_number":5,"roll":"12001300133101230333233210","pitch_mm":82.0,"loose_hard_ok":true,"loose_violations":[],"total_time_s":22.0,"start":{"states":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base":2,"cells":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0],[25,0,0],[26,0,0]]},"goal":{"states":[0,1,0,0,0,1,1,0,-1,0,1,0,-1,1,1,-1,0,0,0,0,0,1,1,0,0,0],"base":2,"silhouette":["##....","###.##","###..#","######","##..##","##..##","##...."]},"final_tracked":{"base":23,"ends_flat_on_table":true,"lattice_span":[5,6,0]},"moves":[{"step":1,"joint":1,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.12111635159907644,"failed_checks":[],"states_after":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base_after":14,"cells_after":[[0,0,0],[0,0,-1],[1,0,-1],[2,0,-1],[3,0,-1],[4,0,-1],[5,0,-1],[6,0,-1],[7,0,-1],[8,0,-1],[9,0,-1],[10,0,-1],[11,0,-1],[12,0,-1],[13,0,-1],[14,0,-1],[15,0,-1],[16,0,-1],[17,0,-1],[18,0,-1],[19,0,-1],[20,0,-1],[21,0,-1],[22,0,-1],[23,0,-1],[24,0,-1],[25,0,-1]]},{"step":2,"joint":21,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":1.8709371340010252,"failed_checks":[],"states_after":[0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0],"base_after":14,"cells_after":[[0,0,0],[0,0,-1],[1,0,-1],[2,0,-1],[3,0,-1],[4,0,-1],[5,0,-1],[6,0,-1],[7,0,-1],[8,0,-1],[9,0,-1],[10,0,-1],[11,0,-1],[12,0,-1],[13,0,-1],[14,0,-1],[15,0,-1],[16,0,-1],[17,0,-1],[18,0,-1],[19,0,-1],[20,0,-1],[20,0,0],[20,0,1],[20,0,2],[20,0,3],[20,0,4]]},{"step":3,"joint":8,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":4.242211580652399,"failed_checks":[],"states_after":[0,1,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0],"base_after":18,"cells_after":[[0,0,0],[-1,0,0],[-1,1,0],[-1,2,0],[-1,3,0],[-1,4,0],[-1,5,0],[-1,6,0],[-1,7,0],[0,7,0],[1,7,0],[2,7,0],[3,7,0],[4,7,0],[5,7,0],[6,7,0],[7,7,0],[8,7,0],[9,7,0],[10,7,0],[11,7,0],[12,7,0],[12,7,1],[12,7,2],[12,7,3],[12,7,4],[12,7,5]]},{"step":4,"joint":15,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":8.813281030502317,"failed_checks":[],"states_after":[0,1,0,0,0,0,0,0,-1,0,0,0,0,0,0,-1,0,0,0,0,0,1,0,0,0,0],"base_after":5,"cells_after":[[0,0,0],[0,0,1],[1,0,1],[2,0,1],[3,0,1],[4,0,1],[5,0,1],[6,0,1],[7,0,1],[7,0,0],[7,0,-1],[7,0,-2],[7,0,-3],[7,0,-4],[7,0,-5],[7,0,-6],[8,0,-6],[9,0,-6],[10,0,-6],[11,0,-6],[12,0,-6],[13,0,-6],[13,0,-5],[13,0,-4],[13,0,-3],[13,0,-2],[13,0,-1]]},{"step":5,"joint":5,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":1.4187237863341629,"failed_checks":[],"states_after":[0,1,0,0,0,1,0,0,-1,0,0,0,0,0,0,-1,0,0,0,0,0,1,0,0,0,0],"base_after":18,"cells_after":[[0,0,0],[-1,0,0],[-1,1,0],[-1,2,0],[-1,3,0],[-1,4,0],[0,4,0],[1,4,0],[2,4,0],[2,4,-1],[2,4,-2],[2,4,-3],[2,4,-4],[2,4,-5],[2,4,-6],[2,4,-7],[3,4,-7],[4,4,-7],[5,4,-7],[6,4,-7],[7,4,-7],[8,4,-7],[8,4,-6],[8,4,-5],[8,4,-4],[8,4,-3],[8,4,-2]]},{"step":6,"joint":6,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.129044160235846,"failed_checks":[],"states_after":[0,1,0,0,0,1,1,0,-1,0,0,0,0,0,0,-1,0,0,0,0,0,1,0,0,0,0],"base_after":7,"cells_after":[[0,0,0],[0,0,1],[-1,0,1],[-2,0,1],[-3,0,1],[-4,0,1],[-4,0,0],[-3,0,0],[-2,0,0],[-2,0,-1],[-2,0,-2],[-2,0,-3],[-2,0,-4],[-2,0,-5],[-2,0,-6],[-2,0,-7],[-1,0,-7],[0,0,-7],[1,0,-7],[2,0,-7],[3,0,-7],[4,0,-7],[4,0,-6],[4,0,-5],[4,0,-4],[4,0,-3],[4,0,-2]]},{"step":7,"joint":10,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.9305417245484056,"failed_checks":[],"states_after":[0,1,0,0,0,1,1,0,-1,0,1,0,0,0,0,-1,0,0,0,0,0,1,0,0,0,0],"base_after":12,"cells_after":[[0,0,0],[0,1,0],[0,1,1],[0,1,2],[0,1,3],[0,1,4],[0,0,4],[0,0,3],[0,0,2],[0,-1,2],[0,-2,2],[0,-2,1],[0,-2,0],[0,-2,-1],[0,-2,-2],[0,-2,-3],[1,-2,-3],[2,-2,-3],[3,-2,-3],[4,-2,-3],[5,-2,-3],[6,-2,-3],[6,-2,-2],[6,-2,-1],[6,-2,0],[6,-2,1],[6,-2,2]]},{"step":8,"joint":13,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":3.846205452657885,"failed_checks":[],"states_after":[0,1,0,0,0,1,1,0,-1,0,1,0,0,1,0,-1,0,0,0,0,0,1,0,0,0,0],"base_after":18,"cells_after":[[0,0,0],[-1,0,0],[-1,1,0],[-1,2,0],[-1,3,0],[-1,4,0],[0,4,0],[0,3,0],[0,2,0],[1,2,0],[2,2,0],[2,1,0],[2,0,0],[2,-1,0],[2,-1,-1],[2,-1,-2],[3,-1,-2],[4,-1,-2],[5,-1,-2],[6,-1,-2],[7,-1,-2],[8,-1,-2],[8,-1,-1],[8,-1,0],[8,-1,1],[8,-1,2],[8,-1,3]]},{"step":9,"joint":14,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":6.3512044853045495,"failed_checks":[],"states_after":[0,1,0,0,0,1,1,0,-1,0,1,0,0,1,1,-1,0,0,0,0,0,1,0,0,0,0],"base_after":18,"cells_after":[[0,0,0],[-1,0,0],[-1,1,0],[-1,2,0],[-1,3,0],[-1,4,0],[0,4,0],[0,3,0],[0,2,0],[1,2,0],[2,2,0],[2,1,0],[2,0,0],[2,-1,0],[2,-1,-1],[2,-2,-1],[2,-2,0],[2,-2,1],[2,-2,2],[2,-2,3],[2,-2,4],[2,-2,5],[2,-1,5],[2,0,5],[2,1,5],[2,2,5],[2,3,5]]},{"step":10,"joint":22,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":8.066025529922275,"failed_checks":[],"states_after":[0,1,0,0,0,1,1,0,-1,0,1,0,0,1,1,-1,0,0,0,0,0,1,1,0,0,0],"base_after":22,"cells_after":[[0,0,0],[0,0,-1],[-1,0,-1],[-2,0,-1],[-3,0,-1],[-4,0,-1],[-4,0,0],[-3,0,0],[-2,0,0],[-2,0,1],[-2,0,2],[-1,0,2],[0,0,2],[1,0,2],[1,1,2],[2,1,2],[2,0,2],[2,-1,2],[2,-2,2],[2,-3,2],[2,-4,2],[2,-5,2],[1,-5,2],[1,-4,2],[1,-3,2],[1,-2,2],[1,-1,2]]},{"step":11,"joint":12,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":2.982798874318715,"failed_checks":[],"states_after":[0,1,0,0,0,1,1,0,-1,0,1,0,-1,1,1,-1,0,0,0,0,0,1,1,0,0,0],"base_after":23,"cells_after":[[0,0,0],[-1,0,0],[-1,-1,0],[-1,-2,0],[-1,-3,0],[-1,-4,0],[0,-4,0],[0,-3,0],[0,-2,0],[1,-2,0],[2,-2,0],[2,-1,0],[2,0,0],[3,0,0],[3,1,0],[4,1,0],[4,0,0],[4,-1,0],[4,-2,0],[4,-3,0],[4,-4,0],[4,-5,0],[3,-5,0],[3,-4,0],[3,-3,0],[3,-2,0],[3,-1,0]]}]},{"name":"t","demo_number":6,"roll":"12001300133101230333233210","pitch_mm":82.0,"loose_hard_ok":true,"loose_violations":[],"total_time_s":12.0,"start":{"states":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base":8,"cells":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0],[25,0,0],[26,0,0]]},"goal":{"states":[1,0,0,0,0,0,0,1,0,0,0,0,0,-1,-1,0,0,0,0,0,0,0,0,1,-1,0],"base":0,"silhouette":["##########","##########","......#...","......#...","......#...","......#...","......#...","......#...","......#..."]},"final_tracked":{"base":8,"ends_flat_on_table":false,"lattice_span":[9,0,8]},"moves":[{"step":1,"joint":0,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.0,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base_after":4,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0],[25,0,0],[26,0,0]]},{"step":2,"joint":23,"delta":1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.7365905316049622,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],"base_after":4,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[23,0,1],[23,0,2],[23,0,3]]},{"step":3,"joint":7,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":3.5482524276015224,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0],"base_after":23,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,0,-4],[0,0,-5],[0,0,-6],[0,0,-7],[1,0,-7],[2,0,-7],[3,0,-7],[4,0,-7],[5,0,-7],[6,0,-7],[7,0,-7],[8,0,-7],[9,0,-7],[10,0,-7],[11,0,-7],[12,0,-7],[13,0,-7],[14,0,-7],[15,0,-7],[16,0,-7],[16,0,-6],[16,0,-5],[16,0,-4]]},{"step":4,"joint":24,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":0.3656246605650665,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,-1,0],"base_after":23,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,0,-4],[0,0,-5],[0,0,-6],[0,0,-7],[1,0,-7],[2,0,-7],[3,0,-7],[4,0,-7],[5,0,-7],[6,0,-7],[7,0,-7],[8,0,-7],[9,0,-7],[10,0,-7],[11,0,-7],[12,0,-7],[13,0,-7],[14,0,-7],[15,0,-7],[16,0,-7],[16,0,-6],[15,0,-6],[14,0,-6]]},{"step":5,"joint":14,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":9.08627184003849,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,1,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,1,-1,0],"base_after":7,"cells_after":[[0,0,0],[0,1,0],[0,2,0],[0,3,0],[0,4,0],[0,5,0],[0,6,0],[0,7,0],[0,7,-1],[0,7,-2],[0,7,-3],[0,7,-4],[0,7,-5],[0,7,-6],[0,7,-7],[1,7,-7],[2,7,-7],[3,7,-7],[4,7,-7],[5,7,-7],[6,7,-7],[7,7,-7],[8,7,-7],[9,7,-7],[9,7,-6],[8,7,-6],[7,7,-6]]},{"step":6,"joint":13,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":7.346414008305633,"failed_checks":[],"states_after":[1,0,0,0,0,0,0,1,0,0,0,0,0,-1,-1,0,0,0,0,0,0,0,0,1,-1,0],"base_after":8,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,0,-4],[0,0,-5],[0,0,-6],[0,0,-7],[-1,0,-7],[-2,0,-7],[-3,0,-7],[-4,0,-7],[-5,0,-7],[-6,0,-7],[-6,0,-8],[-5,0,-8],[-4,0,-8],[-3,0,-8],[-2,0,-8],[-1,0,-8],[0,0,-8],[1,0,-8],[2,0,-8],[3,0,-8],[3,0,-7],[2,0,-7],[1,0,-7]]}]},{"name":"n","demo_number":7,"roll":"12001300133101230333233210","pitch_mm":82.0,"loose_hard_ok":true,"loose_violations":[],"total_time_s":20.0,"start":{"states":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base":0,"cells":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[10,0,0],[11,0,0],[12,0,0],[13,0,0],[14,0,0],[15,0,0],[16,0,0],[17,0,0],[18,0,0],[19,0,0],[20,0,0],[21,0,0],[22,0,0],[23,0,0],[24,0,0],[25,0,0],[26,0,0]]},"goal":{"states":[0,0,0,0,0,0,0,-1,0,-1,-1,-1,0,0,0,0,0,-1,0,1,0,0,0,0,0,0],"base":4,"silhouette":["###..#","#.##.#","#..#.#","#..#.#","#..#.#","#..#.#","#..#.#","#..###"]},"final_tracked":{"base":11,"ends_flat_on_table":false,"lattice_span":[0,7,5]},"moves":[{"step":1,"joint":10,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":7.143530031275094,"failed_checks":[],"states_after":[0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base_after":17,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,0,-4],[0,0,-5],[0,0,-6],[0,0,-7],[0,0,-8],[0,0,-9],[0,0,-10],[1,0,-10],[2,0,-10],[3,0,-10],[4,0,-10],[5,0,-10],[6,0,-10],[7,0,-10],[8,0,-10],[9,0,-10],[10,0,-10],[11,0,-10],[12,0,-10],[13,0,-10],[14,0,-10],[15,0,-10],[16,0,-10]]},{"step":2,"joint":9,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":5.793193699240763,"failed_checks":[],"states_after":[0,0,0,0,0,0,0,0,0,-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],"base_after":6,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[9,0,-1],[10,0,-1],[11,0,-1],[12,0,-1],[13,0,-1],[14,0,-1],[15,0,-1],[16,0,-1],[17,0,-1],[18,0,-1],[19,0,-1],[20,0,-1],[21,0,-1],[22,0,-1],[23,0,-1],[24,0,-1],[25,0,-1]]},{"step":3,"joint":13,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":11.548115923082083,"failed_checks":[],"states_after":[0,0,0,0,0,0,0,0,0,-1,-1,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0],"base_after":6,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[8,0,0],[9,0,0],[9,0,-1],[10,0,-1],[11,0,-1],[12,0,-1],[12,1,-1],[12,2,-1],[12,3,-1],[12,4,-1],[12,5,-1],[12,6,-1],[12,7,-1],[12,8,-1],[12,9,-1],[12,10,-1],[12,11,-1],[12,12,-1],[12,13,-1]]},{"step":4,"joint":19,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":9.353662721183936,"failed_checks":[],"states_after":[0,0,0,0,0,0,0,0,0,-1,-1,0,0,-1,0,0,0,0,0,1,0,0,0,0,0,0],"base_after":1,"cells_after":[[0,0,0],[0,1,0],[0,2,0],[0,3,0],[0,4,0],[0,5,0],[0,6,0],[0,7,0],[0,8,0],[0,9,0],[1,9,0],[1,10,0],[1,11,0],[1,12,0],[1,12,-1],[1,12,-2],[1,12,-3],[1,12,-4],[1,12,-5],[1,12,-6],[1,13,-6],[1,14,-6],[1,15,-6],[1,16,-6],[1,17,-6],[1,18,-6],[1,19,-6]]},{"step":5,"joint":7,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":3.2658240866217314,"failed_checks":[],"states_after":[0,0,0,0,0,0,0,-1,0,-1,-1,0,0,-1,0,0,0,0,0,1,0,0,0,0,0,0],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-2,0,0],[-3,0,0],[-4,0,0],[-5,0,0],[-6,0,0],[-7,0,0],[-7,1,0],[-7,2,0],[-6,2,0],[-6,3,0],[-6,4,0],[-6,5,0],[-6,5,-1],[-6,5,-2],[-6,5,-3],[-6,5,-4],[-6,5,-5],[-6,5,-6],[-6,6,-6],[-6,7,-6],[-6,8,-6],[-6,9,-6],[-6,10,-6],[-6,11,-6],[-6,12,-6]]},{"step":6,"joint":17,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":4.815558923482307,"failed_checks":[],"states_after":[0,0,0,0,0,0,0,-1,0,-1,-1,0,0,-1,0,0,0,-1,0,1,0,0,0,0,0,0],"base_after":20,"cells_after":[[0,0,0],[-1,0,0],[-2,0,0],[-3,0,0],[-4,0,0],[-5,0,0],[-6,0,0],[-7,0,0],[-7,1,0],[-7,2,0],[-6,2,0],[-6,3,0],[-6,4,0],[-6,5,0],[-6,5,-1],[-6,5,-2],[-6,5,-3],[-6,5,-4],[-7,5,-4],[-8,5,-4],[-8,5,-3],[-8,5,-2],[-8,5,-1],[-8,5,0],[-8,5,1],[-8,5,2],[-8,5,3]]},{"step":7,"joint":9,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":5.257594623243897,"failed_checks":[],"states_after":[0,0,0,0,0,0,0,-1,0,0,-1,0,0,-1,0,0,0,-1,0,1,0,0,0,0,0,0],"base_after":17,"cells_after":[[0,0,0],[0,0,-1],[0,0,-2],[0,0,-3],[0,0,-4],[0,0,-5],[0,0,-6],[0,0,-7],[1,0,-7],[2,0,-7],[3,0,-7],[3,1,-7],[3,2,-7],[3,3,-7],[3,3,-8],[3,3,-9],[3,3,-10],[3,3,-11],[2,3,-11],[1,3,-11],[1,3,-10],[1,3,-9],[1,3,-8],[1,3,-7],[1,3,-6],[1,3,-5],[1,3,-4]]},{"step":8,"joint":13,"delta":1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":1.1536638035934264,"failed_checks":[],"states_after":[0,0,0,0,0,0,0,-1,0,0,-1,0,0,0,0,0,0,-1,0,1,0,0,0,0,0,0],"base_after":0,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[7,1,0],[7,2,0],[7,3,0],[7,3,-1],[7,3,-2],[7,3,-3],[7,3,-4],[7,3,-5],[7,3,-6],[7,3,-7],[6,3,-7],[5,3,-7],[5,3,-6],[5,3,-5],[5,3,-4],[5,3,-3],[5,3,-2],[5,3,-1],[5,3,0]]},{"step":9,"joint":9,"delta":-1,"side":"out","duration_s":2.0,"hard_ok":true,"peak_demand_nm":5.221547772561237,"failed_checks":[],"states_after":[0,0,0,0,0,0,0,-1,0,-1,-1,0,0,0,0,0,0,-1,0,1,0,0,0,0,0,0],"base_after":0,"cells_after":[[0,0,0],[1,0,0],[2,0,0],[3,0,0],[4,0,0],[5,0,0],[6,0,0],[7,0,0],[7,1,0],[7,2,0],[6,2,0],[6,3,0],[6,4,0],[6,5,0],[6,6,0],[6,7,0],[6,8,0],[6,9,0],[6,9,-1],[6,9,-2],[6,8,-2],[6,7,-2],[6,6,-2],[6,5,-2],[6,4,-2],[6,3,-2],[6,2,-2]]},{"step":10,"joint":11,"delta":-1,"side":"in","duration_s":2.0,"hard_ok":true,"peak_demand_nm":5.362392208946937,"failed_checks":[],"states_after":[0,0,0,0,0,0,0,-1,0,-1,-1,-1,0,0,0,0,0,-1,0,1,0,0,0,0,0,0],"base_after":11,"cells_after":[[0,0,0],[0,-1,0],[0,-2,0],[0,-3,0],[0,-4,0],[0,-5,0],[0,-6,0],[0,-7,0],[0,-7,-1],[0,-7,-2],[0,-6,-2],[0,-6,-3],[0,-5,-3],[0,-4,-3],[0,-3,-3],[0,-2,-3],[0,-1,-3],[0,0,-3],[0,0,-4],[0,0,-5],[0,-1,-5],[0,-2,-5],[0,-3,-5],[0,-4,-5],[0,-5,-5],[0,-6,-5],[0,-7,-5]]}]}]</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+// ------------------------------------------------------------------ data
+const SHAPES = JSON.parse(document.getElementById('shapes').textContent);
+const STL = { still: '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', moving: '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' };
+const MM = 1000;                       // URDF is in metres; the scene is in mm
+const DETENT = 2 * Math.PI / 3;        // one joint detent = 120 deg
+const S3 = 1 / Math.sqrt(3);
+const JOINT_AXIS = new THREE.Vector3(S3, S3, S3);
+
+// ------------------------------------------------------------------ parse the URDF text (same as viewer.html)
+const doc = new DOMParser().parseFromString(document.getElementById('urdf').textContent, 'application/xml');
+const nums = s => (s || '0 0 0').trim().split(/\s+/).map(Number);
+const links = {}, joints = [];
+for (const L of doc.querySelectorAll('robot > link')) {
+  const shapes = [];
+  for (const el of L.querySelectorAll(':scope > visual')) {
+    const o = el.querySelector('origin'); const mesh = el.querySelector('geometry > mesh'); const box = el.querySelector('geometry > box');
+    shapes.push({ xyz: nums(o?.getAttribute('xyz')), rpy: nums(o?.getAttribute('rpy')),
+                  mesh: mesh?.getAttribute('filename') || null, box: box ? nums(box.getAttribute('size')) : null });
+  }
+  links[L.getAttribute('name')] = { name: L.getAttribute('name'), shapes };
+}
+for (const J of doc.querySelectorAll('robot > joint')) {
+  const o = J.querySelector('origin');
+  joints.push({ name: J.getAttribute('name'), type: J.getAttribute('type'),
+                parent: J.querySelector('parent').getAttribute('link'), child: J.querySelector('child').getAttribute('link'),
+                xyz: nums(o?.getAttribute('xyz')), rpy: nums(o?.getAttribute('rpy')), axis: nums(J.querySelector('axis')?.getAttribute('xyz') || '1 0 0') });
+}
+const childNames = new Set(joints.map(j => j.child));
+const rootName = Object.keys(links).find(n => !childNames.has(n));
+const mounts = joints.filter(j => j.type === 'fixed').sort((a, b) => a.name.localeCompare(b.name));
+const PITCH = mounts[0].xyz[0] * MM;   // 82.2 mm in the shipped URDF (the planner checked at 82; only the scale differs)
+
+// ------------------------------------------------------------------ decode the STLs (binary, metres)
+function stlGeometry(b64) {
+  const bin = atob(b64), buf = new ArrayBuffer(bin.length), u8 = new Uint8Array(buf);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  const dv = new DataView(buf), n = dv.getUint32(80, true), pos = new Float32Array(n * 9);
+  for (let i = 0; i < n; i++) for (let k = 0; k < 9; k++) pos[i * 9 + k] = dv.getFloat32(84 + i * 50 + 12 + k * 4, true) * MM;
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.computeVertexNormals();
+  const uniq = new Map();
+  for (let i = 0; i < pos.length; i += 3) uniq.set(`${pos[i].toFixed(3)},${pos[i+1].toFixed(3)},${pos[i+2].toFixed(3)}`, new THREE.Vector3(pos[i], pos[i+1], pos[i+2]));
+  g.userData.verts = [...uniq.values()];   // hull vertices, for settling the pose onto the table
+  return g;
+}
+const geoms = { 'meshes/still.stl': stlGeometry(STL.still), 'meshes/moving.stl': stlGeometry(STL.moving) };
+const edgeGeoms = {}; for (const k in geoms) edgeGeoms[k] = new THREE.EdgesGeometry(geoms[k], 20);
+const edgeMat = new THREE.LineBasicMaterial({ color: 0x1a1a1a });
+const spacerMat = new THREE.MeshStandardMaterial({ color: '#6b7280', roughness: .6 });
+const mkMat = c => new THREE.MeshStandardMaterial({ color: c, roughness: .75, flatShading: true, emissive: c, emissiveIntensity: 0 });
+
+// ------------------------------------------------------------------ scene
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); stage.prepend(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color('#14161a');
+const camera = new THREE.PerspectiveCamera(35, 1, 5, 30000); camera.up.set(0, 0, 1);
+const controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x303038, 0.75));
+const sun = new THREE.DirectionalLight(0xffffff, 0.8); sun.position.set(-600, -1400, 2000); scene.add(sun);
+const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(900, 1500, -300); scene.add(fill);
+const grid = new THREE.GridHelper(6000, 72, 0x2a2e36, 0x22252b); grid.rotation.x = Math.PI / 2; grid.position.set(1000, 0, -0.5); scene.add(grid);
+
+// build the kinematic tree exactly as the joints describe it, under a root group we place in the world
+const robot = new THREE.Group(); scene.add(robot);
+const linkObj = {}, edgeObjs = [], spacerObjs = [];
+const urdfRot = rpy => new THREE.Quaternion().setFromEuler(new THREE.Euler(rpy[0], rpy[1], rpy[2], 'ZYX'));   // URDF rpy = Rz·Ry·Rx
+const pieces = [];   // every half-cube mesh: { module, half, mesh, mats:{halves, modules} }
+for (const name in links) {
+  const L = links[name], g = new THREE.Group(); g.name = name; linkObj[name] = g;
+  const module = parseInt(name.slice(1, 3), 10) - 1, half = name.endsWith('_still') ? 'still' : 'moving';
+  for (const s of L.shapes) {
+    let obj;
+    if (s.mesh) {
+      const halves = mkMat(module === 0 ? '#3b82f6' : half === 'still' ? '#d9d4c7' : '#e8833a');
+      const modules = mkMat(module === 0 ? '#93c5fd' : module % 2 ? '#ec7048' : '#2b6cb0');
+      obj = new THREE.Mesh(geoms[s.mesh], halves);
+      const e = new THREE.LineSegments(edgeGeoms[s.mesh], edgeMat); obj.add(e); edgeObjs.push(e);
+      pieces.push({ module, half, mesh: obj, mats: { halves, modules } });
+    } else if (s.box) {
+      obj = new THREE.Mesh(new THREE.BoxGeometry(s.box[0] * MM, s.box[1] * MM, s.box[2] * MM), spacerMat); spacerObjs.push(obj);
+      obj.userData.verts = [-1, 1].flatMap(a => [-1, 1].flatMap(b => [-1, 1].map(c => new THREE.Vector3(a * s.box[0] * MM / 2, b * s.box[1] * MM / 2, c * s.box[2] * MM / 2))));
+    }
+    if (!obj) continue;
+    obj.position.set(s.xyz[0] * MM, s.xyz[1] * MM, s.xyz[2] * MM); obj.quaternion.copy(urdfRot(s.rpy)); g.add(obj);
+  }
+}
+const servos = [];   // index k = handoff joint k = hinge inside module k (URDF servo{k+1})
+for (const j of joints) {
+  const frame = new THREE.Group(); frame.name = j.name;
+  frame.position.set(j.xyz[0] * MM, j.xyz[1] * MM, j.xyz[2] * MM); frame.quaternion.copy(urdfRot(j.rpy));
+  linkObj[j.parent].add(frame);
+  const motion = new THREE.Group(); frame.add(motion); motion.add(linkObj[j.child]);
+  if (j.type === 'continuous' || j.type === 'revolute') servos.push({ name: j.name, motion, axis: new THREE.Vector3(...j.axis).normalize() });
+}
+servos.sort((a, b) => a.name.localeCompare(b.name));
+robot.add(linkObj[rootName]);
+const N_MODULES = servos.length;   // 27
+const stillLink = k => linkObj[`m${String(k + 1).padStart(2, '0')}_still`];
+const settleVerts = [...pieces.map(p => p.mesh), ...spacerObjs];
+
+// hinge axis marker, shown through the active joint during a move
+const axisLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, -160), new THREE.Vector3(0, 0, 160)]),
+                                new THREE.LineBasicMaterial({ color: 0x3b82f6 }));
+axisLine.visible = false; scene.add(axisLine);
+
+// ------------------------------------------------------------------ orientation group (replay.py::group_closure — BFS order IS the base index)
+const I3 = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+const JM = [[0, 0, 1], [1, 0, 0], [0, 1, 0]];      // +120 deg about (1,1,1): x->y->z->x
+const RXM = [[1, 0, 0], [0, 0, -1], [0, 1, 0]];    // +90 deg about local +x
+const mmul = (a, b) => a.map((r, i) => [0, 1, 2].map(j => r[0] * b[0][j] + r[1] * b[1][j] + r[2] * b[2][j]));
+const mkey = m => m.flat().join(',');
+const ORIENTS = [I3]; const ORIENT_INDEX = new Map([[mkey(I3), 0]]);
+for (let cursor = 0; cursor < ORIENTS.length; cursor++) for (const g of [JM, RXM]) {
+  const c = mmul(ORIENTS[cursor], g); if (!ORIENT_INDEX.has(mkey(c))) { ORIENT_INDEX.set(mkey(c), ORIENTS.length); ORIENTS.push(c); }
+}
+console.assert(ORIENTS.length === 24, 'cube rotation group should have 24 elements');
+const orientQuat = i => { const m = ORIENTS[i], M = new THREE.Matrix4(); M.set(m[0][0], m[0][1], m[0][2], 0, m[1][0], m[1][1], m[1][2], 0, m[2][0], m[2][1], m[2][2], 0, 0, 0, 0, 1); return new THREE.Quaternion().setFromRotationMatrix(M); };
+function quatOrient(q) {   // which group element a (lattice-aligned) quaternion is
+  const e = new THREE.Matrix4().makeRotationFromQuaternion(q).elements;
+  const m = [[e[0], e[4], e[8]], [e[1], e[5], e[9]], [e[2], e[6], e[10]]].map(r => r.map(v => Math.round(v) || 0));
+  return ORIENT_INDEX.has(mkey(m)) ? ORIENT_INDEX.get(mkey(m)) : -1;
+}
+
+// ------------------------------------------------------------------ pose primitives
+const q = new Float64Array(N_MODULES);   // servo angles, rad
+function applyQ() { for (let k = 0; k < N_MODULES; k++) servos[k].motion.quaternion.setFromAxisAngle(servos[k].axis, q[k]); }
+function setPose(qs, pos, quat) { q.set(qs); robot.position.copy(pos); robot.quaternion.copy(quat); applyQ(); }
+const _v = new THREE.Vector3();
+function minZ() {
+  robot.updateMatrixWorld(true); let z = Infinity;
+  for (const o of settleVerts) for (const v of o.geometry.userData?.verts || o.userData.verts) { _v.copy(v).applyMatrix4(o.matrixWorld); if (_v.z < z) z = _v.z; }
+  return z;
+}
+function centres() { robot.updateMatrixWorld(true); return Array.from({ length: N_MODULES }, (_, k) => new THREE.Vector3().setFromMatrixPosition(stillLink(k).matrixWorld)); }
+const _q = new THREE.Quaternion();
+function rotateRobotAbout(axis, pivot, angle) {   // world rotation applied to the root: keeps the other side of the hinge fixed
+  _q.setFromAxisAngle(axis, angle);
+  robot.position.sub(pivot).applyQuaternion(_q).add(pivot);
+  robot.quaternion.premultiply(_q);
+}
+
+// Rest poses of a shape: rest[0] is the start, rest[m] is after move m.  Each is built from the previous one with the
+// physically static side held fixed (tail pinned on `in` moves), then settled onto z = 0 like geometry.py::_pose_frames.
+function buildRests(shape) {
+  const rests = [];
+  q.fill(0); shape.start.states.forEach((s, k) => q[k] = s * DETENT);
+  robot.position.set(0, 0, 0); robot.quaternion.copy(orientQuat(shape.start.base)); applyQ();
+  robot.position.z -= minZ();
+  rests.push({ q: Float64Array.from(q), pos: robot.position.clone(), quat: robot.quaternion.clone(), settleDz: 0, pivot: null, axis: null, centres: centres() });
+  for (const mv of shape.moves) {
+    const pivot = new THREE.Vector3().setFromMatrixPosition(stillLink(mv.joint).matrixWorld);
+    const axis = JOINT_AXIS.clone().applyQuaternion(new THREE.Quaternion().setFromRotationMatrix(stillLink(mv.joint).matrixWorld)).normalize();
+    const theta = mv.delta * DETENT;
+    q[mv.joint] += theta;
+    if (mv.side === 'in') rotateRobotAbout(axis, pivot, -theta);
+    applyQ();
+    const dz = -minZ(); robot.position.z += dz;
+    rests.push({ q: Float64Array.from(q), pos: robot.position.clone(), quat: robot.quaternion.clone(), settleDz: dz, pivot, axis, centres: centres() });
+  }
+  return rests;
+}
+
+// Self-check: every rest pose must reproduce the planner's certified cells_after / base_after
+function verifyShape(shape, rests) {
+  const problems = [];
+  const expect = (m, cells, base) => {
+    const r = rests[m], c0 = r.centres[0];
+    for (let k = 0; k < N_MODULES; k++) {
+      const d = r.centres[k].clone().sub(c0).divideScalar(PITCH);
+      const got = [d.x, d.y, d.z].map(v => Math.round(v) || 0);
+      if (got.some((v, i) => v !== cells[k][i]) || [d.x, d.y, d.z].some((v, i) => Math.abs(v - got[i]) > 1e-3)) { problems.push(`pose ${m} module ${k}: ${got} vs ${cells[k]}`); break; }
+    }
+    if (quatOrient(r.quat) !== base) problems.push(`pose ${m}: base ${quatOrient(r.quat)} vs ${base}`);
+    const dup = new Set(cells.map(c => c.join(','))); if (dup.size !== N_MODULES) problems.push(`pose ${m}: not self-avoiding`);
+  };
+  expect(0, shape.start.cells, shape.start.base);
+  shape.moves.forEach((mv, i) => expect(i + 1, mv.cells_after, mv.base_after));
+  const last = shape.moves[shape.moves.length - 1];
+  if (last.base_after !== shape.final_tracked.base) problems.push('final base disagrees with final_tracked');
+  return problems;
+}
+
+// ------------------------------------------------------------------ silhouette (replay.py::silhouette) of a rest pose
+function silhouette(cells) {
+  const lo = [0, 1, 2].map(i => Math.min(...cells.map(c => c[i]))), hi = [0, 1, 2].map(i => Math.max(...cells.map(c => c[i])));
+  const axes = [0, 1, 2].filter(i => hi[i] > lo[i]);
+  if (axes.length === 1) axes.push((axes[0] + 1) % 3);   // a straight line is a one-row drawing
+  if (axes.length !== 2) return null;
+  const [a, b] = axes, occ = new Set(cells.map(c => `${c[a]},${c[b]}`)), rows = [];
+  for (let j = hi[b]; j >= lo[b]; j--) { let s = ''; for (let i = lo[a]; i <= hi[a]; i++) s += occ.has(`${i},${j}`) ? '#' : '.'; rows.push(s); }
+  rows.plane = 'xyz'[a] + 'xyz'[b];   // which lattice plane the drawing lies in (xz / yz = standing)
+  return rows;
+}
+const silCanvas = document.getElementById('silCanvas'), silCtx = silCanvas.getContext('2d');
+function drawSil(current, goal, label) {
+  const W = silCanvas.width, H = silCanvas.height; silCtx.clearRect(0, 0, W, H);
+  const panel = (rows, x0, w, title) => {
+    silCtx.fillStyle = '#9a9ca3'; silCtx.font = '11px ui-monospace, Menlo, monospace'; silCtx.fillText(title, x0, 12);
+    if (!rows) { silCtx.fillText('not planar', x0, 40); return; }
+    const cols = rows[0].length, cell = Math.floor(Math.min((w - 4) / cols, (H - 22) / rows.length));
+    const ox = x0 + Math.floor((w - cols * cell) / 2), oy = 18 + Math.floor((H - 22 - rows.length * cell) / 2);
+    rows.forEach((r, j) => [...r].forEach((ch, i) => { silCtx.fillStyle = ch === '#' ? '#e8e6e1' : '#23262c'; silCtx.fillRect(ox + i * cell, oy + j * cell, cell - 1, cell - 1); }));
+  };
+  panel(current, 4, W / 2 - 8, label); panel(goal, W / 2 + 4, W / 2 - 8, 'goal');
+}
+
+// ------------------------------------------------------------------ timeline
+const ease = u => u * u * (3 - 2 * u);
+const smooth = (u, a, b) => ease(Math.min(1, Math.max(0, (u - a) / (b - a))));
+let shape, rests, cum;   // cum[m] = time at rest pose m
+let t = 0, playing = false, dir = 1, speed = 1, cur = { m: 0, u: 0 };
+const T_END = () => cum[cum.length - 1];
+
+function setTime(time) {
+  t = Math.min(Math.max(0, time), T_END());
+  let m = 0; while (m < shape.moves.length && t >= cum[m + 1]) m++;
+  const u = m < shape.moves.length ? (t - cum[m]) / shape.moves[m].duration_s : 0;
+  const r = rests[m]; setPose(r.q, r.pos, r.quat);
+  for (const p of pieces) p.mesh.material.emissiveIntensity = 0;
+  axisLine.visible = false;
+  if (u > 0) {
+    const mv = shape.moves[m], nr = rests[m + 1], theta = mv.delta * DETENT * ease(u);
+    q[mv.joint] += theta;
+    if (mv.side === 'in') rotateRobotAbout(nr.axis, nr.pivot, -theta);
+    robot.position.z += nr.settleDz * smooth(u, 0.8, 1);
+    applyQ();
+    const swings = p => mv.side === 'out' ? (p.module > mv.joint || (p.module === mv.joint && p.half === 'moving'))
+                                          : (p.module < mv.joint || (p.module === mv.joint && p.half === 'still'));
+    for (const p of pieces) if (swings(p)) p.mesh.material.emissiveIntensity = 0.35;
+    if (document.getElementById('tAxis').checked) {   // the hinge line lives on the still half of the joint module
+      robot.updateMatrixWorld(true);
+      axisLine.position.setFromMatrixPosition(stillLink(mv.joint).matrixWorld);
+      axisLine.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), JOINT_AXIS.clone().applyQuaternion(new THREE.Quaternion().setFromRotationMatrix(stillLink(mv.joint).matrixWorld)));
+      axisLine.visible = true;
+    }
+  }
+  cur = { m, u };
+  updateTransport(); updateMoves(); updateSil();
+}
+
+// ------------------------------------------------------------------ UI: tabs + status
+const tabs = document.getElementById('tabs'), statusEl = document.getElementById('status');
+SHAPES.forEach((s, i) => {
+  const b = document.createElement('button'); b.className = s.loose_hard_ok ? '' : 'warn';
+  b.innerHTML = `<small>${s.demo_number}</small>${s.name}`; b.title = `${s.moves.length} moves`; b.onclick = () => selectShape(i); tabs.appendChild(b);
+});
+function selectShape(i) {
+  shape = SHAPES[i]; rests = buildRests(shape);
+  cum = [0]; shape.moves.forEach(mv => cum.push(cum[cum.length - 1] + mv.duration_s));
+  [...tabs.children].forEach((b, k) => b.classList.toggle('on', k === i));
+  const ft = shape.final_tracked;
+  statusEl.innerHTML = `<span class="stat"><b>${shape.moves.length}</b> moves · <b class="num">${shape.total_time_s.toFixed(1)} s</b> nominal</span>
+    <span class="stat"><b>${shape.moves.filter(m => m.side === 'in').length}</b> in · <b>${shape.moves.filter(m => m.side === 'out').length}</b> out</span>
+    <span class="stat">finishes <b>${ft.ends_flat_on_table ? 'flat on the table' : 'standing on edge'}</b> (span <span class="num">${ft.lattice_span.join('×')}</span>, base ${shape.start.base} → ${ft.base})</span>
+    <span class="stat ${shape.loose_hard_ok ? 'ok' : 'bad'}">${shape.loose_hard_ok ? '✓ loose hard checks pass' : `✗ ${shape.loose_violations.length} loose violation${shape.loose_violations.length === 1 ? '' : 's'} — still kinematically complete`}</span>`;
+  buildMoves(); playing = false; dir = 1; follow = true;
+  setTime(0); frameWhole();
+}
+
+// ------------------------------------------------------------------ UI: moves list
+const moveList = document.getElementById('moveList');
+function buildMoves() {
+  document.getElementById('movesMeta').textContent = `(joint · Δ · side · peak N·m)`;
+  moveList.innerHTML = shape.moves.map(mv => `<li data-step="${mv.step}" title="after this move: base ${mv.base_after}">
+      <span>${mv.step}</span><span>j${mv.joint} ${mv.delta > 0 ? '+1' : '−1'} <span class="side ${mv.side}">${mv.side}</span></span>
+      <span class="t">${mv.hard_ok ? '' : `<span class="bad">✗ ${mv.failed_checks.join(', ')}</span> `}${mv.peak_demand_nm == null ? '' : mv.peak_demand_nm.toFixed(1)}</span></li>`).join('');
+  [...moveList.children].forEach(li => li.onclick = () => { playing = false; setTime(cum[+li.dataset.step]); });
+}
+let lastActive = -1;
+function updateMoves() {
+  const active = cur.u > 0 ? cur.m + 1 : cur.m;
+  [...moveList.children].forEach((li, i) => { li.classList.toggle('active', i + 1 === active && cur.u > 0); li.classList.toggle('done', i + 1 <= active && !(i + 1 === active && cur.u > 0)); });
+  if (active !== lastActive && active > 0) { moveList.children[active - 1].scrollIntoView({ block: 'nearest' }); lastActive = active; }
+}
+function updateSil() {
+  const cells = cur.m === 0 ? shape.start.cells : shape.moves[cur.m - 1].cells_after;
+  const rows = silhouette(cells);
+  drawSil(rows, shape.goal.silhouette, (cur.m === 0 ? 'start' : `after move ${cur.m}`) + (rows && rows.plane !== 'xy' ? ` · ${rows.plane} plane` : ''));
+  document.getElementById('silLabel').textContent = cur.u > 0 ? '(moving)' : '';
+}
+
+// ------------------------------------------------------------------ UI: transport
+const transport = document.getElementById('transport');
+transport.innerHTML = `
+  <div class="big num"><span id="tMove"></span></div>
+  <input type="range" id="scrub" min="0" max="1" step="0.01" value="0" aria-label="path time">
+  <div class="btns">
+    <button id="bStart" title="start (Home)">⏮</button><button id="bBack" title="previous rest pose (←)">◀</button>
+    <button id="bPlay" class="play" title="play / pause (space)">Play</button>
+    <button id="bFwd" title="next rest pose (→)">▶</button><button id="bEnd" title="end (End)">⏭</button>
+    <button id="bUnfold" class="text" title="play the moves in reverse">Unfold</button>
+    <select id="speed" title="playback speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option><option value="4">4×</option></select>
+  </div>
+  <p id="tNote"></p>`;
+const scrub = document.getElementById('scrub'), tMove = document.getElementById('tMove'), tNote = document.getElementById('tNote'), bPlay = document.getElementById('bPlay'), bUnfold = document.getElementById('bUnfold');
+function updateTransport() {
+  scrub.max = T_END().toFixed(2); scrub.value = t.toFixed(2);
+  const mv = cur.u > 0 ? shape.moves[cur.m] : null;
+  tMove.innerHTML = mv
+    ? `move <em>${cur.m + 1}</em><span>/${shape.moves.length}</span> <span>· joint ${mv.joint} ${mv.delta > 0 ? '+' : '−'}120° · ${mv.side} · ${Math.round(cur.u * 100)}%</span>`
+    : `${cur.m === 0 ? 'start' : cur.m === shape.moves.length ? 'goal' : `after ${cur.m}`}<span>${cur.m === 0 ? ' · straight chain' : ` · ${cur.m}/${shape.moves.length} moves`} · ${t.toFixed(1)} s</span>`;
+  tNote.textContent = mv
+    ? (mv.side === 'out' ? `Modules ${mv.joint + 1}–26 and the moving half of ${mv.joint} swing about module ${mv.joint}'s ⟨111⟩ diagonal; the base side stays put.`
+                         : `Modules 0–${Math.max(0, mv.joint - 1)} and the still half of ${mv.joint} swing; the tail side stays put, so the base re-orients.`)
+    : (cur.m === shape.moves.length ? `Done: ${shape.final_tracked.ends_flat_on_table ? 'the drawing lies flat on the table.' : 'the drawing stands on edge (drawing plane vertical).'}` : 'Rest pose: every joint at a detent (−120°, 0°, +120°).');
+  bPlay.textContent = playing ? 'Pause' : 'Play';
+  bUnfold.classList.toggle('on', dir < 0);
+}
+scrub.oninput = e => { playing = false; setTime(+e.target.value); updateTransport(); };
+document.getElementById('bStart').onclick = () => { playing = false; setTime(0); };
+document.getElementById('bEnd').onclick = () => { playing = false; setTime(T_END()); };
+document.getElementById('bBack').onclick = () => { playing = false; setTime(cum[cur.u > 0 ? cur.m : Math.max(0, cur.m - 1)]); };
+document.getElementById('bFwd').onclick = () => { playing = false; setTime(cum[Math.min(shape.moves.length, cur.m + 1)]); };
+function togglePlay() {
+  if (!playing) { if (dir > 0 && t >= T_END()) setTime(0); if (dir < 0 && t <= 0) setTime(T_END()); }
+  playing = !playing; updateTransport();
+}
+bPlay.onclick = togglePlay;
+bUnfold.onclick = () => { dir = -dir; if (playing) { /* keep playing, now the other way */ } updateTransport(); };
+document.getElementById('speed').onchange = e => speed = +e.target.value;
+document.getElementById('colorMode').onchange = e => pieces.forEach(p => p.mesh.material = p.mats[e.target.value]);
+document.getElementById('tEdges').onchange = e => edgeObjs.forEach(o => o.visible = e.target.checked);
+document.getElementById('tSpacer').onchange = e => spacerObjs.forEach(o => o.visible = e.target.checked);
+document.getElementById('tAxis').onchange = () => setTime(t);
+document.getElementById('tFollow').onchange = e => follow = e.target.checked;
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'SELECT') return;
+  if (e.target.tagName === 'INPUT' && e.target.type === 'range' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) return;
+  if (e.key === ' ') { e.preventDefault(); togglePlay(); }
+  else if (e.key === 'ArrowRight') document.getElementById('bFwd').click();
+  else if (e.key === 'ArrowLeft') document.getElementById('bBack').click();
+  else if (e.key === 'Home') document.getElementById('bStart').click();
+  else if (e.key === 'End') document.getElementById('bEnd').click();
+  else if (e.key === 'u' || e.key === 'U') bUnfold.click();
+  else if (e.key === 'Escape' || e.key === 'f' || e.key === 'F') { follow = true; document.getElementById('tFollow').checked = true; frameWhole(); }
+  else if (e.key >= '1' && e.key <= '7') selectShape(+e.key - 1);
+});
+
+// ------------------------------------------------------------------ camera
+let follow = true;
+const view = { target: new THREE.Vector3(), pos: new THREE.Vector3(), anim: 0 };
+function centroid() { const c = centres(), s = new THREE.Vector3(); c.forEach(v => s.add(v)); return s.divideScalar(c.length); }
+function frameWhole() {   // fit the current pose: distance from the bounding radius of the module centres
+  const c = centroid(), r = Math.max(...centres().map(v => v.distanceTo(c))) + 60;
+  const wide = stage.clientWidth / Math.max(stage.clientHeight, 1), dist = Math.max(700, 2.4 * r) / Math.min(1, wide / 1.6);
+  view.target.copy(c); view.pos.set(c.x - dist * .15, c.y - dist, c.z + dist * .5); view.anim = 1;
+}
+controls.addEventListener('start', () => { view.anim = 0; follow = false; document.getElementById('tFollow').checked = false; });
+function resize() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize);
+
+// ------------------------------------------------------------------ boot: verify every shape, then show the first
+(function boot() {
+  const report = []; let poses = 0;
+  for (const s of SHAPES) { const r = buildRests(s); poses += r.length; const p = verifyShape(s, r); if (p.length) report.push(`${s.name}: ${p.join('; ')}`); }
+  const el = document.getElementById('verify'); el.className = 'stat ' + (report.length ? 'bad' : 'ok');
+  el.textContent = report.length ? `✗ ${report.length} of ${SHAPES.length} shapes disagree with the planner` : `✓ ${SHAPES.length}/${SHAPES.length} shapes · ${poses} rest poses reproduce cells_after / base_after`;
+  el.title = report.join('\n') || `URDF pitch ${PITCH} mm`;
+  console.log('[fold-viewer]', el.textContent, report);
+  resize(); selectShape(0); camera.position.copy(view.pos); controls.target.copy(view.target);
+})();
+
+let tPrev = performance.now();
+(function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.05, (now - tPrev) / 1000); tPrev = now;
+  if (playing) {
+    const next = t + dir * speed * dt;
+    if (next <= 0 || next >= T_END()) { playing = false; setTime(next <= 0 ? 0 : T_END()); }
+    else setTime(next);
+  }
+  if (view.anim) { camera.position.lerp(view.pos, 0.12); controls.target.lerp(view.target, 0.12); if (camera.position.distanceTo(view.pos) < 1) view.anim = 0; }
+  else if (follow) { const d = centroid().sub(controls.target).multiplyScalar(0.06); controls.target.add(d); camera.position.add(d); }
+  controls.update(); renderer.render(scene, camera);
+})(tPrev);
+</script>

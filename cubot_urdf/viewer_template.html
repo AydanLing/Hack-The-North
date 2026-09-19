@@ -1,0 +1,305 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CuBot URDF Viewer</title>
+<style>
+  :root { --bg:#14161a; --panel:#1d2026; --line:#2e323a; --fg:#e8e6e1; --dim:#9a9ca3; --accent:#3b82f6;
+          --r0:#7d8189; --r1:#3b82f6; --r2:#b067f2; --r3:#22c55e; --moving:#e8833a; --still:#d9d4c7; --spacer:#6b7280;
+          --ok:#22c55e; --bad:#ef4444; --mono:ui-monospace,Menlo,Consolas,monospace; }
+  * { box-sizing:border-box; }
+  html,body { height:100%; margin:0; background:var(--bg); color:var(--fg);
+              font:14px/1.4 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+  #app { display:grid; grid-template-rows:auto 1fr; height:100%; }
+  header { padding:10px 16px 10px; border-bottom:1px solid var(--line); background:var(--panel); }
+  .row { display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center; }
+  h1 { font-size:15px; margin:0; font-weight:600; }
+  h1 code { font:600 14px var(--mono); color:var(--fg); }
+  .stat { color:var(--dim); font-size:12.5px; font-variant-numeric:tabular-nums; }
+  .stat b { color:var(--fg); font-weight:600; }
+  .num { font-family:var(--mono); font-variant-numeric:tabular-nums; }
+  #summary.ok { color:var(--ok); } #summary.bad { color:var(--bad); }
+  /* the chain strip: module | roll digit | module | ... */
+  #strip { display:grid; grid-template-columns:repeat(26, minmax(0,1fr) 12px) minmax(0,1fr); gap:2px; margin-top:9px; align-items:stretch; }
+  #strip .m { border:1px solid var(--line); background:transparent; color:var(--dim); border-radius:4px; padding:3px 0 2px;
+              font:600 12px var(--mono); cursor:pointer; line-height:1.15; min-width:0; }
+  #strip .m small { display:block; font-weight:400; font-size:9.5px; color:var(--dim); }
+  #strip .m.turned { color:var(--fg); border-color:#4a5263; background:#2b3140; }
+  #strip .m.turned small { color:var(--moving); }
+  #strip .m.sel { outline:2px solid #fff; outline-offset:1px; color:var(--fg); }
+  #strip .d { align-self:center; height:22px; border-radius:3px; font:600 10px/22px var(--mono); text-align:center; color:#fff; }
+  .legend { display:flex; gap:12px; font-size:12px; color:var(--dim); flex-wrap:wrap; margin-top:8px; }
+  .sw { display:inline-block; width:10px; height:10px; border-radius:2px; vertical-align:-1px; margin-right:4px; }
+  .legend label { cursor:pointer; user-select:none; } .legend input { vertical-align:-1px; margin:0 3px 0 0; accent-color:var(--accent); }
+  main { position:relative; min-height:0; }
+  canvas { display:block; }
+  .card { position:absolute; background:rgba(29,32,38,.94); border:1px solid var(--line); border-radius:8px; padding:12px 14px; }
+  .card h2 { margin:0 0 6px; font-size:13px; font-weight:600; }
+  .card p { margin:4px 0 0; color:var(--dim); font-size:12.5px; }
+  #servo { left:14px; bottom:14px; width:min(360px, calc(100% - 28px)); }
+  #servo .big { font:600 30px var(--mono); font-variant-numeric:tabular-nums; color:var(--moving); line-height:1.1; }
+  #servo .big span { font-size:14px; color:var(--dim); font-weight:400; }
+  #angle { width:100%; margin:8px 0 6px; accent-color:var(--moving); }
+  .btns { display:flex; gap:6px; flex-wrap:wrap; }
+  .btns button { background:transparent; color:var(--fg); border:1px solid var(--line); border-radius:6px; padding:5px 10px;
+                 font:600 12px var(--mono); cursor:pointer; }
+  .btns button:hover { border-color:#4a5263; background:#2b3140; }
+  .btns button.on { background:#3a2a1e; border-color:var(--moving); color:var(--moving); }
+  .btns button.text { font-family:inherit; font-weight:500; color:var(--dim); }
+  button:focus-visible, input:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  #checks { right:14px; top:14px; width:min(330px, calc(100% - 28px)); max-height:calc(100% - 28px); overflow:auto; }
+  #checks ul { list-style:none; margin:0; padding:0; display:grid; gap:4px; }
+  #checks li { display:grid; grid-template-columns:14px 1fr; gap:8px; font-size:12.5px; align-items:baseline; }
+  #checks li i { font-style:normal; font-weight:700; } #checks li.ok i { color:var(--ok); } #checks li.bad i { color:var(--bad); }
+  #checks li .v { color:var(--dim); font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:11.5px; display:block; }
+  #hint { position:absolute; right:14px; bottom:14px; color:var(--dim); font-size:12px; text-align:right; }
+  @media (max-width: 700px) { #checks { top:auto; bottom:14px; right:14px; left:14px; width:auto; max-height:40%; } #servo { bottom:auto; top:14px; } #hint { display:none; } }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+
+<div id="app">
+  <header>
+    <div class="row">
+      <h1><code>cubot_shipped.urdf</code></h1>
+      <span class="stat" id="summary">parsing…</span>
+      <span class="stat" id="meta"></span>
+    </div>
+    <div id="strip"></div>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--still)"></i>still half</span>
+      <span><i class="sw" style="background:var(--moving)"></i>moving half</span>
+      <span><i class="sw" style="background:var(--spacer)"></i>spacer</span>
+      <span>roll digit: <i class="sw" style="background:var(--r0)"></i>0° <i class="sw" style="background:var(--r1)"></i>90° <i class="sw" style="background:var(--r2)"></i>180° <i class="sw" style="background:var(--r3)"></i>270°</span>
+      <label><input type="checkbox" id="tEdges" checked>edges</label>
+      <label><input type="checkbox" id="tSpacer" checked>spacers</label>
+      <label><input type="checkbox" id="tAxis">hinge axes</label>
+      <label><input type="checkbox" id="tGhost">ideal 80 mm cube</label>
+    </div>
+  </header>
+  <main id="stage">
+    <div class="card" id="servo"></div>
+    <div class="card" id="checks"><h2>Checks against the shipped configuration</h2><ul id="checkList"></ul></div>
+    <div id="hint">drag to orbit · scroll to zoom · click a module · ←/→ select · ↑/↓ detents · 0 reset · Esc whole chain</div>
+  </main>
+</div>
+
+<script type="text/plain" id="urdf">__URDF__</script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+// ------------------------------------------------------------------ what the viewer checks against
+const SHIPPED = { roll: '12001300133101230333233210', pitchMm: 82.2, cubeMm: 80, gapMm: 2.2, modules: 27, massKg: 6.75 };
+const STL = { still: '__STL_STILL__', moving: '__STL_MOVING__' };
+const RCOL = ['#7d8189', '#3b82f6', '#b067f2', '#22c55e'];
+const MM = 1000;   // URDF is in metres; the scene is in mm
+
+// ------------------------------------------------------------------ parse the URDF text
+const doc = new DOMParser().parseFromString(document.getElementById('urdf').textContent, 'application/xml');
+const nums = s => (s || '0 0 0').trim().split(/\s+/).map(Number);
+const links = {}, joints = [];
+for (const L of doc.querySelectorAll('robot > link')) {
+  const shapes = [];
+  for (const kind of ['visual', 'collision']) for (const el of L.querySelectorAll(`:scope > ${kind}`)) {
+    const o = el.querySelector('origin'); const mesh = el.querySelector('geometry > mesh'); const box = el.querySelector('geometry > box');
+    shapes.push({ kind, xyz: nums(o?.getAttribute('xyz')), rpy: nums(o?.getAttribute('rpy')),
+                  mesh: mesh?.getAttribute('filename') || null, box: box ? nums(box.getAttribute('size')) : null });
+  }
+  const inertial = L.querySelector(':scope > inertial');
+  links[L.getAttribute('name')] = { name: L.getAttribute('name'), shapes, mass: +(inertial?.querySelector('mass')?.getAttribute('value') || 0),
+                                    com: nums(inertial?.querySelector('origin')?.getAttribute('xyz')) };
+}
+for (const J of doc.querySelectorAll('robot > joint')) {
+  const o = J.querySelector('origin');
+  joints.push({ name: J.getAttribute('name'), type: J.getAttribute('type'),
+                parent: J.querySelector('parent').getAttribute('link'), child: J.querySelector('child').getAttribute('link'),
+                xyz: nums(o?.getAttribute('xyz')), rpy: nums(o?.getAttribute('rpy')), axis: nums(J.querySelector('axis')?.getAttribute('xyz') || '1 0 0') });
+}
+const childNames = new Set(joints.map(j => j.child));
+const rootName = Object.keys(links).find(n => !childNames.has(n));
+
+// ------------------------------------------------------------------ decode the STLs (binary, metres)
+function stlGeometry(b64) {
+  const bin = atob(b64), buf = new ArrayBuffer(bin.length), u8 = new Uint8Array(buf);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  const dv = new DataView(buf), n = dv.getUint32(80, true), pos = new Float32Array(n * 9);
+  for (let i = 0; i < n; i++) for (let k = 0; k < 9; k++) pos[i * 9 + k] = dv.getFloat32(84 + i * 50 + 12 + k * 4, true) * MM;
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos, 3)); g.computeVertexNormals();
+  const uniq = new Set(); for (let i = 0; i < pos.length; i += 3) uniq.add(`${pos[i].toFixed(3)},${pos[i+1].toFixed(3)},${pos[i+2].toFixed(3)}`);
+  g.computeBoundingBox();
+  g.userData.stats = { tris: n, verts: uniq.size, bb: g.boundingBox };
+  return g;
+}
+const geoms = { 'meshes/still.stl': stlGeometry(STL.still), 'meshes/moving.stl': stlGeometry(STL.moving) };
+const mats = { still: new THREE.MeshStandardMaterial({ color: '#d9d4c7', roughness: .8, flatShading: true }),
+               moving: new THREE.MeshStandardMaterial({ color: '#e8833a', roughness: .7, flatShading: true }),
+               spacer: new THREE.MeshStandardMaterial({ color: '#6b7280', roughness: .6 }) };
+const edgeMat = new THREE.LineBasicMaterial({ color: 0x1a1a1a });
+const edgeGeoms = {}; for (const k in geoms) edgeGeoms[k] = new THREE.EdgesGeometry(geoms[k], 20);
+
+// ------------------------------------------------------------------ scene
+const stage = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ antialias: true }); renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); stage.prepend(renderer.domElement);
+const scene = new THREE.Scene(); scene.background = new THREE.Color('#14161a');
+const camera = new THREE.PerspectiveCamera(35, 1, 5, 20000); camera.up.set(0, 0, 1);
+const controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true;
+scene.add(new THREE.HemisphereLight(0xffffff, 0x303038, 0.75));
+const sun = new THREE.DirectionalLight(0xffffff, 0.8); sun.position.set(-600, -1400, 2000); scene.add(sun);
+const fill = new THREE.DirectionalLight(0xffffff, 0.25); fill.position.set(900, 1500, -300); scene.add(fill);
+const grid = new THREE.GridHelper(4000, 48, 0x2a2e36, 0x22252b); grid.rotation.x = Math.PI / 2; grid.position.set(1070, 0, -41); scene.add(grid);
+
+// build the kinematic tree exactly as the joints describe it
+const linkObj = {}, edgeObjs = [], spacerObjs = [], axisObjs = [], ghostObjs = [];
+const urdfRot = rpy => new THREE.Quaternion().setFromEuler(new THREE.Euler(rpy[0], rpy[1], rpy[2], 'ZYX'));   // URDF rpy = Rz·Ry·Rx
+for (const name in links) {
+  const L = links[name], g = new THREE.Group(); g.name = name; linkObj[name] = g;
+  for (const s of L.shapes) {
+    if (s.kind !== 'visual') continue;
+    let obj;
+    if (s.mesh) {
+      const which = s.mesh.includes('moving') ? 'moving' : 'still';
+      obj = new THREE.Mesh(geoms[s.mesh], mats[which]);
+      const e = new THREE.LineSegments(edgeGeoms[s.mesh], edgeMat); obj.add(e); edgeObjs.push(e);
+      if (which === 'still') {   // ghost of the ideal cube, to see what the chamfers and neck remove
+        const gh = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(80, 80, 80)), new THREE.LineBasicMaterial({ color: 0x7d8189, transparent: true, opacity: .6 }));
+        gh.visible = false; g.add(gh); ghostObjs.push(gh);
+      }
+    } else if (s.box) {
+      obj = new THREE.Mesh(new THREE.BoxGeometry(s.box[0] * MM, s.box[1] * MM, s.box[2] * MM), mats.spacer); spacerObjs.push(obj);
+    }
+    if (!obj) continue;
+    obj.position.set(s.xyz[0] * MM, s.xyz[1] * MM, s.xyz[2] * MM); obj.quaternion.copy(urdfRot(s.rpy)); g.add(obj);
+  }
+}
+const servos = [];   // { joint, motion, axis, q }
+for (const j of joints) {
+  const frame = new THREE.Group(); frame.name = j.name;
+  frame.position.set(j.xyz[0] * MM, j.xyz[1] * MM, j.xyz[2] * MM); frame.quaternion.copy(urdfRot(j.rpy));
+  linkObj[j.parent].add(frame);
+  const motion = new THREE.Group(); frame.add(motion); motion.add(linkObj[j.child]);
+  if (j.type === 'continuous' || j.type === 'revolute') {
+    const axis = new THREE.Vector3(...j.axis).normalize();
+    servos.push({ joint: j, motion, axis, q: 0 });
+    const ax = new THREE.Line(new THREE.BufferGeometry().setFromPoints([axis.clone().multiplyScalar(-75), axis.clone().multiplyScalar(75)]),
+                              new THREE.LineBasicMaterial({ color: 0x3b82f6 })); ax.visible = false; frame.add(ax); axisObjs.push(ax);
+  }
+}
+scene.add(linkObj[rootName]);
+const N = servos.length;
+
+// ------------------------------------------------------------------ checks, computed from what was parsed
+const checks = [];
+const check = (label, ok, value) => checks.push({ label, ok, value });
+const mounts = joints.filter(j => j.type === 'fixed').sort((a, b) => a.name.localeCompare(b.name));
+check(`${Object.keys(links).length} links, ${N} servo joints, ${mounts.length} fixed mounts`, Object.keys(links).length === 2 * SHIPPED.modules && N === SHIPPED.modules && mounts.length === SHIPPED.modules - 1, `root link ${rootName}`);
+const rollRead = mounts.map(m => ((Math.round(m.rpy[0] / (Math.PI / 2)) % 4) + 4) % 4).join('');
+check('roll word read from the mount joints matches shipped', rollRead === SHIPPED.roll, rollRead);
+const pitches = mounts.map(m => m.xyz[0] * MM), offAxis = mounts.map(m => Math.hypot(m.xyz[1], m.xyz[2]) * MM);
+check(`every mount is ${SHIPPED.pitchMm} mm along +X, 0 off-axis`, pitches.every(p => Math.abs(p - SHIPPED.pitchMm) < 1e-6) && offAxis.every(o => o < 1e-9), `pitch ${Math.min(...pitches).toFixed(2)}…${Math.max(...pitches).toFixed(2)} mm → gap ${(Math.min(...pitches) - SHIPPED.cubeMm).toFixed(2)} mm`);
+const s3 = 1 / Math.sqrt(3);
+check('every servo axis is +⟨111⟩/√3, still → moving', servos.every(s => s.axis.distanceTo(new THREE.Vector3(s3, s3, s3)) < 1e-6 && s.joint.parent.endsWith('_still') && s.joint.child.endsWith('_moving')), servos[0] ? servos[0].joint.axis.map(v => v.toFixed(5)).join(' ') : '—');
+const chainOk = mounts.every(m => m.parent.endsWith('_moving') && m.child.endsWith('_still'));
+check('chain is still → servo → moving → mount → next still', chainOk, `${servos[0]?.joint.name} … ${mounts.at(-1)?.name}`);
+const mass = Object.values(links).reduce((a, l) => a + l.mass, 0);
+check(`total mass ${SHIPPED.massKg.toFixed(3)} kg (${(SHIPPED.massKg / SHIPPED.modules * 1000).toFixed(0)} g / module)`, Math.abs(mass - SHIPPED.massKg) < 1e-6, `${mass.toFixed(3)} kg from ${Object.keys(links).length} inertials`);
+for (const k of ['meshes/still.stl', 'meshes/moving.stl']) {
+  const st = geoms[k].userData.stats, bb = st.bb, mn = bb.min, mx = bb.max;
+  const cubeOk = [mn.x, mn.y, mn.z].every(v => Math.abs(v + 40) < 1e-3) && [mx.x, mx.y, mx.z].every(v => Math.abs(v - 40) < 1e-3);
+  check(`${k.split('/')[1]} spans the full 80 mm cube`, cubeOk, `${st.verts} vertices · ${st.tris} triangles · bbox ${mn.x.toFixed(1)}…${mx.x.toFixed(1)} mm`);
+}
+const spacerCount = spacerObjs.length;
+check(`${SHIPPED.modules - 1} spacers of 2.2 × 50 × 50 mm on the moving halves`, spacerCount === SHIPPED.modules - 1 && links[servos[0]?.joint.child]?.shapes.some(s => s.box && Math.abs(s.box[0] * MM - 2.2) < 1e-6 && Math.abs(s.box[1] * MM - 50) < 1e-6), `${spacerCount} found`);
+scene.updateMatrixWorld(true);
+const centre = name => new THREE.Vector3().setFromMatrixPosition(linkObj[name].matrixWorld);
+const first = centre(rootName), last = centre(mounts.at(-1)?.child || rootName), span = first.distanceTo(last);
+check(`straight-chain span ${(26 * SHIPPED.pitchMm).toFixed(1)} mm`, Math.abs(span - 26 * SHIPPED.pitchMm) < 1e-3, `module 1 → 27 centre distance ${span.toFixed(1)} mm`);
+// cumulative roll in the built scene must equal the prefix sums of the roll word (roll.html's rule)
+let cumOk = true; const stills = mounts.map(m => m.child);
+stills.forEach((nm, k) => {
+  const cum = SHIPPED.roll.slice(0, k + 1).split('').reduce((a, b) => a + +b, 0) % 4;
+  const q = new THREE.Quaternion().setFromRotationMatrix(linkObj[nm].matrixWorld), want = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), cum * Math.PI / 2);
+  if (Math.abs(Math.abs(q.dot(want)) - 1) > 1e-6) cumOk = false;
+});
+check("each module's world roll = cumulative roll (roll.html's rule)", cumOk, cumOk ? 'all 26 mounted modules' : 'mismatch');
+const allOk = checks.every(c => c.ok);
+document.getElementById('checkList').innerHTML = checks.map(c => `<li class="${c.ok ? 'ok' : 'bad'}"><i>${c.ok ? '✓' : '✗'}</i><span>${c.label}<span class="v">${c.value}</span></span></li>`).join('');
+const sum = document.getElementById('summary'); sum.className = 'stat ' + (allOk ? 'ok' : 'bad');
+sum.textContent = allOk ? `${checks.length}/${checks.length} checks pass` : `${checks.filter(c => !c.ok).length} of ${checks.length} checks FAIL`;
+document.getElementById('meta').innerHTML = `<b>${N}</b> servos · roll <b class="num">${rollRead}</b> · pitch <b class="num">${SHIPPED.pitchMm}</b> mm · gap <b class="num">${SHIPPED.gapMm}</b> mm`;
+
+// ------------------------------------------------------------------ strip: module | digit | module | ...
+let sel = 12, sweeping = false;
+const strip = document.getElementById('strip');
+function buildStrip() {
+  strip.innerHTML = '';
+  servos.forEach((s, k) => {
+    const b = document.createElement('button'); b.className = 'm' + (k === sel ? ' sel' : '') + (Math.abs(s.q) > 1e-6 ? ' turned' : '');
+    b.innerHTML = `${k + 1}<small>${Math.round(THREE.MathUtils.radToDeg(s.q))}°</small>`;
+    b.title = `module ${k + 1}: ${s.joint.name} at ${THREE.MathUtils.radToDeg(s.q).toFixed(0)}°`;
+    b.onclick = () => select(k); strip.appendChild(b);
+    if (k < N - 1) { const d = document.createElement('div'); d.className = 'd'; const r = +rollRead[k]; d.style.background = RCOL[r]; d.textContent = r; d.title = `mount ${k + 1}→${k + 2}: ${r * 90}°`; strip.appendChild(d); }
+  });
+}
+
+// ------------------------------------------------------------------ servo card
+const card = document.getElementById('servo');
+function setQ(k, deg) { const s = servos[k]; s.q = THREE.MathUtils.degToRad(deg); s.motion.quaternion.setFromAxisAngle(s.axis, s.q); }
+function renderCard() {
+  const s = servos[sel], deg = THREE.MathUtils.radToDeg(s.q);
+  const nd = Math.round(deg / 120) * 120;
+  card.innerHTML = `<h2>Module ${sel + 1} · <span class="num">${s.joint.name}</span></h2>
+    <div class="big num">${deg.toFixed(0)}° <span>${Math.abs(deg - nd) < 0.5 ? (nd === 0 ? 'straight' : 'detent') : 'between detents'}</span></div>
+    <input type="range" id="angle" min="-240" max="240" step="1" value="${deg.toFixed(0)}" aria-label="servo angle">
+    <div class="btns">
+      ${[-240, -120, 0, 120, 240].map(v => `<button data-v="${v}" class="${Math.abs(deg - v) < 0.5 ? 'on' : ''}">${v > 0 ? '+' : ''}${v}°</button>`).join('')}
+      <button id="sweep" class="text ${sweeping ? 'on' : ''}">${sweeping ? 'stop' : 'sweep'}</button>
+      <button id="resetAll" class="text">reset all</button>
+    </div>
+    <p>Turns the moving half and every module after it about this cube's ⟨111⟩ diagonal. Detents are 120° apart; ±240° reaches the same shape as ∓120° by the other route.</p>`;
+  card.querySelector('#angle').oninput = e => { setQ(sel, +e.target.value); refresh(false); };
+  card.querySelectorAll('button[data-v]').forEach(b => b.onclick = () => { sweeping = false; setQ(sel, +b.dataset.v); refresh(); });
+  card.querySelector('#sweep').onclick = () => { sweeping = !sweeping; refresh(); };
+  card.querySelector('#resetAll').onclick = () => { sweeping = false; servos.forEach((_, k) => setQ(k, 0)); refresh(); };
+}
+function refresh(full = true) {
+  if (full) { buildStrip(); renderCard(); return; }
+  const deg = THREE.MathUtils.radToDeg(servos[sel].q), b = strip.children[sel * 2];
+  b.querySelector('small').textContent = `${Math.round(deg)}°`; b.classList.toggle('turned', Math.abs(deg) > 0.5);
+  card.querySelector('.big').firstChild.textContent = `${deg.toFixed(0)}° `;
+}
+
+// ------------------------------------------------------------------ camera
+const view = { target: new THREE.Vector3(), pos: new THREE.Vector3(), anim: 0 };
+function whole() {
+  const cx = span / 2, wide = stage.clientWidth / Math.max(stage.clientHeight, 1), dist = 2400 / Math.min(1, wide / 1.6);
+  view.target.set(cx, 0, 0); view.pos.set(cx - dist * .15, -dist, dist * .45); view.anim = 1;
+}
+function select(k, focus = true) {
+  sel = k; sweeping = false; refresh();
+  if (!focus) return;
+  const c = centre(servos[k].joint.parent); view.target.copy(c); view.pos.set(c.x - 200, c.y - 480, c.z + 300); view.anim = 1;
+}
+document.getElementById('tEdges').onchange = e => edgeObjs.forEach(o => o.visible = e.target.checked);
+document.getElementById('tSpacer').onchange = e => spacerObjs.forEach(o => o.visible = e.target.checked);
+document.getElementById('tAxis').onchange = e => axisObjs.forEach(o => o.visible = e.target.checked);
+document.getElementById('tGhost').onchange = e => ghostObjs.forEach(o => o.visible = e.target.checked);
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' && e.target.type === 'range' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) return;
+  if (e.key === 'ArrowRight') select(Math.min(N - 1, sel + 1));
+  else if (e.key === 'ArrowLeft') select(Math.max(0, sel - 1));
+  else if (e.key === 'ArrowUp') { setQ(sel, Math.min(240, Math.round(THREE.MathUtils.radToDeg(servos[sel].q) / 120) * 120 + 120)); refresh(); }
+  else if (e.key === 'ArrowDown') { setQ(sel, Math.max(-240, Math.round(THREE.MathUtils.radToDeg(servos[sel].q) / 120) * 120 - 120)); refresh(); }
+  else if (e.key === '0') { setQ(sel, 0); refresh(); }
+  else if (e.key === 'Escape') { sweeping = false; refresh(); whole(); }
+});
+controls.addEventListener('start', () => { view.anim = 0; });
+function resize() { const w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+addEventListener('resize', resize);
+resize(); refresh(); whole(); camera.position.copy(view.pos); controls.target.copy(view.target);
+let tPrev = performance.now();
+(function loop(now) {
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.05, (now - tPrev) / 1000); tPrev = now;
+  if (sweeping) { const s = servos[sel]; let deg = THREE.MathUtils.radToDeg(s.q) + 45 * dt; if (deg > 240) deg = -240; setQ(sel, deg); refresh(false); const r = card.querySelector('#angle'); if (r) r.value = deg.toFixed(0); }
+  if (view.anim) { camera.position.lerp(view.pos, 0.12); controls.target.lerp(view.target, 0.12); if (camera.position.distanceTo(view.pos) < 1) view.anim = 0; }
+  controls.update(); renderer.render(scene, camera);
+})(tPrev);
+</script>
