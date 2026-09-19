@@ -68,6 +68,7 @@ class Settings:
     base_url: str = DEFAULT_BASE_URL
     from_number: str = ""
     webhook_token: str = ""
+    webhook_secret: str = ""
     webhook_path: str = "/linq/webhook"
     allowed_senders: list[str] = field(default_factory=list)
     handoff_dir: str = DEFAULT_HANDOFF
@@ -91,6 +92,7 @@ class Settings:
             base_url=_env("LINQ_BASE_URL", DEFAULT_BASE_URL).rstrip("/"),
             from_number=_env("LINQ_FROM"),
             webhook_token=_env("LINQ_WEBHOOK_TOKEN"),
+            webhook_secret=_env("LINQ_WEBHOOK_SECRET"),
             webhook_path=_env("BRIDGE_WEBHOOK_PATH", "/linq/webhook"),
             allowed_senders=_env_list("LINQ_ALLOWED_SENDERS"),
             handoff_dir=_env("CUBOT_HANDOFF_DIR", DEFAULT_HANDOFF),
@@ -113,7 +115,11 @@ class Settings:
             ("Linq API key", key),
             ("Linq base URL", self.base_url),
             ("sending number", self.from_number or "(let Linq choose)"),
-            ("webhook token", "set" if self.webhook_token else "MISSING (endpoint would be open)"),
+            ("webhook signing secret", "set (signatures verified)" if self.webhook_secret
+             else "MISSING (falls back to the URL token alone)"),
+            ("webhook token", "set" if self.webhook_token
+             else ("not set (fine, signatures are verified)" if self.webhook_secret
+                   else "MISSING (endpoint would be open)")),
             ("webhook path", self.webhook_path),
             ("allowed senders", ", ".join(self.allowed_senders) or "(any)"),
             ("handoff dir", self.handoff_dir),

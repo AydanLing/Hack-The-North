@@ -1,19 +1,23 @@
-"""Linq iMessage API client and inbound-webhook parsing (stdlib only).
+"""Linq Partner API v3 client and inbound-webhook parsing (stdlib only).
 
-API shape, from https://docs.linqapp.com/channel/imessage/ :
+API shape, from https://docs.linqapp.com/api/ :
 
     POST {base}/messages                  {"to": ["+1555..."], "message": {"parts": [{"type","value"}]}}
-    POST {base}/chats/{chat_id}/messages  {"parts": [{"type": "text", "value": "..."}]}
+    POST {base}/chats/{chat_id}/messages  {"message": {"parts": [{"type": "text", "value": "..."}]}}
     POST {base}/webhook-subscriptions     {"target_url": "...", "subscribed_events": [...]}
 
     Authorization: Bearer $LINQ_API_KEY
 
-Inbound `message.received` events arrive as a common envelope wrapping `data`::
+Inbound `message.received` events arrive as a common envelope wrapping `data`. **Two payload layouts
+exist** and the one you get is pinned by a `?version=` query parameter on the `target_url` you
+register (https://docs.linqapp.com/guides/webhooks/events/). They disagree about where the text
+lives, so both are parsed here — a subscription created before 2026-02-03 speaks the older dialect
+and reading only the newer one would silently drop every message::
 
-    {"event_type": "message.received", "event_id": "...", "data": {
-        "chat": {"id": "...", "is_group": false}, "id": "...", "direction": "inbound",
-        "sender_handle": {"handle": "+1555...", "is_me": false},
-        "parts": [{"type": "text", "value": "show hack the north some love"}]}}
+    2026-02-03   data.parts[].value   data.sender_handle.handle   data.chat.id    data.direction
+    2025-01-01   data.message.parts[].value   data.from           data.chat_id    data.is_from_me
+
+Deliveries are signed with HMAC-SHA256 per the Standard Webhooks spec; see `verify_signature`.
 
 Everything in that payload is untrusted input from whoever texted the number. `InboundMessage.text`
 is *data* for the classifier, never a command: the bridge's only outputs are one of the shape labels
@@ -21,16 +25,28 @@ in the handoff vocabulary and a templated reply.
 """
 from __future__ import annotations
 
+import base64
+import hashlib
+import hmac
 import json
 import re
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
 INBOUND_EVENT = "message.received"
 DEFAULT_EVENTS = ("message.received",)
+
+# The payload layout this bridge prefers. Pinned on the subscription's target_url, because Linq
+# otherwise hands out whatever is newest at creation time.
+WEBHOOK_VERSION = "2026-02-03"
+
+# Standard Webhooks: reject replays older than this. 5 minutes is the value Linq's own examples use.
+SIGNATURE_TOLERANCE_S = 300
+
 _CONTROL = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 
 
@@ -71,9 +87,34 @@ def text_of(parts: Any) -> str:
     return _clean(" ".join(chunks))
 
 
+def pin_version(target_url: str, version: str = WEBHOOK_VERSION) -> str:
+    """Add `?version=` to a webhook URL, leaving an explicit one alone.
+
+    Also the documented way to reuse a host: Linq allows each `target_url` only once per account, so
+    the query string is what distinguishes two subscriptions.
+    """
+    if not version:
+        return target_url
+    parts = urllib.parse.urlsplit(target_url)
+    query = urllib.parse.parse_qsl(parts.query, keep_blank_values=True)
+    if any(key == "version" for key, _ in query):
+        return target_url
+    query.append(("version", version))
+    return urllib.parse.urlunsplit(parts._replace(query=urllib.parse.urlencode(query)))
+
+
+def _dict(value: Any) -> dict:
+    return value if isinstance(value, dict) else {}
+
+
 def parse_inbound(payload: Any) -> Optional[InboundMessage]:
     """InboundMessage for a `message.received` envelope, or None for any other event or a payload
-    that is missing what a reply needs (chat id, sender, non-empty text). Never raises."""
+    that is missing what a reply needs (chat id, sender, non-empty text). Never raises.
+
+    Accepts both documented payload versions. The newer layout is tried first and the older one is
+    used to fill whatever it left empty, so neither dialect needs to be detected up front — the
+    `webhook_version` field is advisory and absent from hand-rolled test payloads.
+    """
     if not isinstance(payload, dict):
         return None
     if payload.get("event_type") != INBOUND_EVENT:
@@ -81,28 +122,103 @@ def parse_inbound(payload: Any) -> Optional[InboundMessage]:
     data = payload.get("data")
     if not isinstance(data, dict):
         return None
-    if data.get("direction") not in (None, "inbound"):
+
+    # Direction: the new layout says so explicitly, the old one inverts a boolean. Either saying
+    # "this came from us" means our own echo is coming back, and replying to it would loop.
+    if str(data.get("direction") or "inbound") != "inbound":
+        return None
+    if data.get("is_from_me") is True:
         return None
 
-    chat = data.get("chat") if isinstance(data.get("chat"), dict) else {}
-    handle = data.get("sender_handle") if isinstance(data.get("sender_handle"), dict) else {}
-    if handle.get("is_me") is True:                      # our own echo coming back: never reply to it
+    chat = _dict(data.get("chat"))
+    message = _dict(data.get("message"))                 # 2025-01-01 nests the message
+    sender_handle = _dict(data.get("sender_handle")) or _dict(data.get("from_handle"))
+    if sender_handle.get("is_me") is True:
         return None
 
-    text = text_of(data.get("parts"))
-    chat_id = str(chat.get("id") or "")
-    sender = _clean(str(handle.get("handle") or ""), 64)
+    text = text_of(data.get("parts")) or text_of(message.get("parts"))
+    chat_id = str(chat.get("id") or data.get("chat_id") or "")
+    sender = _clean(str(sender_handle.get("handle") or data.get("from") or ""), 64)
     if not (text and chat_id and sender):
         return None
     return InboundMessage(
-        event_id=str(payload.get("event_id") or data.get("id") or ""),
-        message_id=str(data.get("id") or ""),
+        event_id=str(payload.get("event_id") or message.get("id") or data.get("id") or ""),
+        message_id=str(data.get("id") or message.get("id") or ""),
         chat_id=chat_id,
         sender=sender,
         text=text,
-        is_group=bool(chat.get("is_group")),
+        is_group=bool(chat.get("is_group") or data.get("is_group")),
         raw=payload,
     )
+
+
+# ------------------------------------------------------------------------------ signature checking
+
+def _signing_key(secret: str) -> bytes:
+    """Raw HMAC key from a Linq signing secret. Linq's secrets are `whsec_` + base64 of the key
+    bytes; anything else is used as raw UTF-8 so a hand-set test secret still works."""
+    raw = str(secret)
+    if raw.startswith("whsec_"):
+        raw = raw[len("whsec_"):]
+        try:
+            return base64.b64decode(raw, validate=True)
+        except (ValueError, TypeError):
+            pass
+    return raw.encode()
+
+
+def verify_signature(secret: str, body: bytes, headers: Any,
+                     tolerance_s: float = SIGNATURE_TOLERANCE_S,
+                     now: Optional[float] = None) -> tuple[bool, str]:
+    """Verify a Standard Webhooks signature. Returns (ok, reason-when-not).
+
+    Linq signs `{webhook-id}.{webhook-timestamp}.{body}` with HMAC-SHA256 and sends the result
+    base64-encoded in `webhook-signature` as `v1,<sig>`, space-separating several during a secret
+    rotation — so any one match is enough. Documented at https://docs.linqapp.com/guides/webhooks/ .
+
+    `body` must be the bytes as received. Parsing and re-serialising JSON changes key order and
+    whitespace, which changes the digest.
+    """
+    def header(name: str) -> str:
+        getter = getattr(headers, "get", None)
+        return str(getter(name) or "") if getter else ""
+
+    webhook_id = header("webhook-id")
+    timestamp = header("webhook-timestamp")
+    signature = header("webhook-signature")
+    legacy = header("X-Webhook-Signature")
+
+    if not signature and not legacy:
+        return False, "no webhook-signature header"
+
+    if timestamp:
+        # A valid signature over a very old body is still a replay, so the timestamp is part of the
+        # check rather than metadata.
+        try:
+            sent_at = float(timestamp)
+        except ValueError:
+            return False, "malformed webhook-timestamp"
+        drift = abs((time.time() if now is None else now) - sent_at)
+        if tolerance_s and drift > tolerance_s:
+            return False, f"timestamp is {drift:.0f}s away (tolerance {tolerance_s:.0f}s)"
+
+    key = _signing_key(secret)
+    if signature:
+        expected = base64.b64encode(
+            hmac.new(key, f"{webhook_id}.{timestamp}.".encode() + body, hashlib.sha256).digest()
+        ).decode()
+        for candidate in signature.split():
+            version, _, value = candidate.partition(",")
+            if version == "v1" and hmac.compare_digest(value, expected):
+                return True, ""
+        return False, "signature mismatch"
+
+    # Deprecated header, still sent alongside the modern one. Linq documents it as a hex HMAC-SHA256
+    # but not what it covers; body-only is the assumption. Only ever reached if `webhook-signature`
+    # is absent, and a wrong guess fails closed.
+    if hmac.compare_digest(legacy.lower(), hmac.new(key, body, hashlib.sha256).hexdigest()):
+        return True, ""
+    return False, "legacy signature mismatch"
 
 
 class LinqClient:
@@ -161,15 +277,21 @@ class LinqClient:
 
     def reply(self, chat_id: str, text: str) -> dict:
         """Reply inside an existing chat. This is the only send the webhook handler performs, so the
-        bridge can never message a number that did not message it first."""
+        bridge can never message a number that did not message it first — which is also what Linq's
+        sandbox requires, since sending to someone who has not texted you fails with 403/2008."""
         if not chat_id:
             raise LinqError("reply() needs a chat_id")
-        return self._post(f"/chats/{chat_id}/messages", {"parts": self._parts(text)})
+        return self._post(f"/chats/{chat_id}/messages", {"message": {"parts": self._parts(text)}})
 
     # -- webhooks ----------------------------------------------------------------------------
-    def create_subscription(self, target_url: str, events: tuple[str, ...] = DEFAULT_EVENTS) -> dict:
+    def create_subscription(self, target_url: str, events: tuple[str, ...] = DEFAULT_EVENTS,
+                            version: str = WEBHOOK_VERSION) -> dict:
+        """Subscribe to inbound events. The payload layout is pinned on the URL rather than left to
+        Linq's default, so the shape `parse_inbound` sees does not depend on the day the subscription
+        happened to be created."""
         return self._post("/webhook-subscriptions",
-                          {"target_url": target_url, "subscribed_events": list(events)})
+                          {"target_url": pin_version(target_url, version),
+                           "subscribed_events": list(events)})
 
 
 class SeenEvents:

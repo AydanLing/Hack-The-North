@@ -2,9 +2,13 @@
 faked, and the handoff folder is a small fixture (plus the real one when it is present)."""
 from __future__ import annotations
 
+import base64
+import hashlib
+import hmac
 import json
 import os
 import sys
+import time
 
 import pytest
 
@@ -13,8 +17,9 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from cubot_imessage.bridge import Bridge                                    # noqa: E402
 from cubot_imessage.config import Settings                                  # noqa: E402
 from cubot_imessage.intent import IntentResult                              # noqa: E402
-from cubot_imessage.linq import (InboundMessage, LinqClient, RateLimiter,   # noqa: E402
-                                 SeenEvents, parse_inbound, text_of)
+from cubot_imessage.linq import (WEBHOOK_VERSION, InboundMessage, LinqClient,   # noqa: E402
+                                 RateLimiter, SeenEvents, parse_inbound,
+                                 pin_version, text_of, verify_signature)
 from cubot_imessage.robot import (DryRunExecutor, ShapeLibrary,             # noqa: E402
                                   states_match_goal)
 from cubot_imessage.vocab import (STATUS_PLANNABLE, STATUS_PLAYABLE,        # noqa: E402
@@ -128,7 +133,11 @@ def test_label_to_icon_mechanical_and_aliased():
 def test_out_of_scope_label_names_no_shape(handoff):
     """'none' is the classifier's explicit chitchat class; it must never reach a fold path."""
     assert label_to_icon("none") == ""
-    assert Vocabulary(handoff).shape_for_icon("") is None
+    vocab = Vocabulary(handoff)
+    assert vocab.shape_for_icon("") is None
+    # even if a caller wrongly marks it accepted, it must not resolve to a shape
+    resolution = vocab.resolve("none", accepted=True)
+    assert resolution.status == STATUS_UNSURE and not resolution.shape
 
 
 def test_variants_collapse_to_one_concept(handoff):
@@ -219,7 +228,102 @@ def test_client_dry_run_records_without_sending():
     client = LinqClient("key", "https://example.invalid/v3", dry_run=True)
     client.reply("chat-1", "hello")
     assert client.sent[0]["url"].endswith("/chats/chat-1/messages")
-    assert client.sent[0]["body"] == {"parts": [{"type": "text", "value": "hello"}]}
+    # the v3 reference wraps parts in `message`, unlike the quickstart's flat form
+    assert client.sent[0]["body"] == {"message": {"parts": [{"type": "text", "value": "hello"}]}}
+
+
+def test_parse_inbound_reads_the_2025_payload_layout():
+    """A subscription created before 2026-02-03 nests the message and flattens the handles. Reading
+    only the newer layout would drop every one of these silently."""
+    msg = parse_inbound({
+        "event_type": "message.received", "event_id": "evt-9",
+        "webhook_version": "2025-01-01",
+        "data": {"chat_id": "chat-7", "is_from_me": False, "is_group": True,
+                 "from": "+12025550000",
+                 "message": {"id": "m-9",
+                             "parts": [{"type": "text", "value": "do a T"}]}}})
+    assert msg is not None
+    assert (msg.chat_id, msg.sender, msg.text) == ("chat-7", "+12025550000", "do a T")
+    assert msg.event_id == "evt-9" and msg.is_group
+
+
+def test_parse_inbound_ignores_our_own_echo_in_both_layouts():
+    """`is_from_me` (2025-01-01) and `direction` (2026-02-03) both mean the robot's own reply came
+    back. Replying to that is an infinite loop against a 100-message daily sandbox budget."""
+    text = [{"type": "text", "value": "Showing Hack the North some love with a heart."}]
+    assert parse_inbound({"event_type": "message.received",
+                          "data": {"chat_id": "c", "from": "+1", "is_from_me": True,
+                                   "message": {"parts": text}}}) is None
+    assert parse_inbound({"event_type": "message.received",
+                          "data": {"chat": {"id": "c"}, "direction": "outbound",
+                                   "sender_handle": {"handle": "+1"}, "parts": text}}) is None
+
+
+def test_pin_version_adds_the_payload_version_but_respects_an_explicit_one():
+    assert pin_version("https://x.invalid/hook") == f"https://x.invalid/hook?version={WEBHOOK_VERSION}"
+    assert pin_version("https://x.invalid/hook?token=t") == \
+        f"https://x.invalid/hook?token=t&version={WEBHOOK_VERSION}"
+    assert pin_version("https://x.invalid/hook?version=2025-01-01") == \
+        "https://x.invalid/hook?version=2025-01-01"
+
+
+def test_subscription_pins_the_payload_version():
+    client = LinqClient("key", "https://example.invalid/v3", dry_run=True)
+    client.create_subscription("https://tunnel.invalid/linq/webhook?token=abc")
+    assert client.sent[0]["body"]["target_url"].endswith(f"version={WEBHOOK_VERSION}")
+
+
+# ---------------------------------------------------------------- webhook signature verification
+
+def _sign(secret: str, body: bytes, webhook_id: str = "evt-1",
+          timestamp: str | None = None) -> dict:
+    """Headers Linq would send for `body`, per the Standard Webhooks scheme."""
+    timestamp = str(int(time.time())) if timestamp is None else timestamp
+    key = secret[len("whsec_"):] if secret.startswith("whsec_") else secret
+    raw = base64.b64decode(key) if secret.startswith("whsec_") else key.encode()
+    digest = hmac.new(raw, f"{webhook_id}.{timestamp}.".encode() + body, hashlib.sha256).digest()
+    return {"webhook-id": webhook_id, "webhook-timestamp": timestamp,
+            "webhook-signature": "v1," + base64.b64encode(digest).decode()}
+
+
+SECRET = "whsec_" + base64.b64encode(b"cubot-test-signing-key").decode()
+
+
+def test_verify_signature_accepts_a_genuine_delivery():
+    body = json.dumps({"event_type": "message.received"}).encode()
+    ok, why = verify_signature(SECRET, body, _sign(SECRET, body))
+    assert ok, why
+
+
+def test_verify_signature_rejects_a_tampered_body():
+    """The whole point: a forged body cannot be made to match a signature over the original."""
+    body = json.dumps({"event_type": "message.received", "data": {"parts": []}}).encode()
+    headers = _sign(SECRET, body)
+    ok, why = verify_signature(SECRET, body.replace(b"message.received", b"message.injected"), headers)
+    assert not ok and "mismatch" in why
+
+
+def test_verify_signature_rejects_a_replay_outside_the_tolerance():
+    body = b"{}"
+    stale = str(int(time.time()) - 3600)
+    ok, why = verify_signature(SECRET, body, _sign(SECRET, body, timestamp=stale))
+    assert not ok and "timestamp" in why
+
+
+def test_verify_signature_rejects_the_wrong_secret_and_a_missing_header():
+    body = b"{}"
+    other = "whsec_" + base64.b64encode(b"a-different-key").decode()
+    assert not verify_signature(SECRET, body, _sign(other, body))[0]
+    assert not verify_signature(SECRET, body, {})[0]
+
+
+def test_verify_signature_accepts_any_of_several_rotated_signatures():
+    """Linq space-separates signatures while a secret is being rotated; one match is enough."""
+    body = b'{"event_type":"message.received"}'
+    good = _sign(SECRET, body)
+    good["webhook-signature"] = "v1,AAAAinvalidAAAA " + good["webhook-signature"]
+    ok, why = verify_signature(SECRET, body, good)
+    assert ok, why
 
 
 # ------------------------------------------------------------------------------- robot

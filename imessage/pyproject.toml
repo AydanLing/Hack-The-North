@@ -3,10 +3,12 @@ name = "cubot-imessage"
 version = "1.0.0"
 description = "Text CuBot a shape over iMessage: Linq webhook -> MiniLM intent -> CuBot V2 fold path."
 requires-python = ">=3.10"
-dependencies = []          # stdlib only; the classifier comes from a snake_pipeline checkout
+dependencies = []          # the bridge itself is stdlib only
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+# Training and the semantic half of the encoder. The bridge runs without these on `--encoder tfidf`.
+model = ["numpy>=1.24", "onnxruntime>=1.16", "tokenizers>=0.15", "huggingface_hub>=0.20"]
+dev = ["pytest>=8", "numpy>=1.24"]
 
 [project.scripts]
 cubot-imessage = "cubot_imessage.cli:main"

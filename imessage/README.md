@@ -35,7 +35,7 @@ encoder (`--encoder tfidf`) is pure numpy and needs no download at all.
 ## Setup
 
 ```bash
-cp imessage/.env.example imessage/.env      # then fill in LINQ_API_KEY and LINQ_WEBHOOK_TOKEN
+cp imessage/.env.example imessage/.env      # then fill in LINQ_API_KEY (+ LINQ_WEBHOOK_SECRET later)
 python3 -m cubot_imessage.model.train       # ~1 minute, CPU only
 python3 -m cubot_imessage doctor
 ```
@@ -94,6 +94,25 @@ python3 -m cubot_imessage subscribe --url https://<your-tunnel>/linq/webhook
 python3 -m cubot_imessage subscribe --url https://<your-tunnel>/linq/webhook --send
 ```
 
+It also pins `?version=2026-02-03`, which selects the inbound payload layout. This matters: Linq
+date-versions webhook payloads and a subscription created before that date gets a
+[different field layout](https://docs.linqapp.com/guides/webhooks/events/) — the text at
+`data.message.parts[]` instead of `data.parts[]`, the sender at `data.from` instead of
+`data.sender_handle.handle`. `parse_inbound` reads both, so an older subscription still works, but
+pinning means the shape does not depend on the day you registered.
+
+Copy the `signing_secret` from the response into `LINQ_WEBHOOK_SECRET` right away — it is shown once.
+
+### Two sandbox limits that shape the demo
+
+- **A recipient must text you first.** Sending to someone who has not messaged you fails with
+  `403` / [`2008`](https://docs.linqapp.com/error/codes/2xxx/2008/). The bridge only ever replies into
+  the `chat_id` a message arrived on, so this is satisfied by construction — but it does mean you
+  cannot pre-seed a conversation with a judge's phone.
+- **100 messages/day**, resetting midnight UTC, plus 30 per 60 seconds per sender-recipient pair.
+  That is the real budget for a demo day, so `BRIDGE_RATE_LIMIT_PER_MINUTE` and the `event_id` dedupe
+  are protecting a quota, not just the robot.
+
 ## What it does with a message
 
 1. **Help words** (`help`, `shapes`, `what can you do`) short-circuit to the shape list.
@@ -149,9 +168,23 @@ On top of that: a shared-secret token on the webhook URL compared in constant ti
 sender allowlist (`LINQ_ALLOWED_SENDERS`), a per-sender rate limit, `event_id` dedupe so a webhook
 retry cannot fold twice, a 256 KB body cap, and control-character stripping on every inbound string.
 
-One caveat worth knowing: Linq's public docs specify the subscription `target_url` but no request
-signing scheme, so the URL token is the floor, not the ceiling. Terminate TLS in front of this and
-treat the token as a credential. If Linq documents an HMAC header, verify that instead.
+Webhook deliveries are authenticated two ways, strongest first:
+
+1. **HMAC signature** (`LINQ_WEBHOOK_SECRET`). Linq signs every delivery per the
+   [Standard Webhooks](https://docs.linqapp.com/guides/webhooks/) spec — HMAC-SHA256 over
+   `{webhook-id}.{webhook-timestamp}.{body}`, base64 in a `webhook-signature: v1,...` header. The
+   bridge verifies it against the **raw** bytes before parsing them, rejects timestamps more than five
+   minutes old, and accepts any one of several space-separated signatures so a secret rotation does not
+   drop messages. `subscribe` prints the `signing_secret` in a banner because Linq returns it exactly
+   once — miss it and you have to delete and recreate the subscription.
+2. **Shared-secret URL token** (`LINQ_WEBHOOK_TOKEN`), compared in constant time. The fallback for
+   before you have a signing secret. A URL-borne secret is only as private as the channel, so
+   terminate TLS in front of it.
+
+Either passing is enough, but a signature that is *present and wrong* is fatal no matter what the
+token says — otherwise anyone who learned the URL could put words in a sender's mouth. And once a
+secret is configured, an unsigned delivery is refused, so the weaker check cannot be selected by
+simply omitting the header.
 
 ## Tests
 
@@ -159,7 +192,10 @@ treat the token as a credential. If Linq documents an HMAC header, verify that i
 python3 -m pytest imessage/tests -q
 ```
 
-65 tests, none of which touch the network or need a trained head: the classifier is faked for the
+83 tests, none of which touch the network or need a trained head: the classifier is faked for the
 bridge tests, the handoff folder is a fixture, and the model tests run on the pure-numpy TF-IDF
-encoder. Two of them check the real artifacts when present — every shipped fold path must re-derive
-its recorded goal from its move deltas, and every playable concept must resolve to a real directory.
+encoder. `test_server.py` stands the webhook endpoint up on an ephemeral port to check the
+authentication gate end to end, because the mistake worth catching there is not in any one function
+but in the ordering — verifying a re-serialised body, or letting a valid token wave a forged one
+through. Two tests check the real artifacts when present: every shipped fold path must re-derive its
+recorded goal from its move deltas, and every playable concept must resolve to a real directory.

@@ -14,5 +14,8 @@ desktop.ini
 # MuJoCo runtime output
 MUJOCO_LOG.TXT
 
+# onnxruntime drops a telemetry device-id file wherever it is first imported
+:memory:.ses
+
 # Local planning notes
 CUBOT_V2_PLAN.md

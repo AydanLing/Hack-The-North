@@ -252,6 +252,21 @@ def cmd_subscribe(args, settings: Settings) -> int:
     if not args.send:
         print("DRY RUN — nothing registered. Re-run with --send to create the subscription.")
     print(json.dumps(result, indent=2))
+
+    # Linq returns the signing secret once and never again; missing it means deleting the
+    # subscription and making a new one. Do not let it scroll past in a blob of JSON.
+    secret = result.get("signing_secret") if isinstance(result, dict) else None
+    if secret:
+        print("\n" + "=" * 78)
+        print("SAVE THIS NOW — Linq shows the signing secret only once:")
+        print(f"\n    LINQ_WEBHOOK_SECRET={secret}\n")
+        print("Put it in imessage/.env. Without it the bridge cannot verify signatures and falls")
+        print("back to the URL token. To get a new one you must delete and recreate this")
+        print("subscription.")
+        print("=" * 78)
+    elif args.send:
+        print("\n[warn] no signing_secret in the response — signature verification will be "
+              "unavailable; the bridge will authenticate on the URL token alone.")
     return 0
 
 

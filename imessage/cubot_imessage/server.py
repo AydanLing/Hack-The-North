@@ -8,12 +8,19 @@ runs on a worker thread. Linq retries on a non-2xx or a slow response, and a ret
 the robot is mid-fold is exactly what we do not want; `SeenEvents` catches the duplicates that slip
 through anyway.
 
-**Authentication.** Linq's public docs specify the subscription's `target_url` but no request-signing
-scheme, so the bridge authenticates with a shared secret that you put in the subscription URL
-(`?token=...`, or an `X-Bridge-Token` header) and compares in constant time. A URL-borne secret is only
-as private as the channel, so terminate TLS in front of this (a tunnel's HTTPS URL is fine) and treat
-the token as a credential. If Linq later documents an HMAC signature header, verify that instead: this
-token check is the floor, not the ceiling.
+**Authentication.** Two independent checks, in order of strength:
+
+1. *HMAC signature* (`LINQ_WEBHOOK_SECRET`). Linq signs every delivery per the Standard Webhooks spec
+   and returns the signing secret once, when the subscription is created. This is the real check: it
+   proves Linq sent the exact bytes, and the timestamp in the signed material bounds replays. Set the
+   secret and nothing else is needed.
+2. *Shared-secret URL token* (`LINQ_WEBHOOK_TOKEN`). A `?token=...` on the subscription URL, or an
+   `X-Bridge-Token` header, compared in constant time. This is the fallback for before you have a
+   signing secret in hand. A URL-borne secret is only as private as the channel, so terminate TLS in
+   front of it.
+
+Either one passing is enough, but a *present* signature that fails to verify is fatal regardless of
+the token — a valid token cannot rescue a forged body.
 """
 from __future__ import annotations
 
@@ -28,7 +35,7 @@ from urllib.parse import parse_qs, urlparse
 
 from .bridge import Bridge, Outcome
 from .config import Settings
-from .linq import RateLimiter, SeenEvents, parse_inbound
+from .linq import RateLimiter, SeenEvents, parse_inbound, verify_signature
 
 MAX_BODY_BYTES = 256 * 1024
 
@@ -99,6 +106,25 @@ class WebhookHandler(BaseHTTPRequestHandler):
                     or "")
         return hmac.compare_digest(str(supplied), str(expected))
 
+    def _authenticate(self, query: dict, body: bytes) -> tuple[bool, str]:
+        """(ok, reason-when-not) for one delivery, given the raw body bytes."""
+        secret = self.server.settings.webhook_secret                 # type: ignore[attr-defined]
+        signed = bool(self.headers.get("webhook-signature")
+                      or self.headers.get("X-Webhook-Signature"))
+        if secret and signed:
+            ok, why = verify_signature(secret, body, self.headers)
+            return ok, why
+        if signed and not secret:
+            # Linq is signing and we have nowhere to check it. Not fatal — the token still gates the
+            # endpoint — but it means the strong check is sitting unused.
+            self.server.bridge_log(                                  # type: ignore[attr-defined]
+                "[warn] delivery is signed but LINQ_WEBHOOK_SECRET is unset; "
+                "falling back to the URL token")
+        elif secret and not signed:
+            # Downgrading to the weaker check by simply omitting the header must not be possible.
+            return False, "LINQ_WEBHOOK_SECRET is set but the delivery had no signature header"
+        return (True, "") if self._token_ok(query) else (False, "bad token")
+
     # -- routes ------------------------------------------------------------------------------
     def do_GET(self) -> None:                                        # noqa: N802
         route = urlparse(self.path).path.rstrip("/") or "/"
@@ -123,17 +149,22 @@ class WebhookHandler(BaseHTTPRequestHandler):
         if route != settings.webhook_path.rstrip("/"):
             self._json(404, {"ok": False, "error": "not found"})
             return
-        if not self._token_ok(parse_qs(parsed.query)):
-            self.server.bridge_log("[warn] rejected webhook with a bad token")   # type: ignore[attr-defined]
-            self._json(401, {"ok": False, "error": "bad token"})
-            return
-
         length = int(self.headers.get("Content-Length") or 0)
         if length <= 0 or length > MAX_BODY_BYTES:
             self._json(400, {"ok": False, "error": "bad content length"})
             return
+        body = self.rfile.read(length)
+
+        # Authenticate before parsing: the signature covers the bytes as sent, so decoding and
+        # re-encoding the JSON would invalidate it.
+        authentic, why = self._authenticate(parse_qs(parsed.query), body)
+        if not authentic:
+            self.server.bridge_log(f"[warn] rejected webhook: {why}")            # type: ignore[attr-defined]
+            self._json(401, {"ok": False, "error": why})
+            return
+
         try:
-            payload = json.loads(self.rfile.read(length).decode("utf-8", "replace"))
+            payload = json.loads(body.decode("utf-8", "replace"))
         except json.JSONDecodeError:
             self._json(400, {"ok": False, "error": "invalid json"})
             return
@@ -196,8 +227,14 @@ def serve(settings: Settings, bridge: Optional[Bridge] = None, log=print) -> Non
         log(f"[boot] WARNING: intent model not ready: {e}")
     log(f"[boot] playable shapes: {', '.join(bridge.vocab.playable)}")
     log(f"[boot] executor={bridge.executor.name} auto_reply={settings.auto_reply}")
-    if not settings.webhook_token:
-        log("[boot] WARNING: LINQ_WEBHOOK_TOKEN is empty — the webhook endpoint accepts anyone")
+    if settings.webhook_secret:
+        log("[boot] webhook signatures will be verified (LINQ_WEBHOOK_SECRET is set)")
+    elif settings.webhook_token:
+        log("[boot] NOTE: no LINQ_WEBHOOK_SECRET — authenticating on the URL token alone. Set the "
+            "signing secret from the subscription response to verify signatures.")
+    else:
+        log("[boot] WARNING: neither LINQ_WEBHOOK_SECRET nor LINQ_WEBHOOK_TOKEN is set — "
+            "the webhook endpoint accepts anyone")
     server = BridgeServer(settings, bridge, log=log).start()
     log(f"[boot] listening on http://{settings.host}:{settings.port}{settings.webhook_path}")
     try:
