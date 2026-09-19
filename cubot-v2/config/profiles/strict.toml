@@ -1,0 +1,15 @@
+[profile]
+sweep_step_deg = 2.0
+hard_penetration_mm = 0.0
+soft_penetration_mm = 0.0
+pivot_dip_exempt_mm = 2.4
+ground_soft_mm = 0.5
+ground_hard_mm = 40.0
+torque_cap_nm = 5.8
+torque_stall_nm = 10.6
+balance_margin_mm = 10.0
+fold_budget_s = 120.0
+node_budget = 1000000
+detour_budget = 12
+side_ambiguity_ratio = 0.85
+

@@ -1,0 +1,8 @@
+{
+  "name": "cube-regression",
+  "roll": "12001300133101230333233210",
+  "states_mod3": [0,2,0,2,2,2,0,2,2,2,1,0,2,2,2,0,2,0,1,1,0,1,2,0,1,0],
+  "expected_strict_outgoing_moves": 0,
+  "note": "Local-move geometry regression only; not an UNSAT proof in the directed move graph."
+}
+

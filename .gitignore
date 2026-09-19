@@ -13,3 +13,6 @@ desktop.ini
 
 # MuJoCo runtime output
 MUJOCO_LOG.TXT
+
+# Local planning notes
+CUBOT_V2_PLAN.md

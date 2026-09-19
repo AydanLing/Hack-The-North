@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+out/
+data/family/*.npz
+data/harvest/*.json
+
+docs/FINDINGS.md

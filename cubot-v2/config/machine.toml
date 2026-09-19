@@ -1,0 +1,12 @@
+[machine]
+modules = 27                    # decision D1
+side_mm = 80.0                 # current CAD bounding box
+gap_mm = 2.0                   # design value; spacer CAD measures 2.2 mm
+chamfer_mm = 8.0               # current printed part
+roll = "12001300133101230333233210" # shipped assembly
+mass_kg = 0.223                # BOM roll-up; remeasure when hardware exists
+stall_torque_nm = 10.6         # STS3215 x 4:1 x 0.9
+move_time_s = 2.0              # minimum single-detent move time
+joint_angle_deg = 120.0        # positions are -120, 0, and +120 degrees
+joint_min_position = -1        # no alternate winding beyond -120 degrees
+joint_max_position = 1         # no alternate winding beyond +120 degrees

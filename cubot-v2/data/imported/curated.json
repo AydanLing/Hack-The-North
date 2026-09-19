@@ -1,0 +1,425 @@
+[
+  {
+    "name": "heart",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "W1 N1 E2 N2 E2 N1 W1 N1 W1 S1 W3 N1 W1 S2 E3 S1 W2",
+      "E1 S6 E1 N1 E1 S2 E1 N2 E1 S1 E1 N6 E1 S1",
+      "E1 S1 E1 N1 E2 N4 E1 N1 W2 S1 W3 N1 W2 S1 E1 S3",
+      "N4 E1 S2 E5 N2 E1 S3 W2 S2 W2 S1 E1"
+    ]
+  },
+  {
+    "name": "plus",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "N3 W2 N1 E2 N2 E2 N1 E2 S1 W1 S2 E2 S1 W2 S2",
+      "E2 N3 E1 S6 E1 N6 E1 S3 E2 S1",
+      "N2 E3 S3 E2 S1 W2 S2 W3 N2 E1 N1 W3 S1",
+      "E1 S3 W2 S2 W3 N2 W2 N3 E2 N2 E3 S1"
+    ]
+  },
+  {
+    "name": "star",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "N3 W2 N1 E2 N2 E2 N1 E2 S1 W1 S2 E2 S1 W2 S2",
+      "E2 N3 E1 S6 E1 N6 E1 S3 E2 S1",
+      "N2 E3 S3 E2 S1 W2 S2 W3 N2 E1 N1 W3 S1",
+      "E1 S3 W2 S2 W3 N2 W2 N3 E2 N2 E3 S1"
+    ]
+  },
+  {
+    "name": "circle",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "N4 W2 N1 W4 S1 W1 S5 E1 S1 E4 N1 E1",
+      "N2 E2 N3 W2 N2 W3 S2 W2 S3 E2 S2 E1"
+    ]
+  },
+  {
+    "name": "square",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E7 N7 W6 S6",
+      "E6 N7 W7 S6"
+    ]
+  },
+  {
+    "name": "spiral",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E1 S3 W7 N6 E5 S3 W1",
+      "N1 E3 S4 W6 N7 E2 S2 W1",
+      "N1 W7 S5 E5 N3 W3 S1 E1"
+    ]
+  },
+  {
+    "name": "zigzag",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E2 N4 E3 S4 E5 N4 E3 S1",
+      "E2 N4 E3 S4 E3 N4 E3 S3",
+      "E1 N4 E3 S4 E4 N4 E3 S3"
+    ]
+  },
+  {
+    "name": "wave",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E2 N2 E2 N2 E3 S1 E2 S2 E3 N3 E2 N2",
+      "E2 N2 E2 N2 E3 S2 E2 S2 E3 N2 E2 N2"
+    ]
+  },
+  {
+    "name": "arrow",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "N5 W2 N1 E2 N2 E1 S2 E2 S1 W2 S6",
+      "S2 W2 S5 W1 N3 W1 S3 W1 N5 W2 N1"
+    ]
+  },
+  {
+    "name": "lightning",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "N3 W4 N2 E4 N3 W4 N4 E2",
+      "N2 E2 N2 E2 N3 W4 N3 E2 N2 E2 N2"
+    ]
+  },
+  {
+    "name": "house",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "N2 W1 N1 W2 N4 W1 S4 W2 S1 W1 S2 E5",
+      "S3 W3 N7 W1 S7 W3 N2",
+      "E2 N4 E1 S4 E2 S1 E1 S2 W7 N2",
+      "N3 W2 N2 W2 N2 W1 S2 W2 S2 W2 S3 E3"
+    ]
+  },
+  {
+    "name": "smiley",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E1 S1 W2 S3 E2 S2 E3 N2 E2 N3 W2 N1 E2"
+    ]
+  },
+  {
+    "name": "infinity",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "N2 E4 S3 W5 N1 W3 S3 E5",
+      "N2 E1 S3 W7 N2 W3 S3 E5",
+      "N2 E3 S3 W5 N2 W3 S3 E5"
+    ]
+  },
+  {
+    "name": "snake",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E6 N2 W6 N3 E7 N1 W1",
+      "E6 N3 W6 N3 E6 N1 W1",
+      "E8 N3 W6 N1 E6 N1 W1"
+    ]
+  },
+  {
+    "name": "straight",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E26"
+    ]
+  },
+  {
+    "name": "hairpin",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E12 N3 W11"
+    ]
+  },
+  {
+    "name": "block",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E5 N1 W6 N2 E6 S1 W5",
+      "W5 N1 E5 N1 W4 N1 E4 N1 W4"
+    ]
+  },
+  {
+    "name": "letter_H",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E1 S6 W4 N3 E2 S1 E1 N2 W3 N2 E1",
+      "N6 E1 S4 E1 N2 E1 S4 E1 N6",
+      "N6 E1 S4 E4 N4 E1 S6",
+      "E1 S5 W1 N4 W3 S4 W1 N5 E2"
+    ]
+  },
+  {
+    "name": "letter_T",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "N7 W6 N1 E9 S1 W2",
+      "E1 S1 E1 N1 E1 S7 E1 N7 E1 S1 E1 N1 E1 S1",
+      "N7 W4 N1 E9 S1 W4"
+    ]
+  },
+  {
+    "name": "letter_N",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "N5 E1 S2 E2 S3 E2 S2 E3 N6",
+      "N6 E1 S2 E2 S2 E2 S2 E3 N6",
+      "N5 E1 S2 E2 S2 E4 S1 E3 N6"
+    ]
+  },
+  {
+    "name": "letter_U",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E1 S4 E2 S4 E5 N2 E2 N6",
+      "E1 S6 E2 S2 E5 N2 E2 N6",
+      "W2 S7 E7 N7 W3"
+    ]
+  },
+  {
+    "name": "letter_L",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E1 S16 E9"
+    ]
+  },
+  {
+    "name": "letter_C",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "N2 W6 N2 W2 N5 E3 N2 E4",
+      "N1 W6 N2 W2 N5 E2 N2 E6"
+    ]
+  },
+  {
+    "name": "letter_S",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E4 N5 W5 N6 E6",
+      "E4 N5 W6 N5 E6"
+    ]
+  },
+  {
+    "name": "letter_Z",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E7 S2 W2 S2 W3 S2 W2 S1 E5",
+      "E7 S1 W2 S2 W2 S2 W2 S1 E7",
+      "E7 S1 W2 S2 W4 S1 W2 S1 E6"
+    ]
+  },
+  {
+    "name": "letter_I",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "N1 W3 S1 E2 S11 W2 S1 E3 N2",
+      "N26"
+    ]
+  },
+  {
+    "name": "letter_J",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E3 S14 W5 N4",
+      "E6 S12 W5 N3",
+      "W7 N1 E7 N5 W6",
+      "E5 S13 W5 N3"
+    ]
+  },
+  {
+    "name": "digit_0",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E3 N9 W6 S8",
+      "E4 N9 W5 S8"
+    ]
+  },
+  {
+    "name": "digit_1",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "N19 W1 S2 W2 S2",
+      "N18 W1 S2 W3 S2"
+    ]
+  },
+  {
+    "name": "digit_2",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E5 S3 W6 S5 E7"
+    ]
+  },
+  {
+    "name": "digit_3",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E6 S2 W4 S1 E4 S3 W6",
+      "E5 S3 W4 S1 E4 S3 W6",
+      "E3 S3 W4 S1 E4 S5 W6"
+    ]
+  },
+  {
+    "name": "digit_5",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "E5 N6 W6 N3 E6",
+      "E4 N7 W6 N3 E6"
+    ]
+  },
+  {
+    "name": "digit_7",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "planar",
+    "drawings": [
+      "N6 E2 N2 E2 N2 E2 N3 W7",
+      "N4 E2 N2 E2 N2 E2 N3 W9",
+      "N4 E2 N2 E2 N2 E1 N4 W9"
+    ]
+  },
+  {
+    "name": "bridge",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "lattice3d",
+    "drawings": [
+      "E9 U1 E6 D1 E9",
+      "E8 U1 E7 D1 E9",
+      "E10 U1 E5 D1 E9"
+    ]
+  },
+  {
+    "name": "staircase",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "lattice3d",
+    "drawings": [
+      "E8 U1 W7 U1 E6 U1 W2",
+      "E9 U1 W8 U1 E7"
+    ]
+  },
+  {
+    "name": "arch",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "lattice3d",
+    "drawings": [
+      "E3 U7 E7 D7 E2",
+      "E2 U6 E9 D6 E3",
+      "E1 U8 E8 D6 E3"
+    ]
+  },
+  {
+    "name": "ramp",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "lattice3d",
+    "drawings": [
+      "E14 U1 E11"
+    ]
+  },
+  {
+    "name": "cube",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "lattice3d",
+    "drawings": []
+  },
+  {
+    "name": "cobra",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "free3d",
+    "drawings": []
+  },
+  {
+    "name": "helix",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "free3d",
+    "drawings": []
+  },
+  {
+    "name": "wave3d",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "free3d",
+    "drawings": []
+  },
+  {
+    "name": "ring",
+    "kind": "curated",
+    "status": "proposed",
+    "mode": "free3d",
+    "drawings": []
+  }
+]
