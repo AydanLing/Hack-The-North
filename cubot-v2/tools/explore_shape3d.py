@@ -61,6 +61,7 @@ from cubot.folder import (  # noqa: E402
     lattice_span,
     replay,
     replay_tracked,
+    tether_cell,
 )
 from cubot.lattice import ORIENTS, apply_detent, pose_cells  # noqa: E402
 from cubot.pipeline import _raw_plan, _report_payload, _representative_ranking, _strict_replays  # noqa: E402
@@ -230,6 +231,7 @@ def explore_one(
         "threadings": 0,
         "thread_status": None,
         "escape_counts": [],
+        "wire_blocked_threadings": 0,
         "complete": None,
         "hard_ok": None,
         "tier": None,
@@ -272,14 +274,25 @@ def explore_one(
         row["elapsed_s"] = round(time.monotonic() - started, 2)
         return row
 
-    # Distinct physical state words only (several threadings may share one).
+    # Distinct physical state words only (several threadings may share one),
+    # and never a threading whose own goal puts a module in the wire cell
+    # behind module 0 — no fold order can pass its last move (docs/RULES.md).
     poses: list[Pose] = []
     seen_words: set[tuple[int, ...]] = set()
+    wire_blocked = 0
     for pose in threaded.poses:
         if pose.states in seen_words:
             continue
         seen_words.add(pose.states)
+        if tether_cell(pose) in set(pose_cells(pose)):
+            wire_blocked += 1
+            continue
         poses.append(pose)
+    row["wire_blocked_threadings"] = wire_blocked
+    if not poses:
+        row["fold_statuses"] = ["WIRE_BLOCKED"]
+        row["elapsed_s"] = round(time.monotonic() - started, 2)
+        return row
     if probe:
         scored = []
         for pose in poses:
