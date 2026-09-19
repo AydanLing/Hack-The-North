@@ -5,7 +5,10 @@
   "aliases": [],
   "status": {
     "complete": true,
+    "accept_profile": "loose",
+    "tier": 1,
     "loose_hard_ok": true,
+    "platform_hard_ok": null,
     "strict_hard_ok": false,
     "loose_violations": [],
     "human_pick": null,
@@ -2196,6 +2199,9 @@
       0
     ],
     "ends_flat_on_table": true,
+    "layered": false,
+    "final_upright": true,
+    "up_axis": "+z",
     "final_balance_margin_mm": 208.13382382279448
   },
   "world_frames": {
@@ -6776,6 +6782,21 @@
       "pivot_dip_exempt_mm": 3.0,
       "ground_soft_mm": 3.0,
       "ground_hard_mm": 40.0,
+      "torque_cap_nm": 5.8,
+      "torque_stall_nm": 10.6,
+      "balance_margin_mm": -20.0,
+      "fold_budget_s": 30.0,
+      "node_budget": 200000,
+      "detour_budget": 8,
+      "side_ambiguity_ratio": 0.85
+    },
+    "platform": {
+      "sweep_step_deg": 4.0,
+      "hard_penetration_mm": 6.0,
+      "soft_penetration_mm": 1.0,
+      "pivot_dip_exempt_mm": 1000000000.0,
+      "ground_soft_mm": 3.0,
+      "ground_hard_mm": 1000000000.0,
       "torque_cap_nm": 5.8,
       "torque_stall_nm": 10.6,
       "balance_margin_mm": -20.0,

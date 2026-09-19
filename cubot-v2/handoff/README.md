@@ -4,9 +4,11 @@ This folder is the complete, self-contained hand-off of every fold path the
 offline pre-simulation planner (`cubot-v2`) has certified, to the MuJoCo
 simulation pipeline: the seven finalized demo paths — **heart, arrow,
 lightning, plus, H, T, N** (shapes 1–7, the fixed review contract) — followed
-by the 42 mask-first exploration winners (8–49) and the 35 loose-passing
-glyph-atlas discovery candidates (50–84). 84 paths in all; see
-"Appended shapes" below for how the two extra groups differ from the demo seven.
+by the 42 mask-first exploration winners (8–49), the 35 loose-passing
+glyph-atlas discovery candidates (50–84), 15 one-deep 3-D shells and
+backfill icons (85–99) and the 36 icon-library winners (100–135). 135 paths
+in all; see "Appended shapes" below for how the extra groups differ from the
+demo seven.
 
 Everything a replay needs is here: the machine constants, the collision hull,
 the roll word, the start pose (including how the straight chain lies on the
@@ -29,7 +31,7 @@ neighbours against strict's 0 mm penetration limit (loose allows 6 mm). It is
 a modelling artefact of the conservative hull, not a real collision.
 
 `PATHS.md` is a generated digest with the silhouette and full move list of
-every shape (all 84); `index.json` is the same table for machines. **No human pick has
+every shape (all 135); `index.json` is the same table for machines. **No human pick has
 been recorded yet** (`human_pick: null` everywhere) — "finalized" here means
 these are the routes the planner shipped for the seven demo icons, reviewed on
 `contact-sheet-labeled.png`.
@@ -57,16 +59,16 @@ these are the routes the planner shipped for the seven demo icons, reviewed on
    rigid keep-out box (`tether_length_mm` = 82, `tether_width_mm` = 40) that
    rides with module 0's still half: no module may sweep through it, occupy
    the lattice cell behind module 0 at rest, or push it into the table. On
-   2026-09-19 all 84 paths were re-audited against it (`tools/tether_audit.py`)
+   2026-09-19 all 84 flat paths were re-audited against it (`tools/tether_audit.py`)
    and the 36 that violated it — mostly by an opening `(0, ±1, in)` flip that
    turned the cable into the table — were re-folded from their authored
    masks. Lightning's re-fold is now a loose-passing plan (15 moves) rather
    than the measured-only fallback shipped earlier. In the sim, give module 0
    the same keep-out and expect zero contacts with it.
 
-## Appended shapes (8–84)
+## Appended shapes (8–135)
 
-Everything after the demo seven was found by one of the two discovery methods
+Everything after the demo seven was found by one of the discovery methods
 and exported through the very same replay and consistency checks
 (`tools/export_handoff.py --manifest`), so the files, fields and conventions
 are identical. What differs is provenance and review status:
@@ -75,13 +77,18 @@ are identical. What differs is provenance and review status:
 |---|-------|------:|---------------------|----------|
 | 8–49 | mask-first exploration | 42 | hand-drawn 27-cell masks, gated by an exact shipped-roll threading, folded exactly (`docs/METHOD.md`, `docs/EXPLORATION-20260919.md`) | `out/explore-20260919/handoff-manifest.json` from `tools/explore_summary.py` |
 | 50–84 | glyph-atlas discovery | 35 | generated atlas variants ranked offline, then folded (`docs/DISCOVERY.md`); names keep the atlas slug (`c-v01`), so several concepts appear twice (`hook-v01` / `hook-v02`) or also exist as an exploration winner (`c` vs `c-v01`) | `out/discovery-20260919/handoff-manifest.json` from `tools/discovery_manifest.py` |
+| 85–91 | one-deep 3-D shells (tether campaign) | 7 | wire-frame boxes, an open book, a laptop, a window frame, a trough and a ring stand folded under the shipped box tether (`docs/TETHER.md`); names carry a `-3d` suffix and none finishes flat | `out/explore3d-tether/handoff-manifest.json` |
+| 92–99 | volumetric campaign | 8 | one-deep shells and flat backfill icons from `docs/EXPLORATION-3D-20260919.md`; `paperclip`, `hammer` and `half-cube` pass loose (tier 1), while `pencil`, `magnifier`, `bench`, `bottle` and `power` are **tier 2** — they pass only under the `platform` profile (table removed) and are marked so in `PATHS.md` and `path.json → tier`. The campaign's `stool`, `low-bench`, `side-table` and `lounge` are *not* shipped: certified under the earlier Ø20 round bundle, they sweep through the box tether and need a re-fold | `docs/exploration3d-20260919/handoff-manifest.json` |
+| 100–135 | icon library (mask-first, at scale) | 36 | one concept per name across animals, food, nature, objects, places, sports, UI and vehicles (`docs/library-20260919/worker-brief.md`); best loose-passing variant per concept, 19 of them finish standing | `out/library-20260919/handoff-manifest.json` from `tools/explore_summary.py` |
 
 - `path.json → provenance.source_record` says which run family a shape came
   from; `provenance.mask_variant` is the mask / atlas slug that was folded.
 - Every appended shape is kinematically complete and passes the **loose** hard
   checks (that was the admission rule; the 21 discovery candidates that fold but
-  violate loose are not exported). Strict fails everywhere for the same 0.398 mm
-  artefact as the demo seven.
+  violate loose are not exported), except the five tier-2 volumetric entries
+  (95–99), which pass only under `platform`. Strict fails everywhere for the
+  same 0.398 mm artefact as the demo seven. All 135 pass `tools/tether_audit.py`
+  under loose.
 - Many appended shapes finish **standing** (see `ends_flat_on_table` in
   `index.json`) — the same `in`-move effect described above.
 - No human pick has been recorded for any of them either; they are candidates,
@@ -93,7 +100,7 @@ are identical. What differs is provenance and review status:
 ```
 handoff/
 ├── README.md                 this file — conventions and field reference
-├── PATHS.md                  generated digest: silhouettes + move lists for all 84
+├── PATHS.md                  generated digest: silhouettes + move lists for all 135
 ├── index.json                one row per shape (status, move count, bases, files)
 ├── machine.json              constants: 27 modules, 80 mm cube, 82 mm pitch, roll word, servo, check profiles
 ├── module_solid.json         conservative convex hull of one module (full / still / moving pieces), mm
@@ -110,7 +117,9 @@ handoff/
     │   └── engineering.png   top view with module numbers (0 = base ... 26 = tail)
     ├── 02-arrow/  03-lightning/  04-plus/  05-h/  06-t/  07-n/   (same files)
     ├── 08-c/ … 49-a/                 mask-first exploration winners (same files)
-    └── 50-hook-v01/ … 84-check-v01/  glyph-atlas discovery candidates (same files)
+    ├── 50-hook-v01/ … 84-check-v01/  glyph-atlas discovery candidates (same files)
+    ├── 85-open-book-3d/ … 99-power/   3-D shells and backfill icons (same files; 95–99 are tier 2)
+    └── 100-home/ … 135-duck/          icon-library winners (same files)
 ```
 
 ## Conventions (the contract)
