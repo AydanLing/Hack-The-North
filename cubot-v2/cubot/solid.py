@@ -251,10 +251,36 @@ def analytic_module_solid(side_mm: float = 80.0, chamfer_mm: float = 8.0) -> Mod
 MODULE_SOLID = load_module_solid()
 
 
+def tether_piece(diameter_mm: float = 20.0, length_mm: float = 40.0, side_mm: float = 80.0, facets: int = 8) -> ConvexPiece:
+    """The wire bundle leaving module 0 through its free (incoming, -x) face.
+
+    Modelled as a convex prism (an ``facets``-gon of ``diameter_mm``) running
+    from the face plane ``x = -side/2`` outward to ``x = -side/2 - length``.
+    It is rigidly attached to module 0's still half and nothing may sweep
+    through it, rest in it, or drive it into the table.
+    """
+
+    half = side_mm / 2.0
+    normals: list[tuple[float, float, float]] = [(1.0, 0.0, 0.0), (-1.0, 0.0, 0.0)]
+    offsets: list[float] = [-half, half + length_mm]
+    for index in range(facets):
+        angle = 2.0 * np.pi * index / facets
+        normals.append((0.0, float(np.cos(angle)), float(np.sin(angle))))
+        offsets.append(diameter_mm / 2.0)
+    return _piece_from_halfspaces("tether", _unit_rows(normals), np.asarray(offsets, dtype=float))
+
+
+TETHER_PIECE = tether_piece()
+TETHER_MODULE = -1  # placeholder module id used in collision reports
+
+
 __all__ = [
     "ConvexPiece",
     "DEFAULT_SOLID_PATH",
     "JOINT_AXIS",
+    "TETHER_MODULE",
+    "TETHER_PIECE",
+    "tether_piece",
     "MODULE_SOLID",
     "ModuleSolid",
     "analytic_module_solid",

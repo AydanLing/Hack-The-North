@@ -16,6 +16,8 @@ Two details are important for callers:
 
 from __future__ import annotations
 
+import numpy as np
+
 from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass, field, replace
 import heapq
@@ -184,15 +186,41 @@ def aggregate_reports(moves: Sequence[Move]) -> CheckReport:
     return aggregate
 
 
+def tether_cell(pose: Pose) -> tuple[int, int, int]:
+    """The lattice cell behind module 0's free face, where its wire bundle lives."""
+
+    from .lattice import DIRS
+
+    cells = pose_cells(pose)
+    direction = DIRS[pose.base, 0]
+    return tuple(int(v) for v in (np.asarray(cells[0]) - np.asarray(direction)))
+
+
 def _rest_report(after: Pose) -> CheckReport:
     cells = pose_cells(after)
     unique = len(set(cells))
+    wire = tether_cell(after)
+    wire_clear = wire not in set(cells)
+    lowest = min(cell[2] for cell in cells)
+    wire_down = wire[2] < cells[0][2] and cells[0][2] == lowest
     return CheckReport(
         hard={
             "rest_cell_overlap": (
                 unique == len(cells),
                 f"{len(cells) - unique} duplicate occupied lattice cells at rest",
-            )
+            ),
+            "tether_cell": (
+                wire_clear,
+                "cell behind module 0's free face is clear"
+                if wire_clear
+                else f"a module rests in the wire cell {wire} behind module 0",
+            ),
+            "tether_down": (
+                not wire_down,
+                "wire bundle does not point into the resting surface"
+                if not wire_down
+                else "module 0 rests on the lowest layer with its wire bundle pointing down",
+            ),
         },
         measurements={"rest_unique_cells": unique},
     )
@@ -214,7 +242,7 @@ def _early_geometry_rejection(
     """
 
     from .geometry import _evaluate_sample, _pose_frames
-    from .solid import MODULE_SOLID
+    from .solid import MODULE_SOLID, TETHER_MODULE
 
     frames = _pose_frames(pose, machine)
     max_depth = 0.0
@@ -234,8 +262,12 @@ def _early_geometry_rejection(
         max_depth = max(max_depth, max((hit.depth_mm for hit in collisions), default=0.0))
         max_ground = max(
             max_ground,
-            max((hit.depth_mm for hit in ground if not hit.pivot_piece), default=0.0),
+            max((hit.depth_mm for hit in ground if not hit.pivot_piece and hit.module != TETHER_MODULE), default=0.0),
         )
+        if profile.ground_hard_mm < 1e8:
+            max_tether = max((hit.depth_mm for hit in ground if hit.module == TETHER_MODULE), default=0.0)
+            if max_tether > profile.hard_penetration_mm + 1e-6:
+                max_depth = max(max_depth, max_tether)  # the wire went into the table
         if (
             max_depth > profile.hard_penetration_mm + 1e-6
             or max_ground > profile.ground_hard_mm + 1e-6
