@@ -35,5 +35,11 @@ folder, and check profiles revalidate every route before it can be marked
 checked. Record human picks with `cubot library pick ...` after reviewing the
 numbered sheet; rerunning the pipeline preserves those picks.
 
+The finalized seven demo paths are exported to `handoff/` — a self-contained,
+dependency-free folder (JSON, CSV, PNG, one pure-Python verifier) meant to be
+handed to the MuJoCo sim owner. See `handoff/README.md` for the conventions and
+`handoff/PATHS.md` for the move lists. Regenerate it with
+`uv run python tools/export_handoff.py` after a new planner run.
+
 MuJoCo, hardware drivers, voice, LLM generation, and vision judging are
 deliberately not dependencies of this project.
