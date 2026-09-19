@@ -34,18 +34,20 @@ def rank_key(row: dict) -> tuple:
     """Lower is better: passing < complete-violating < partial < threadable-no-plan < UNSAT < structural."""
 
     if not row["screen_ok"]:
-        return (5, 0, 0, 0)
+        return (6, 0, 0, 0)
     if not row["threadings"]:
-        return (4, 0, 0, 0)
+        return (5, 0, 0, 0)
     if row["complete"] is None:
-        return (3, 0, 0, 0)
+        return (4, 0, 0, 0)
     if row["complete"] and row["hard_ok"]:
-        klass = 0
+        # 3D rows carry a tier: 1 = passes loose on the table, 2 = passes platform only.
+        klass = 0 if (row.get("tier") or 1) == 1 else 1
     elif row["complete"]:
-        klass = 1
-    else:
         klass = 2
-    return (klass, 0 if row["ends_flat"] else 1, -(row["worst_soft"] or 0.0), row["moves"] or 999)
+    else:
+        klass = 3
+    finish_ok = row["ends_flat"] or row.get("final_upright")
+    return (klass, 0 if finish_ok else 1, -(row["worst_soft"] or 0.0), row["moves"] or 999)
 
 
 def verdict(row: dict) -> str:
@@ -56,7 +58,7 @@ def verdict(row: dict) -> str:
     if row["complete"] is None:
         return "threadable, no plan"
     if row["complete"] and row["hard_ok"]:
-        return "PASS"
+        return "PASS" if (row.get("tier") or 1) == 1 else f"PASS ({row.get('fold_profile') or 'platform'}, tier 2)"
     if row["complete"]:
         return f"violating ({len(row['violations'])})"
     return "partial"
@@ -86,19 +88,38 @@ def load_rows(root: Path) -> list[dict]:
     return sorted(best.values(), key=lambda r: (rank_key(r), r["name"]))
 
 
+def is_layered(row: dict) -> bool:
+    return (row.get("layers") or 1) > 1
+
+
+def review_png(row: dict) -> str | None:
+    """Iso render for layered (3D) rows, top view for flat drawings."""
+
+    return row.get("iso_png") if is_layered(row) and row.get("iso_png") else row["top_png"]
+
+
+def finish_label(row: dict) -> str:
+    if is_layered(row):
+        if row.get("final_upright") is None:
+            return "-"
+        return "upright" if row["final_upright"] else f"tilted ({row.get('final_up_axis')})"
+    return {True: "flat", False: "STANDING", None: "-"}[row["ends_flat"]]
+
+
 def write_summary(rows: list[dict], out_root: Path) -> Path:
     lines = [
         "| # | shape | variant | tried | threadings | verdict | moves | worst soft | finish | box | render |",
         "|---|-------|---------|------:|-----------:|---------|------:|-----------:|--------|-----|--------|",
     ]
     for index, row in enumerate(rows, start=1):
-        finish = {True: "flat", False: "STANDING", None: "-"}[row["ends_flat"]]
-        render = f"`{Path(row['top_png']).relative_to(out_root)}`" if row["top_png"] else "-"
+        finish = finish_label(row)
+        png = review_png(row)
+        render = f"`{Path(png).relative_to(out_root)}`" if png else "-"
         lines.append(
             f"| {index} | {row['name']} | {row['variant']} | {row['variants_tried']} | {row['threadings']} | "
             f"{verdict(row)} | {row['moves'] if row['moves'] is not None else '-'} | "
             f"{row['worst_soft'] if row['worst_soft'] is not None else '-'} | {finish} | "
-            f"{row['box'][0]}x{row['box'][1]} | {render} |"
+            f"{'x'.join(str(b) for b in row['box'])} | {render} |"
         )
     lines.append("")
     for row in rows:
@@ -131,8 +152,12 @@ def write_manifest(rows: list[dict], out_root: Path, only: set[str] | None = Non
             run = str(run_dir.relative_to(out_root.resolve()))
         except ValueError:
             run = str(run_dir)
-        shapes.append({"name": row["name"], "variant": row["variant"], "run": run,
-                       "moves": row["moves"], "ends_flat": row["ends_flat"]})
+        entry = {"name": row["name"], "variant": row["variant"], "run": run,
+                 "moves": row["moves"], "ends_flat": row["ends_flat"]}
+        if is_layered(row):
+            entry.update({"tier": row.get("tier"), "profile": row.get("fold_profile"),
+                          "final_upright": row.get("final_upright"), "volumetric": row.get("volumetric")})
+        shapes.append(entry)
     if only is not None:
         missing = sorted(only - {s["name"] for s in shapes})
         if missing:
@@ -153,7 +178,7 @@ def main() -> int:
     rows = load_rows(args.out)
     summary = write_summary(rows, args.out)
     manifest = write_manifest(rows, args.out, None if args.only is None else set(args.only))
-    rendered = [(row["name"], row["top_png"]) for row in rows if row["top_png"] and Path(row["top_png"]).is_file()]
+    rendered = [(row["name"], review_png(row)) for row in rows if review_png(row) and Path(review_png(row)).is_file()]
     if rendered:
         contact_sheet(rendered, args.out / "contact-sheet-labeled.png", columns=args.columns, show_labels=True)
         contact_sheet(rendered, args.out / "contact-sheet-blind.png", columns=args.columns, show_labels=False)

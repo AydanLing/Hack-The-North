@@ -50,6 +50,10 @@ from cubot.folder import ends_flat_on_table, lattice_span, next_pose  # noqa: E4
 from cubot.geometry import pose_frames  # noqa: E402
 from cubot.lattice import ORIENTS, fk  # noqa: E402
 from cubot.records import Move, Pose  # noqa: E402
+from cubot.shapes import to_layers  # noqa: E402
+
+PROFILE_NAMES = ("loose", "platform", "strict")
+AXIS_NAMES = {(1, 0, 0): "+x", (-1, 0, 0): "-x", (0, 1, 0): "+y", (0, -1, 0): "-y", (0, 0, 1): "+z", (0, 0, -1): "-z"}
 
 SCHEMA = "cubot.handoff.v1"
 MANIFEST_SCHEMA = "cubot.handoff.manifest.v1"
@@ -138,6 +142,14 @@ def _silhouette(cells: list[tuple[int, int, int]]) -> list[str]:
     arr = np.asarray(cells, dtype=int)
     spans = arr.max(axis=0) - arr.min(axis=0)
     axes = [i for i in range(3) if spans[i] > 0]
+    if len(axes) == 3:
+        # One-deep 3D shell: print the z-slices, top layer first, separated by ``---``.
+        rows: list[str] = []
+        for index, layer in enumerate(to_layers([tuple(int(v) for v in c) for c in cells])):
+            if index:
+                rows.append("---")
+            rows.extend(layer)
+        return rows
     if len(axes) != 2:
         return []
     a, b = axes
@@ -193,7 +205,7 @@ def export_shape(name: str, number: int, run_dir: Path, out_dir: Path, machine, 
     record = json.loads((run_dir / "record.json").read_text())
     reports = {
         p: json.loads((run_dir / f"{p}-report.json").read_text())
-        for p in ("loose", "strict")
+        for p in PROFILE_NAMES
         if (run_dir / f"{p}-report.json").is_file()
     }
     plans = record["plans"]
@@ -244,6 +256,18 @@ def export_shape(name: str, number: int, run_dir: Path, out_dir: Path, machine, 
         }
     strict_match = report_summary.get("strict", {}).get("this_path")
     strict_hard_ok = None if strict_match is None else bool(strict_match["hard_ok"])
+    # 3D shells may be accepted under ``platform`` (table removed, tier 2); the
+    # loose verdict for the same route is then looked up by move signature.
+    accept_profile = record.get("meta", {}).get("profile", "loose")
+    loose_match = report_summary.get("loose", {}).get("this_path")
+    platform_match = report_summary.get("platform", {}).get("this_path")
+    loose_hard_ok = plan["hard_ok"] if accept_profile == "loose" else (None if loose_match is None else bool(loose_match["hard_ok"]))
+    platform_hard_ok = plan["hard_ok"] if accept_profile == "platform" else (None if platform_match is None else bool(platform_match["hard_ok"]))
+    tier = 1 if loose_hard_ok else 2 if platform_hard_ok else None
+    rotation = ORIENTS[replayed.base] @ ORIENTS[goal.base].T
+    up = tuple(int(v) for v in np.rint(rotation @ np.array([0, 0, 1])))
+    final_upright = up == (0, 0, 1)
+    layered = len([i for i in range(3) if tracked_span[i] > 0]) == 3
 
     alternates = [
         {"plan_index": i, **_plan_summary(p), "moves_compact": [[m["joint"], m["delta"], m["side"], m["duration_s"]] for m in p["moves"]]}
@@ -264,7 +288,10 @@ def export_shape(name: str, number: int, run_dir: Path, out_dir: Path, machine, 
         "aliases": record.get("aliases", []),
         "status": {
             "complete": plan["complete"],
-            "loose_hard_ok": plan["hard_ok"],
+            "accept_profile": accept_profile,
+            "tier": tier,
+            "loose_hard_ok": loose_hard_ok,
+            "platform_hard_ok": platform_hard_ok,
             "strict_hard_ok": strict_hard_ok,
             "loose_violations": plan["violations"],
             "human_pick": record.get("human_pick"),
@@ -317,6 +344,9 @@ def export_shape(name: str, number: int, run_dir: Path, out_dir: Path, machine, 
             **_pose_json(replayed),
             "lattice_span": tracked_span,
             "ends_flat_on_table": ends_flat,
+            "layered": layered,
+            "final_upright": final_upright,
+            "up_axis": AXIS_NAMES.get(up, str(up)),
             "final_balance_margin_mm": moves[-1]["checks"]["measurements"].get("balance_margin_mm"),
         },
         "world_frames": {
@@ -380,9 +410,15 @@ def export_shape(name: str, number: int, run_dir: Path, out_dir: Path, machine, 
         "dir": f"shapes/{number:02d}-{name}",
         "moves": len(moves),
         "complete": plan["complete"],
-        "loose_hard_ok": plan["hard_ok"],
+        "accept_profile": accept_profile,
+        "tier": tier,
+        "loose_hard_ok": loose_hard_ok,
+        "platform_hard_ok": platform_hard_ok,
         "strict_hard_ok": strict_hard_ok,
         "loose_violations": len(plan["violations"]),
+        "layered": layered,
+        "final_upright": final_upright,
+        "lattice_span": tracked_span,
         "alternate_passing_routes": len(alternates),
         "human_pick": record.get("human_pick"),
         "ends_flat_on_table": ends_flat,
@@ -417,9 +453,15 @@ def _paths_markdown(entries: list[dict], out_dir: Path) -> str:
         for note in payload["status"]["plan_notes"]:
             if note not in ("final forward recheck",):
                 notes.append(note)
+        if e.get("layered"):
+            finish = "upright" if e.get("final_upright") else f"tilted (drawn +z -> {payload['final_tracked'].get('up_axis')})"
+            if e.get("tier") == 2:
+                notes.append("tier 2: passes only with the table removed (platform profile)")
+        else:
+            finish = "flat on table" if e["ends_flat_on_table"] else "STANDING"
         lines.append(
             f"| {e['number']} | {e['name']} | {e['moves']} | {'pass' if e['loose_hard_ok'] else 'FAIL'} | "
-            f"{'pass' if e['strict_hard_ok'] else 'fail'} | {'flat on table' if e['ends_flat_on_table'] else 'STANDING'} | "
+            f"{'pass' if e['strict_hard_ok'] else 'fail'} | {finish} | "
             f"{e['alternate_passing_routes']} | {'; '.join(notes)} |"
         )
     lines.append("")
@@ -441,8 +483,17 @@ def _paths_markdown(entries: list[dict], out_dir: Path) -> str:
             f"- peak torque demand {payload['summary']['peak_demand_nm']:.2f} N·m, max CAD penetration "
             f"{payload['summary']['max_cad_penetration_mm']:.3f} mm, max table incursion {payload['summary']['max_ground_depth_mm']:.1f} mm",
             f"- predicted final orientation: base {payload['final_tracked']['base']}, lattice span {payload['final_tracked']['lattice_span']}, "
-            f"{'flat on the table' if payload['final_tracked']['ends_flat_on_table'] else 'STANDING on edge (drawing plane vertical)'}",
+            + (
+                ("upright (drawn +z up)" if payload["final_tracked"].get("final_upright") else f"tilted: drawn +z points {payload['final_tracked'].get('up_axis')}")
+                if payload["final_tracked"].get("layered")
+                else ("flat on the table" if payload["final_tracked"]["ends_flat_on_table"] else "STANDING on edge (drawing plane vertical)")
+            ),
         ]
+        if payload["status"].get("accept_profile", "loose") != "loose":
+            lines.append(
+                f"- accepted under `{payload['status']['accept_profile']}` (tier {payload['status'].get('tier')}); "
+                f"loose verdict for this route: {payload['status'].get('loose_hard_ok')}"
+            )
         if payload["status"]["loose_violations"]:
             lines.append("- loose hard-check violations:")
             lines += [f"  - {v}" for v in payload["status"]["loose_violations"]]
@@ -475,7 +526,9 @@ def main() -> int:
 
     machine = load_machine()
     profiles = {}
-    for name in ("loose", "strict"):
+    for name in PROFILE_NAMES:
+        if not (ROOT / "config" / "profiles" / f"{name}.toml").is_file():
+            continue
         profile = load_profile(name)
         profiles[name] = {k: getattr(profile, k) for k in profile.__dataclass_fields__ if k != "name"}  # type: ignore[attr-defined]
 
