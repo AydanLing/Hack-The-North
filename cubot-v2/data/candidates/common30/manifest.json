@@ -1,0 +1,170 @@
+[
+  {
+    "name": "heart",
+    "number": 1,
+    "dir": "shapes/01-heart",
+    "mask": "data/candidates/common30/heart.txt"
+  },
+  {
+    "name": "arrow",
+    "number": 2,
+    "dir": "shapes/02-arrow",
+    "mask": "data/candidates/common30/arrow.txt"
+  },
+  {
+    "name": "lightning",
+    "number": 3,
+    "dir": "shapes/03-lightning",
+    "mask": "data/candidates/common30/lightning.txt"
+  },
+  {
+    "name": "h",
+    "number": 5,
+    "dir": "shapes/05-h",
+    "mask": "data/candidates/common30/h.txt"
+  },
+  {
+    "name": "t",
+    "number": 6,
+    "dir": "shapes/06-t",
+    "mask": "data/candidates/common30/t.txt"
+  },
+  {
+    "name": "n",
+    "number": 7,
+    "dir": "shapes/07-n",
+    "mask": "data/candidates/common30/n.txt"
+  },
+  {
+    "name": "c",
+    "number": 8,
+    "dir": "shapes/08-c",
+    "mask": "data/candidates/common30/c.txt"
+  },
+  {
+    "name": "j",
+    "number": 9,
+    "dir": "shapes/09-j",
+    "mask": "data/candidates/common30/j.txt"
+  },
+  {
+    "name": "m",
+    "number": 10,
+    "dir": "shapes/10-m",
+    "mask": "data/candidates/common30/m.txt"
+  },
+  {
+    "name": "a",
+    "number": 49,
+    "dir": "shapes/49-a",
+    "mask": "data/candidates/common30/a.txt"
+  },
+  {
+    "name": "e",
+    "number": 37,
+    "dir": "shapes/37-e",
+    "mask": "data/candidates/common30/e.txt"
+  },
+  {
+    "name": "i",
+    "number": 21,
+    "dir": "shapes/21-i",
+    "mask": "data/candidates/common30/i.txt"
+  },
+  {
+    "name": "o-v01",
+    "number": 76,
+    "dir": "shapes/76-o-v01",
+    "mask": "data/candidates/common30/o-v01.txt"
+  },
+  {
+    "name": "u",
+    "number": 34,
+    "dir": "shapes/34-u",
+    "mask": "data/candidates/common30/u.txt"
+  },
+  {
+    "name": "s",
+    "number": 17,
+    "dir": "shapes/17-s",
+    "mask": "data/candidates/common30/s.txt"
+  },
+  {
+    "name": "k",
+    "number": 16,
+    "dir": "shapes/16-k",
+    "mask": "data/candidates/common30/k.txt"
+  },
+  {
+    "name": "w",
+    "number": 12,
+    "dir": "shapes/12-w",
+    "mask": "data/candidates/common30/w.txt"
+  },
+  {
+    "name": "spiral",
+    "number": 39,
+    "dir": "shapes/39-spiral",
+    "mask": "data/candidates/common30/spiral.txt"
+  },
+  {
+    "name": "staircase",
+    "number": 19,
+    "dir": "shapes/19-staircase",
+    "mask": "data/candidates/common30/staircase.txt"
+  },
+  {
+    "name": "triangle",
+    "number": 35,
+    "dir": "shapes/35-triangle",
+    "mask": "data/candidates/common30/triangle.txt"
+  },
+  {
+    "name": "ring",
+    "number": 46,
+    "dir": "shapes/46-ring",
+    "mask": "data/candidates/common30/ring.txt"
+  },
+  {
+    "name": "rocket",
+    "number": 20,
+    "dir": "shapes/20-rocket",
+    "mask": "data/candidates/common30/rocket.txt"
+  },
+  {
+    "name": "tree",
+    "number": 28,
+    "dir": "shapes/28-tree",
+    "mask": "data/candidates/common30/tree.txt"
+  },
+  {
+    "name": "flag",
+    "number": 44,
+    "dir": "shapes/44-flag",
+    "mask": "data/candidates/common30/flag.txt"
+  },
+  {
+    "name": "crown",
+    "number": 133,
+    "dir": "shapes/133-crown",
+    "mask": "data/candidates/common30/crown.txt"
+  },
+  {
+    "name": "paperclip",
+    "number": 92,
+    "dir": "shapes/92-paperclip",
+    "mask": "data/candidates/common30/paperclip.txt"
+  },
+  {
+    "name": "hammer",
+    "number": 93,
+    "dir": "shapes/93-hammer",
+    "mask": "data/candidates/common30/hammer.txt"
+  },
+  {
+    "name": "smiley",
+    "number": 122,
+    "dir": "shapes/122-smiley",
+    "mask": "data/candidates/common30/smiley.txt"
+  }
+]
