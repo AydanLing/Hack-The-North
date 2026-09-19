@@ -1,0 +1,5783 @@
+{
+  "candidates": [
+    {
+      "complete": true,
+      "goal": {
+        "base": 7,
+        "lying": null,
+        "roll": "12001300133101230333233210",
+        "states": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "goal_progress": 26,
+      "hard_ok": true,
+      "moves": [
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.000 N\u00b7m (eased demand 0.000) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "flat",
+              "balance_margin_mm": 32.23674500805649,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.0,
+              "inertia_kgm2": 0.0,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130400846,
+              "max_pivot_dip_mm": 24.003908666666675,
+              "moving_side": "in",
+              "peak_angle_deg": 0.0,
+              "peak_demand_nm": 0.0,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.0
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 32.237 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                1.0,
+                "peak holding load 0.000 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                0.43232679279279257,
+                "pivoting hinge half dips 24.004 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.000 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 0,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.120 N\u00b7m (eased demand 0.121) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": 29.199715060047257,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.11951758873518147,
+              "inertia_kgm2": 0.0012375013333333336,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 0.12111635159907641,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.11951758873517754
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 29.200 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.9887247557796999,
+                "peak holding load 0.120 N\u00b7m at joint 1"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.121 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 25,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.793 N\u00b7m (eased demand 1.726) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 36.96296296296295,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 14.238542289131559,
+              "inertia_kgm2": 0.05616924,
+              "max_ground_depth_mm": 2.8925937693006247,
+              "max_penetration_mm": 0.3984185130401059,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.725881239370925,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.792763831027664
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 36.963 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 14.239 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.726 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 5,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.617 N\u00b7m (eased demand 1.684) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 35.273774956065864,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 1.61710193153145,
+              "inertia_kgm2": 0.04417362399999998,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.683696799795783,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.6171019315314334
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 35.274 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.847443214006467,
+                "peak holding load 1.617 N\u00b7m at joint 5"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.067; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.684 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 21,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 4.770 N\u00b7m (eased demand 4.921) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": -54.14814814814816,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 4.770077517982665,
+              "inertia_kgm2": 0.22705860000000008,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 72.0,
+              "peak_demand_nm": 4.920528096808955,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 4.7700775179826485
+            },
+            "soft": {
+              "balance": [
+                0.573148148148148,
+                "support margin -54.148 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.5499926869827674,
+                "peak holding load 4.770 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                0.4444444444444842,
+                "side moment ratio 0.933; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 4.921 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 17,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (11, 12) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 2.310 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 7.164 N\u00b7m (eased demand 6.913) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 39.999999999999844,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 10.332785680806701,
+              "inertia_kgm2": 0.4184645546666669,
+              "max_ground_depth_mm": 2.3097634453110274,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 76.0,
+              "peak_demand_nm": 6.912539591326819,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 7.164060237201885
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 40.000 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 2.310 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.025208898037103637,
+                "peak holding load 10.333 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.484; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (11, 12) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                0.7682209184735793,
+                "peak demand including inertia 6.913 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 11,
+          "side": "in"
+        }
+      ],
+      "notes": [
+        "final forward recheck"
+      ],
+      "scores": {
+        "balance": 0.573148148148148,
+        "ground": 1.0,
+        "holding_load": 0.0,
+        "moving_side": 0.0,
+        "near_contact": 1.0,
+        "pivot_dip": 0.43232679279279257,
+        "torque": 0.7682209184735793
+      },
+      "start": {
+        "base": 7,
+        "lying": 0,
+        "roll": "12001300133101230333233210",
+        "states": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "violations": []
+    },
+    {
+      "complete": true,
+      "goal": {
+        "base": 7,
+        "lying": null,
+        "roll": "12001300133101230333233210",
+        "states": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "goal_progress": 26,
+      "hard_ok": true,
+      "moves": [
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.000 N\u00b7m (eased demand 0.000) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "flat",
+              "balance_margin_mm": 32.23674500805649,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.0,
+              "inertia_kgm2": 0.0,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130400846,
+              "max_pivot_dip_mm": 24.003908666666675,
+              "moving_side": "in",
+              "peak_angle_deg": 0.0,
+              "peak_demand_nm": 0.0,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.0
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 32.237 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                1.0,
+                "peak holding load 0.000 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                0.43232679279279257,
+                "pivoting hinge half dips 24.004 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.000 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 0,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.120 N\u00b7m (eased demand 0.121) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": 29.199715060047257,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.11951758873518147,
+              "inertia_kgm2": 0.0012375013333333336,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 0.12111635159907641,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.11951758873517754
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 29.200 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.9887247557796999,
+                "peak holding load 0.120 N\u00b7m at joint 1"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.121 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 25,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.793 N\u00b7m (eased demand 1.726) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 36.96296296296295,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 14.238542289131559,
+              "inertia_kgm2": 0.05616924,
+              "max_ground_depth_mm": 2.8925937693006247,
+              "max_penetration_mm": 0.3984185130401059,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.725881239370925,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.792763831027664
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 36.963 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 14.239 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.726 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 5,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.617 N\u00b7m (eased demand 1.684) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 35.273774956065864,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 1.61710193153145,
+              "inertia_kgm2": 0.04417362399999998,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.683696799795783,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.6171019315314334
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 35.274 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.847443214006467,
+                "peak holding load 1.617 N\u00b7m at joint 5"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.067; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.684 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 21,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 4.770 N\u00b7m (eased demand 4.921) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": -54.14814814814816,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 4.770077517982665,
+              "inertia_kgm2": 0.22705860000000008,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 72.0,
+              "peak_demand_nm": 4.920528096808955,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 4.7700775179826485
+            },
+            "soft": {
+              "balance": [
+                0.573148148148148,
+                "support margin -54.148 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.5499926869827674,
+                "peak holding load 4.770 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                0.4444444444444842,
+                "side moment ratio 0.933; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 4.921 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 17,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 2.214 N\u00b7m (eased demand 2.064) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 7.717056893322445,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 3.280908062878913,
+              "inertia_kgm2": 0.07440053066666667,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130401272,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 108.0,
+              "peak_demand_nm": 2.0644254453209565,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 2.214432858118418
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 7.717 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.6904803714265176,
+                "peak holding load 3.281 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.167; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 2.064 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 20,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (10, 11) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 9.991 N\u00b7m (eased demand 10.756) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 18.740740740740584,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 9.990562110206941,
+              "inertia_kgm2": 0.556365970666667,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 88.0,
+              "peak_demand_nm": 10.756475328889326,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 9.99056211020694
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 18.741 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.057494140546514964,
+                "peak holding load 9.991 N\u00b7m at joint 9"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.200; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (10, 11) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                0.0,
+                "peak demand including inertia 10.756 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 11,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (20, 21) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 2.214 N\u00b7m (eased demand 2.253) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": 39.99999999999979,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 8.492605445360217,
+              "inertia_kgm2": 0.07440053066666669,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130400988,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 72.0,
+              "peak_demand_nm": 2.2534075921707593,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 2.2144328581184194
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 40.000 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.1988108070414889,
+                "peak holding load 8.493 N\u00b7m at joint 9"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.097; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (20, 21) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 2.253 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 20,
+          "side": "out"
+        }
+      ],
+      "notes": [
+        "final forward recheck"
+      ],
+      "scores": {
+        "balance": 0.573148148148148,
+        "ground": 1.0,
+        "holding_load": 0.0,
+        "moving_side": 0.0,
+        "near_contact": 1.0,
+        "pivot_dip": 0.43232679279279257,
+        "torque": 0.0
+      },
+      "start": {
+        "base": 7,
+        "lying": 0,
+        "roll": "12001300133101230333233210",
+        "states": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "violations": []
+    },
+    {
+      "complete": true,
+      "goal": {
+        "base": 7,
+        "lying": null,
+        "roll": "12001300133101230333233210",
+        "states": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "goal_progress": 26,
+      "hard_ok": true,
+      "moves": [
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.000 N\u00b7m (eased demand 0.000) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "flat",
+              "balance_margin_mm": 32.23674500805649,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.0,
+              "inertia_kgm2": 0.0,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130400846,
+              "max_pivot_dip_mm": 24.003908666666675,
+              "moving_side": "in",
+              "peak_angle_deg": 0.0,
+              "peak_demand_nm": 0.0,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.0
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 32.237 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                1.0,
+                "peak holding load 0.000 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                0.43232679279279257,
+                "pivoting hinge half dips 24.004 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.000 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 0,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.120 N\u00b7m (eased demand 0.121) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": 29.199715060047257,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.11951758873518147,
+              "inertia_kgm2": 0.0012375013333333336,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 0.12111635159907641,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.11951758873517754
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 29.200 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.9887247557796999,
+                "peak holding load 0.120 N\u00b7m at joint 1"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.121 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 25,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.793 N\u00b7m (eased demand 1.726) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 36.96296296296295,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 14.238542289131559,
+              "inertia_kgm2": 0.05616924,
+              "max_ground_depth_mm": 2.8925937693006247,
+              "max_penetration_mm": 0.3984185130401059,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.725881239370925,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.792763831027664
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 36.963 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 14.239 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.726 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 5,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.617 N\u00b7m (eased demand 1.684) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 35.273774956065864,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 1.61710193153145,
+              "inertia_kgm2": 0.04417362399999998,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.683696799795783,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.6171019315314334
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 35.274 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.847443214006467,
+                "peak holding load 1.617 N\u00b7m at joint 5"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.067; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.684 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 21,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 4.770 N\u00b7m (eased demand 4.921) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": -54.14814814814816,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 4.770077517982665,
+              "inertia_kgm2": 0.22705860000000008,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 72.0,
+              "peak_demand_nm": 4.920528096808955,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 4.7700775179826485
+            },
+            "soft": {
+              "balance": [
+                0.573148148148148,
+                "support margin -54.148 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.5499926869827674,
+                "peak holding load 4.770 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                0.4444444444444842,
+                "side moment ratio 0.933; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 4.921 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 17,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (14, 15) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 1.643 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 9.986 N\u00b7m (eased demand 9.544) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": -247.76058598158744,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 18.953009713425857,
+              "inertia_kgm2": 0.6131072799999997,
+              "max_ground_depth_mm": 1.6432348250867292,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 80.0,
+              "peak_demand_nm": 9.54417724195862,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 9.98608823339502
+            },
+            "soft": {
+              "balance": [
+                0.0,
+                "support margin -247.761 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 1.643 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 18.953 N\u00b7m at joint 23"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.484; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (14, 15) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                0.21996307459195416,
+                "peak demand including inertia 9.544 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 14,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (14, 15) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 3.211 N\u00b7m (eased demand 3.587) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 85.5555555555552,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 20.91010844001038,
+              "inertia_kgm2": 0.14580215733333338,
+              "max_ground_depth_mm": 7.105427357601002e-15,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 0.0,
+              "peak_demand_nm": 3.587350967687683,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 3.2106191317825217
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 85.556 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 20.910 N\u00b7m at joint 19"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.413; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (14, 15) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 3.587 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 14,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (10, 11) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 9.528 N\u00b7m (eased demand 10.927) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 270.8148148148149,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 8.121218830437611,
+              "inertia_kgm2": 0.5413714506666669,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 24.00390866666659,
+              "moving_side": "out",
+              "peak_angle_deg": 119.99999999999999,
+              "peak_demand_nm": 10.927115118439962,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 9.5282890362578
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 270.815 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.23384728014739517,
+                "peak holding load 8.121 N\u00b7m at joint 12"
+              ],
+              "moving_side": [
+                0.5050505050504986,
+                "side moment ratio 0.924; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (10, 11) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                0.4323267927927949,
+                "pivoting hinge half dips 24.004 mm"
+              ],
+              "torque": [
+                0.0,
+                "peak demand including inertia 10.927 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 11,
+          "side": "out"
+        }
+      ],
+      "notes": [
+        "final forward recheck"
+      ],
+      "scores": {
+        "balance": 0.0,
+        "ground": 1.0,
+        "holding_load": 0.0,
+        "moving_side": 0.0,
+        "near_contact": 1.0,
+        "pivot_dip": 0.43232679279279257,
+        "torque": 0.0
+      },
+      "start": {
+        "base": 7,
+        "lying": 0,
+        "roll": "12001300133101230333233210",
+        "states": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "violations": []
+    },
+    {
+      "complete": true,
+      "goal": {
+        "base": 7,
+        "lying": null,
+        "roll": "12001300133101230333233210",
+        "states": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "goal_progress": 26,
+      "hard_ok": true,
+      "moves": [
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.000 N\u00b7m (eased demand 0.000) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "flat",
+              "balance_margin_mm": 32.23674500805649,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.0,
+              "inertia_kgm2": 0.0,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130400846,
+              "max_pivot_dip_mm": 24.003908666666675,
+              "moving_side": "in",
+              "peak_angle_deg": 0.0,
+              "peak_demand_nm": 0.0,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.0
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 32.237 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                1.0,
+                "peak holding load 0.000 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                0.43232679279279257,
+                "pivoting hinge half dips 24.004 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.000 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 0,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.120 N\u00b7m (eased demand 0.121) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": 29.199715060047257,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.11951758873518147,
+              "inertia_kgm2": 0.0012375013333333336,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 0.12111635159907641,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.11951758873517754
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 29.200 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.9887247557796999,
+                "peak holding load 0.120 N\u00b7m at joint 1"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.121 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 25,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.793 N\u00b7m (eased demand 1.726) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 36.96296296296295,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 14.238542289131559,
+              "inertia_kgm2": 0.05616924,
+              "max_ground_depth_mm": 2.8925937693006247,
+              "max_penetration_mm": 0.3984185130401059,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.725881239370925,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.792763831027664
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 36.963 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 14.239 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.726 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 5,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.617 N\u00b7m (eased demand 1.684) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 35.273774956065864,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 1.61710193153145,
+              "inertia_kgm2": 0.04417362399999998,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.683696799795783,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.6171019315314334
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 35.274 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.847443214006467,
+                "peak holding load 1.617 N\u00b7m at joint 5"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.067; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.684 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 21,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 4.770 N\u00b7m (eased demand 4.921) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": -54.14814814814816,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 4.770077517982665,
+              "inertia_kgm2": 0.22705860000000008,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 72.0,
+              "peak_demand_nm": 4.920528096808955,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 4.7700775179826485
+            },
+            "soft": {
+              "balance": [
+                0.573148148148148,
+                "support margin -54.148 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.5499926869827674,
+                "peak holding load 4.770 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                0.4444444444444842,
+                "side moment ratio 0.933; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 4.921 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 17,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (14, 15) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 1.643 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 9.986 N\u00b7m (eased demand 9.544) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": -247.76058598158744,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 18.953009713425857,
+              "inertia_kgm2": 0.6131072799999997,
+              "max_ground_depth_mm": 1.6432348250867292,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 80.0,
+              "peak_demand_nm": 9.54417724195862,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 9.98608823339502
+            },
+            "soft": {
+              "balance": [
+                0.0,
+                "support margin -247.761 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 1.643 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 18.953 N\u00b7m at joint 23"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.484; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (14, 15) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                0.21996307459195416,
+                "peak demand including inertia 9.544 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 14,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (14, 15) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 3.211 N\u00b7m (eased demand 3.587) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 85.5555555555552,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 20.91010844001038,
+              "inertia_kgm2": 0.14580215733333338,
+              "max_ground_depth_mm": 7.105427357601002e-15,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 0.0,
+              "peak_demand_nm": 3.587350967687683,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 3.2106191317825217
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 85.556 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 20.910 N\u00b7m at joint 19"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.413; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (14, 15) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 3.587 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 14,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (11, 12) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 7.164 N\u00b7m (eased demand 8.006) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 39.9999999999999,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 3.210619131782513,
+              "inertia_kgm2": 0.4184645546666669,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 2.398418513039985,
+              "moving_side": "in",
+              "peak_angle_deg": 16.0,
+              "peak_demand_nm": 8.00559522027014,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 7.164060237201886
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 40.000 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.6971114026620271,
+                "peak holding load 3.211 N\u00b7m at joint 12"
+              ],
+              "moving_side": [
+                0.5050505050504986,
+                "side moment ratio 0.924; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (11, 12) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 2.398 mm"
+              ],
+              "torque": [
+                0.5405009957770542,
+                "peak demand including inertia 8.006 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 11,
+          "side": "in"
+        }
+      ],
+      "notes": [
+        "final forward recheck"
+      ],
+      "scores": {
+        "balance": 0.0,
+        "ground": 1.0,
+        "holding_load": 0.0,
+        "moving_side": 0.0,
+        "near_contact": 1.0,
+        "pivot_dip": 0.43232679279279257,
+        "torque": 0.21996307459195416
+      },
+      "start": {
+        "base": 7,
+        "lying": 0,
+        "roll": "12001300133101230333233210",
+        "states": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "violations": []
+    },
+    {
+      "complete": true,
+      "goal": {
+        "base": 7,
+        "lying": null,
+        "roll": "12001300133101230333233210",
+        "states": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "goal_progress": 26,
+      "hard_ok": true,
+      "moves": [
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.000 N\u00b7m (eased demand 0.000) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "flat",
+              "balance_margin_mm": 32.23674500805649,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.0,
+              "inertia_kgm2": 0.0,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130400846,
+              "max_pivot_dip_mm": 24.003908666666675,
+              "moving_side": "in",
+              "peak_angle_deg": 0.0,
+              "peak_demand_nm": 0.0,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.0
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 32.237 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                1.0,
+                "peak holding load 0.000 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                0.43232679279279257,
+                "pivoting hinge half dips 24.004 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.000 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 0,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.120 N\u00b7m (eased demand 0.121) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": 29.199715060047257,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.11951758873518147,
+              "inertia_kgm2": 0.0012375013333333336,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 0.12111635159907641,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.11951758873517754
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 29.200 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.9887247557796999,
+                "peak holding load 0.120 N\u00b7m at joint 1"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.121 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 25,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.793 N\u00b7m (eased demand 1.726) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 36.96296296296295,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 14.238542289131559,
+              "inertia_kgm2": 0.05616924,
+              "max_ground_depth_mm": 2.8925937693006247,
+              "max_penetration_mm": 0.3984185130401059,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.725881239370925,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.792763831027664
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 36.963 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 14.239 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.726 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 5,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.617 N\u00b7m (eased demand 1.684) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 35.273774956065864,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 1.61710193153145,
+              "inertia_kgm2": 0.04417362399999998,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.683696799795783,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.6171019315314334
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 35.274 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.847443214006467,
+                "peak holding load 1.617 N\u00b7m at joint 5"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.067; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.684 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 21,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 4.770 N\u00b7m (eased demand 4.921) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": -54.14814814814816,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 4.770077517982665,
+              "inertia_kgm2": 0.22705860000000008,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 72.0,
+              "peak_demand_nm": 4.920528096808955,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 4.7700775179826485
+            },
+            "soft": {
+              "balance": [
+                0.573148148148148,
+                "support margin -54.148 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.5499926869827674,
+                "peak holding load 4.770 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                0.4444444444444842,
+                "side moment ratio 0.933; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 4.921 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 17,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (1, 2) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.104 N\u00b7m (eased demand 0.107) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "hump",
+              "balance_margin_mm": -44.42476124804996,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 3.2106191317825368,
+              "inertia_kgm2": 0.0012375013333333334,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130400846,
+              "max_pivot_dip_mm": 24.003908666666632,
+              "moving_side": "in",
+              "peak_angle_deg": 0.0,
+              "peak_demand_nm": 0.10676588481755647,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 0.1035683590897587
+            },
+            "soft": {
+              "balance": [
+                0.6946904843993755,
+                "support margin -44.425 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.6971114026620249,
+                "peak holding load 3.211 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.008; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (1, 2) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                0.43232679279279373,
+                "pivoting hinge half dips 24.004 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.107 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 1,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (10, 11) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 2.310 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 7.048 N\u00b7m (eased demand 6.807) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 36.96296296296267,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 10.97824606351441,
+              "inertia_kgm2": 0.40247039999999995,
+              "max_ground_depth_mm": 2.309763445311013,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 76.0,
+              "peak_demand_nm": 6.807444024729607,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 7.048022144366415
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 36.963 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 2.310 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 10.978 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.484; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (10, 11) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                0.7901158281813319,
+                "peak demand including inertia 6.807 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 11,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 2.214 N\u00b7m (eased demand 2.064) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 15.703703703703443,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 3.280908062878904,
+              "inertia_kgm2": 0.0744005306666667,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130400988,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 108.0,
+              "peak_demand_nm": 2.064425445320956,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 2.2144328581184176
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 15.704 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.6904803714265185,
+                "peak holding load 3.281 N\u00b7m at joint 12"
+              ],
+              "moving_side": [
+                1.650531563276066e-13,
+                "side moment ratio 1.000; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 2.064 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 20,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (1, 2) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.120 N\u00b7m (eased demand 0.121) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 18.74074074074064,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 2.174935540884933,
+              "inertia_kgm2": 0.0012375013333333332,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 28.0,
+              "peak_demand_nm": 0.12111635159907645,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 0.11951758873517758
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 18.741 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.7948174018033082,
+                "peak holding load 2.175 N\u00b7m at joint 20"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.009; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (1, 2) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.121 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 1,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (20, 21) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 35.323 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 8.271 N\u00b7m (eased demand 7.808) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 270.8148148148149,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 12.738908168040338,
+              "inertia_kgm2": 0.4985768586666665,
+              "max_ground_depth_mm": 35.32254874656183,
+              "max_penetration_mm": 0.398418513040113,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 84.0,
+              "peak_demand_nm": 7.807989805846277,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 8.271491511426902
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 270.815 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                0.1264176014442749,
+                "max non-pivot table incursion 35.323 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 12.739 N\u00b7m at joint 17"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.286; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (20, 21) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                0.5816687904486922,
+                "peak demand including inertia 7.808 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 20,
+          "side": "in"
+        }
+      ],
+      "notes": [
+        "final forward recheck"
+      ],
+      "scores": {
+        "balance": 0.573148148148148,
+        "ground": 0.1264176014442749,
+        "holding_load": 0.0,
+        "moving_side": 0.0,
+        "near_contact": 1.0,
+        "pivot_dip": 0.43232679279279257,
+        "torque": 0.5816687904486922
+      },
+      "start": {
+        "base": 7,
+        "lying": 0,
+        "roll": "12001300133101230333233210",
+        "states": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "violations": []
+    },
+    {
+      "complete": true,
+      "goal": {
+        "base": 7,
+        "lying": null,
+        "roll": "12001300133101230333233210",
+        "states": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "goal_progress": 26,
+      "hard_ok": true,
+      "moves": [
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.000 N\u00b7m (eased demand 0.000) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "flat",
+              "balance_margin_mm": 32.23674500805649,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.0,
+              "inertia_kgm2": 0.0,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130400846,
+              "max_pivot_dip_mm": 24.003908666666675,
+              "moving_side": "in",
+              "peak_angle_deg": 0.0,
+              "peak_demand_nm": 0.0,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.0
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 32.237 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                1.0,
+                "peak holding load 0.000 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                0.43232679279279257,
+                "pivoting hinge half dips 24.004 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.000 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 0,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.120 N\u00b7m (eased demand 0.121) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": 29.199715060047257,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.11951758873518147,
+              "inertia_kgm2": 0.0012375013333333336,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 0.12111635159907641,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.11951758873517754
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 29.200 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.9887247557796999,
+                "peak holding load 0.120 N\u00b7m at joint 1"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.121 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 25,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.793 N\u00b7m (eased demand 1.726) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 36.96296296296295,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 14.238542289131559,
+              "inertia_kgm2": 0.05616924,
+              "max_ground_depth_mm": 2.8925937693006247,
+              "max_penetration_mm": 0.3984185130401059,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.725881239370925,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.792763831027664
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 36.963 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 14.239 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.726 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 5,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.617 N\u00b7m (eased demand 1.684) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 35.273774956065864,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 1.61710193153145,
+              "inertia_kgm2": 0.04417362399999998,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.683696799795783,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.6171019315314334
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 35.274 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.847443214006467,
+                "peak holding load 1.617 N\u00b7m at joint 5"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.067; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.684 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 21,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 4.770 N\u00b7m (eased demand 4.921) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": -54.14814814814816,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 4.770077517982665,
+              "inertia_kgm2": 0.22705860000000008,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 72.0,
+              "peak_demand_nm": 4.920528096808955,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 4.7700775179826485
+            },
+            "soft": {
+              "balance": [
+                0.573148148148148,
+                "support margin -54.148 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.5499926869827674,
+                "peak holding load 4.770 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                0.4444444444444842,
+                "side moment ratio 0.933; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 4.921 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 17,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (1, 2) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.104 N\u00b7m (eased demand 0.107) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "hump",
+              "balance_margin_mm": -44.42476124804996,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 3.2106191317825368,
+              "inertia_kgm2": 0.0012375013333333334,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130400846,
+              "max_pivot_dip_mm": 24.003908666666632,
+              "moving_side": "in",
+              "peak_angle_deg": 0.0,
+              "peak_demand_nm": 0.10676588481755647,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 0.1035683590897587
+            },
+            "soft": {
+              "balance": [
+                0.6946904843993755,
+                "support margin -44.425 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.6971114026620249,
+                "peak holding load 3.211 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.008; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (1, 2) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                0.43232679279279373,
+                "pivoting hinge half dips 24.004 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.107 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 1,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (10, 11) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 2.310 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 7.048 N\u00b7m (eased demand 6.807) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 36.96296296296267,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 10.97824606351441,
+              "inertia_kgm2": 0.40247039999999995,
+              "max_ground_depth_mm": 2.309763445311013,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 76.0,
+              "peak_demand_nm": 6.807444024729607,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 7.048022144366415
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 36.963 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 2.310 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 10.978 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.484; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (10, 11) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                0.7901158281813319,
+                "peak demand including inertia 6.807 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 11,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 22.206 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 7.948 N\u00b7m (eased demand 7.643) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": -2.518518518518931,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 15.947140379684537,
+              "inertia_kgm2": 0.4283645653333341,
+              "max_ground_depth_mm": 22.20639123465037,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 80.0,
+              "peak_demand_nm": 7.642888757427795,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 7.947968247286849
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin -2.519 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                0.4809083450094495,
+                "max non-pivot table incursion 22.206 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 15.947 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                0.4761904761904041,
+                "side moment ratio 0.929; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                0.6160648422025427,
+                "peak demand including inertia 7.643 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 19,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (1, 2) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.120 N\u00b7m (eased demand 0.118) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": -2.5185185185189405,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 12.842476527130092,
+              "inertia_kgm2": 0.0012375013333333336,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130401059,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 88.0,
+              "peak_demand_nm": 0.11791882587127865,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 0.11951758873517754
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin -2.519 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 12.842 N\u00b7m at joint 17"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (1, 2) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.118 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 1,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (18, 19) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.673 N\u00b7m (eased demand 1.736) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 270.81481481481495,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 12.73890816804033,
+              "inertia_kgm2": 0.04564899199999999,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 28.0,
+              "peak_demand_nm": 1.7359174824749313,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.6732462422924854
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 270.815 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 12.739 N\u00b7m at joint 17"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.241; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (18, 19) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.736 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 19,
+          "side": "out"
+        }
+      ],
+      "notes": [
+        "final forward recheck"
+      ],
+      "scores": {
+        "balance": 0.573148148148148,
+        "ground": 0.4809083450094495,
+        "holding_load": 0.0,
+        "moving_side": 0.0,
+        "near_contact": 1.0,
+        "pivot_dip": 0.43232679279279257,
+        "torque": 0.6160648422025427
+      },
+      "start": {
+        "base": 7,
+        "lying": 0,
+        "roll": "12001300133101230333233210",
+        "states": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "violations": []
+    },
+    {
+      "complete": true,
+      "goal": {
+        "base": 7,
+        "lying": null,
+        "roll": "12001300133101230333233210",
+        "states": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "goal_progress": 26,
+      "hard_ok": true,
+      "moves": [
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.000 N\u00b7m (eased demand 0.000) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "flat",
+              "balance_margin_mm": 32.23674500805649,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.0,
+              "inertia_kgm2": 0.0,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130400846,
+              "max_pivot_dip_mm": 24.003908666666675,
+              "moving_side": "in",
+              "peak_angle_deg": 0.0,
+              "peak_demand_nm": 0.0,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.0
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 32.237 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                1.0,
+                "peak holding load 0.000 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                0.43232679279279257,
+                "pivoting hinge half dips 24.004 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.000 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 0,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.120 N\u00b7m (eased demand 0.121) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": 29.199715060047257,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.11951758873518147,
+              "inertia_kgm2": 0.0012375013333333336,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 0.12111635159907641,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.11951758873517754
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 29.200 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.9887247557796999,
+                "peak holding load 0.120 N\u00b7m at joint 1"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.121 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 25,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.793 N\u00b7m (eased demand 1.726) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 36.96296296296295,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 14.238542289131559,
+              "inertia_kgm2": 0.05616924,
+              "max_ground_depth_mm": 2.8925937693006247,
+              "max_penetration_mm": 0.3984185130401059,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.725881239370925,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.792763831027664
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 36.963 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 14.239 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.726 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 5,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.617 N\u00b7m (eased demand 1.684) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 35.273774956065864,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 1.61710193153145,
+              "inertia_kgm2": 0.04417362399999998,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.683696799795783,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.6171019315314334
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 35.274 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.847443214006467,
+                "peak holding load 1.617 N\u00b7m at joint 5"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.067; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.684 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 21,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 4.770 N\u00b7m (eased demand 4.921) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": -54.14814814814816,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 4.770077517982665,
+              "inertia_kgm2": 0.22705860000000008,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 72.0,
+              "peak_demand_nm": 4.920528096808955,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 4.7700775179826485
+            },
+            "soft": {
+              "balance": [
+                0.573148148148148,
+                "support margin -54.148 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.5499926869827674,
+                "peak holding load 4.770 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                0.4444444444444842,
+                "side moment ratio 0.933; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 4.921 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 17,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 2.214 N\u00b7m (eased demand 2.064) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 7.717056893322445,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 3.280908062878913,
+              "inertia_kgm2": 0.07440053066666667,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130401272,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 108.0,
+              "peak_demand_nm": 2.0644254453209565,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 2.214432858118418
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 7.717 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.6904803714265176,
+                "peak holding load 3.281 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.167; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 2.064 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 20,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (10, 11) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 9.991 N\u00b7m (eased demand 10.756) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 18.740740740740584,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 9.990562110206941,
+              "inertia_kgm2": 0.556365970666667,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 88.0,
+              "peak_demand_nm": 10.756475328889326,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 9.99056211020694
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 18.741 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.057494140546514964,
+                "peak holding load 9.991 N\u00b7m at joint 9"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.200; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (10, 11) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                0.0,
+                "peak demand including inertia 10.756 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 11,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (13, 14) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 2.946 N\u00b7m (eased demand 2.821) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": 9.629629629629529,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 8.492605445360217,
+              "inertia_kgm2": 0.08282517333333334,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 24.000000000000004,
+              "peak_demand_nm": 2.8211767473257225,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 2.9463926451461986
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 9.630 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.1988108070414889,
+                "peak holding load 8.493 N\u00b7m at joint 9"
+              ],
+              "moving_side": [
+                0.5128205128205235,
+                "side moment ratio 0.923; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (13, 14) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 2.821 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 14,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (20, 21) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 2.214 N\u00b7m (eased demand 2.379) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": -54.14814814814822,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 7.630779144648766,
+              "inertia_kgm2": 0.07440053066666673,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.39841851304007747,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 12.000000000000002,
+              "peak_demand_nm": 2.3785305787097,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 2.2144328581184185
+            },
+            "soft": {
+              "balance": [
+                0.5731481481481472,
+                "support margin -54.148 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.2801151750331352,
+                "peak holding load 7.631 N\u00b7m at joint 9"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.636; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (20, 21) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 2.379 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 20,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (14, 15) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 31.428 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 7.934 N\u00b7m (eased demand 7.781) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 37.43226071638515,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 8.654284529345945,
+              "inertia_kgm2": 0.41517961600000003,
+              "max_ground_depth_mm": 31.428035303023506,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 72.0,
+              "peak_demand_nm": 7.7806531523437075,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 7.933553029580393
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 37.432 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                0.23167472153990523,
+                "max non-pivot table incursion 31.428 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.18355806326925042,
+                "peak holding load 8.654 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.774; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (14, 15) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                0.5873639265950609,
+                "peak demand including inertia 7.781 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 14,
+          "side": "in"
+        }
+      ],
+      "notes": [
+        "final forward recheck"
+      ],
+      "scores": {
+        "balance": 0.5731481481481472,
+        "ground": 0.23167472153990523,
+        "holding_load": 0.0,
+        "moving_side": 0.0,
+        "near_contact": 1.0,
+        "pivot_dip": 0.43232679279279257,
+        "torque": 0.0
+      },
+      "start": {
+        "base": 7,
+        "lying": 0,
+        "roll": "12001300133101230333233210",
+        "states": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "violations": []
+    },
+    {
+      "complete": true,
+      "goal": {
+        "base": 7,
+        "lying": null,
+        "roll": "12001300133101230333233210",
+        "states": [
+          -1,
+          0,
+          0,
+          0,
+          0,
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "goal_progress": 26,
+      "hard_ok": false,
+      "moves": [
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.000 N\u00b7m (eased demand 0.000) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "flat",
+              "balance_margin_mm": 32.23674500805649,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.0,
+              "inertia_kgm2": 0.0,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130400846,
+              "max_pivot_dip_mm": 24.003908666666675,
+              "moving_side": "in",
+              "peak_angle_deg": 0.0,
+              "peak_demand_nm": 0.0,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.0
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 32.237 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                1.0,
+                "peak holding load 0.000 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                0.43232679279279257,
+                "pivoting hinge half dips 24.004 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.000 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 0,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 0.120 N\u00b7m (eased demand 0.121) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": 29.199715060047257,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 0.11951758873518147,
+              "inertia_kgm2": 0.0012375013333333336,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 0.12111635159907641,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 0.11951758873517754
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 29.200 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.9887247557796999,
+                "peak holding load 0.120 N\u00b7m at joint 1"
+              ],
+              "moving_side": [
+                0.0,
+                "side moment ratio 1.000; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 0.121 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 25,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.793 N\u00b7m (eased demand 1.726) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "up",
+              "balance_margin_mm": 36.96296296296295,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 14.238542289131559,
+              "inertia_kgm2": 0.05616924,
+              "max_ground_depth_mm": 2.8925937693006247,
+              "max_penetration_mm": 0.3984185130401059,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.725881239370925,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.792763831027664
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 36.963 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 2.893 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 14.239 N\u00b7m at joint 0"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.000; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.726 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 5,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 1.617 N\u00b7m (eased demand 1.684) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 35.273774956065864,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 1.61710193153145,
+              "inertia_kgm2": 0.04417362399999998,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 92.0,
+              "peak_demand_nm": 1.683696799795783,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 1.6171019315314334
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 35.274 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.847443214006467,
+                "peak holding load 1.617 N\u00b7m at joint 5"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.067; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (21, 22) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 1.684 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 21,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 4.770 N\u00b7m (eased demand 4.921) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "down",
+              "balance_margin_mm": -54.14814814814816,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 4.770077517982665,
+              "inertia_kgm2": 0.22705860000000008,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130402693,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 72.0,
+              "peak_demand_nm": 4.920528096808955,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 4.7700775179826485
+            },
+            "soft": {
+              "balance": [
+                0.573148148148148,
+                "support margin -54.148 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.5499926869827674,
+                "peak holding load 4.770 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                0.4444444444444842,
+                "side moment ratio 0.933; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (17, 18) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 4.921 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 17,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 2.214 N\u00b7m (eased demand 2.064) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 7.717056893322445,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 3.280908062878913,
+              "inertia_kgm2": 0.07440053066666667,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.3984185130401272,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 108.0,
+              "peak_demand_nm": 2.0644254453209565,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 2.214432858118418
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 7.717 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.6904803714265176,
+                "peak holding load 3.281 N\u00b7m at joint 6"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.167; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 2.064 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 20,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (10, 11) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 9.991 N\u00b7m (eased demand 10.756) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": 18.740740740740584,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 9.990562110206941,
+              "inertia_kgm2": 0.556365970666667,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 88.0,
+              "peak_demand_nm": 10.756475328889326,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 9.99056211020694
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 18.741 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.057494140546514964,
+                "peak holding load 9.991 N\u00b7m at joint 9"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.200; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (10, 11) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                0.0,
+                "peak demand including inertia 10.756 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 11,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (13, 14) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 35.323 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 7.934 N\u00b7m (eased demand 7.136) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": -19.373078249014032,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 10.20203930500089,
+              "inertia_kgm2": 0.41517961600000003,
+              "max_ground_depth_mm": 35.32254874656196,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "in",
+              "peak_angle_deg": 108.0,
+              "peak_demand_nm": 7.135774854403299,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": true,
+              "static_peak_nm": 7.933553029580392
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin -19.373 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                0.12641760144427144,
+                "max non-pivot table incursion 35.323 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.03754346179236888,
+                "peak holding load 10.202 N\u00b7m at joint 5"
+              ],
+              "moving_side": [
+                0.5128205128205235,
+                "side moment ratio 0.923; selected in"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (13, 14) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                0.7217135719993127,
+                "peak demand including inertia 7.136 N\u00b7m"
+              ]
+            }
+          },
+          "delta": -1,
+          "duration_s": 2.0,
+          "joint": 14,
+          "side": "in"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "max CAD penetration 0.398 mm for modules (13, 14) (limit 6.000 mm)"
+              ],
+              "ground": [
+                true,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ],
+              "torque_stall": [
+                true,
+                "peak static torque 2.693 N\u00b7m (eased demand 2.907) (cap 5.800, stall 10.600)"
+              ]
+            },
+            "measurements": {
+              "arc": "mixed",
+              "balance_margin_mm": -235.49435103499687,
+              "first_contact_angle_deg": 12.0,
+              "holding_peak_nm": 14.121674284757729,
+              "inertia_kgm2": 0.08282517333333334,
+              "max_ground_depth_mm": 0.0,
+              "max_penetration_mm": 0.39841851304015563,
+              "max_pivot_dip_mm": 0.0,
+              "moving_side": "out",
+              "peak_angle_deg": 0.0,
+              "peak_demand_nm": 2.9067856897059845,
+              "rest_unique_cells": 27,
+              "samples": 61,
+              "side_ambiguous": false,
+              "static_peak_nm": 2.6927773363337244
+            },
+            "soft": {
+              "balance": [
+                0.0,
+                "support margin -235.494 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                1.0,
+                "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+              ],
+              "holding_load": [
+                0.0,
+                "peak holding load 14.122 N\u00b7m at joint 24"
+              ],
+              "moving_side": [
+                1.0,
+                "side moment ratio 0.347; selected out"
+              ],
+              "near_contact": [
+                1.0,
+                "max CAD penetration 0.398 mm for modules (13, 14) (limit 6.000 mm)"
+              ],
+              "pivot_dip": [
+                1.0,
+                "pivoting hinge half dips 0.000 mm"
+              ],
+              "torque": [
+                1.0,
+                "peak demand including inertia 2.907 N\u00b7m"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 14,
+          "side": "out"
+        },
+        {
+          "checks": {
+            "hard": {
+              "cad_penetration": [
+                true,
+                "early sampled CAD penetration 0.000 mm (limit 6.000 mm)"
+              ],
+              "ground": [
+                false,
+                "early sampled table incursion 81.333 mm (limit 40.000 mm)"
+              ],
+              "rest_cell_overlap": [
+                true,
+                "0 duplicate occupied lattice cells at rest"
+              ]
+            },
+            "measurements": {
+              "balance_margin_mm": 270.81481481481495,
+              "early_rejection": true,
+              "early_rejection_angle_deg": 60.0,
+              "max_ground_depth_mm": 81.3333333333335,
+              "max_penetration_mm": 0.0,
+              "rest_unique_cells": 27,
+              "samples": 2
+            },
+            "soft": {
+              "balance": [
+                1.0,
+                "support margin 270.815 mm (preferred -20.000 mm)"
+              ],
+              "ground": [
+                0.0,
+                "early sampled table incursion 81.333 mm (limit 40.000 mm)"
+              ],
+              "near_contact": [
+                1.0,
+                "early sampled CAD penetration 0.000 mm (limit 6.000 mm)"
+              ]
+            }
+          },
+          "delta": 1,
+          "duration_s": 2.0,
+          "joint": 20,
+          "side": "out"
+        }
+      ],
+      "notes": [
+        "search edge rejected by hard checks"
+      ],
+      "scores": {
+        "balance": 0.0,
+        "ground": 0.0,
+        "holding_load": 0.0,
+        "moving_side": 0.0,
+        "near_contact": 1.0,
+        "pivot_dip": 0.43232679279279257,
+        "torque": 0.0
+      },
+      "start": {
+        "base": 7,
+        "lying": 0,
+        "roll": "12001300133101230333233210",
+        "states": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "violations": [
+        "move 9 ground: early sampled table incursion 81.333 mm (limit 40.000 mm)"
+      ]
+    }
+  ],
+  "diagnostics": [
+    "node or wall-clock budget exhausted"
+  ],
+  "elapsed_s": 60.00163204399996,
+  "nodes": 675,
+  "proof": null,
+  "status": "FOUND"
+}

@@ -1,0 +1,130 @@
+# Threadable 27-cell goal poses for the sketches in demo-sketches.txt.
+#
+# Produced by: uv run python tools/sketch_fit.py docs/sketches/demo-sketches.txt \
+#                --out docs/sketches/threadable-targets.txt \
+#                --walks 16 --steps 6000 --tests 4000 --seed 11
+#
+# Each mask threads on the shipped roll (machine.toml) and is a GOAL POSE ONLY:
+# no fold order has been searched yet. Run `cubot fold` next, and expect
+# table-incursion failures of the kind that blocked lightning.
+#
+# 'rank' is how deep in the IoU-ranked variant pool the threading was found.
+# High rank means the search walked far from the sketch, so check recognition
+# by eye: see docs/DEMO_SHAPE_IDEAS.md for which of these still read.
+
+=== maple-leaf  (iou 0.50, variant rank 3004)
+.######
+.#..###
+.#..###
+.######
+...#...
+#.##...
+###....
+
+=== goose  (iou 0.65, variant rank 1222)
+.####.
+.####.
+...##.
+...##.
+#####.
+#.#.##
+######
+
+=== space-invader  (iou 0.74, variant rank 122)
+......#
+.######
+####.##
+#######
+..###.#
+....###
+
+=== pacman  (iou 0.63, variant rank 1954)
+..###..
+.##.###
+.#.....
+.#.....
+######.
+######.
+.#####.
+
+=== ghost  (iou 0.53, variant rank 3394)
+##......
+######..
+##...###
+.#..####
+.#######
+......##
+
+=== smiley  (iou 0.77, variant rank 481)
+..####.
+.######
+.####.#
+.######
+##..##.
+....##.
+
+=== cat-face  (iou 0.82, variant rank 93)
+##.....
+#######
+#.###.#
+#######
+.####..
+...##..
+
+=== star  (iou 0.77, variant rank 353)
+...##...
+...###..
+.###.###
+########
+..##.##.
+..##.##.
+
+=== skull  (iou 0.84, variant rank 97)
+.#####.
+#######
+#.#.#.#
+###.#.#
+###.###
+
+=== donut  (iou 0.81, variant rank 1172)
+######.
+###..##
+####..#
+#.....#
+##...##
+.#####.
+
+=== spiral  (iou 0.81, variant rank 13)
+#######
+#.....#
+#.....#
+#.....#
+#.#####
+#.#....
+######.
+
+=== mushroom  (iou 0.90, variant rank 92)
+..#####
+#######
+#######
+..###..
+..###..
+..##...
+
+=== rabbit  (iou 0.82, variant rank 425)
+###...
+###...
+.##...
+.####.
+.#####
+.#####
+.####.
+....#.
+
+=== cloud  (iou 0.86, variant rank 211)
+...###.
+######.
+#######
+#######
+..####.
+
