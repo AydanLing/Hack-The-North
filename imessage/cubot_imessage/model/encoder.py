@@ -60,7 +60,7 @@ class TransformerEncoder:
     kind = "transformer"
 
     def __init__(self, model: str = DEFAULT_MODEL, max_length: int = 64, batch_size: int = 128,
-                 allow_download: bool = True):
+                 allow_download: bool = True, prefer_vendored: bool = True):
         spec = MODELS.get(model)
         if spec is None:
             raise ValueError(f"unknown encoder {model!r}; known: {', '.join(MODELS)}")
@@ -68,19 +68,33 @@ class TransformerEncoder:
         self.repo = spec["repo"]
         self.prefix = spec["prefix"]
         self.batch_size = batch_size
-        self.name = f"transformer:{model}"
 
         import onnxruntime as ort
         from tokenizers import Tokenizer
 
-        self.tokenizer = Tokenizer.from_file(_hub_file(self.repo, "tokenizer.json", allow_download))
+        # Weights committed to the repo win over the Hugging Face cache, so a fresh clone needs no
+        # network. `self.source` records which was used: the head must be fitted on the same bytes
+        # that serve it, because int8 and float embeddings are not interchangeable.
+        entry = _vendored(model) if prefer_vendored else None
+        if entry:
+            weights_path, tokenizer_path = entry["weights"], entry["tokenizer"]
+            self.source = "vendored" + (":int8" if entry["manifest"].get("quantized") else ":fp32")
+        else:
+            weights_path = _onnx_weights(self.repo, allow_download)
+            tokenizer_path = _hub_file(self.repo, "tokenizer.json", allow_download)
+            self.source = "hub"
+        # The source is part of the name so it lands in the saved head and in `doctor`, which is how
+        # you notice a head fitted on float weights being served by int8 ones.
+        self.name = f"transformer:{model}@{self.source}"
+
+        self.tokenizer = Tokenizer.from_file(tokenizer_path)
         self.tokenizer.enable_truncation(max_length)
         self.tokenizer.enable_padding()
 
         options = ort.SessionOptions()
         options.log_severity_level = 3
         self.session = ort.InferenceSession(
-            _onnx_weights(self.repo, allow_download), options, providers=["CPUExecutionProvider"])
+            weights_path, options, providers=["CPUExecutionProvider"])
         self.inputs = {i.name for i in self.session.get_inputs()}
         shape = self.session.get_outputs()[0].shape
         self.dim = int(shape[-1]) if isinstance(shape[-1], int) else int(spec["dim"])
@@ -103,6 +117,15 @@ class TransformerEncoder:
 
     def state(self) -> dict:
         return {"encoder_model": np.array(self.model)}
+
+
+def _vendored(model: str):
+    """Repo-local weights for `model`, or None. Imported lazily to keep the module cycle-free."""
+    try:
+        from .vendor import vendored
+    except ImportError:
+        return None
+    return vendored(model)
 
 
 def _hub_file(repo: str, filename: str, allow_download: bool = True) -> str:
@@ -226,7 +249,7 @@ class HybridEncoder:
                  tfidf: Optional[TfidfEncoder] = None, model: str = DEFAULT_MODEL):
         self.transformer = transformer or TransformerEncoder(model)
         self.tfidf = tfidf or TfidfEncoder()
-        self.name = f"hybrid:{self.transformer.model}"
+        self.name = f"hybrid:{self.transformer.model}@{self.transformer.source}"
 
     @property
     def dim(self) -> int:

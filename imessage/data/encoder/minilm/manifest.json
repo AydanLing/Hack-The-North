@@ -1,0 +1,11 @@
+{
+  "model": "minilm",
+  "note": "Fit the head on these weights, not the float ones: quantization shifts the embeddings and the head is a linear rule over them.",
+  "quantization": "dynamic int8 (weights only)",
+  "quantized": true,
+  "repo": "sentence-transformers/all-MiniLM-L6-v2",
+  "source_file": "onnx/model.onnx",
+  "tokenizer_sha256": "be50c3628f2bf5bb5e3a7f17b1f74611b2561a3a27eeab05e5aa30f411572037",
+  "weights_mb": 22.9,
+  "weights_sha256": "64d95decae7a8f071f6fa2e554ccc47c93e49e208c22df52e6af4e69addf06ac"
+}

@@ -20,6 +20,7 @@ It is self-contained: clone, train once, run.
 | Linq | `linq.py` | inbound webhook parsing, outbound replies, dedupe, rate limit |
 | Corpus | `data/utterances.jsonl` | the training set, authored for CuBot's own shape vocabulary |
 | Encoder | `model/encoder.py` | frozen sentence-transformer (ONNX, CPU) + numpy TF-IDF |
+| Weights | `model/vendor.py` → `data/encoder/` | the encoder, quantized and committed, so no download |
 | Head | `model/head.py` | class-balanced multinomial softmax, fitted in numpy |
 | Intent | `intent.py` | utterance → one label, offline, ~2 ms |
 | Captions | `captions.py` | who is addressed, and what to say back |
@@ -28,17 +29,59 @@ It is self-contained: clone, train once, run.
 | Orchestration | `bridge.py` | decide, plan, reply |
 | Transport | `server.py` | stdlib HTTP, auth, queueing |
 
-The bridge itself is standard library only. The model needs `numpy`, `onnxruntime`, `tokenizers` and
-`huggingface_hub` — and only at training time and for the semantic half of the encoder; the TF-IDF
-encoder (`--encoder tfidf`) is pure numpy and needs no download at all.
+The bridge itself is standard library only. The model needs `numpy` and `onnxruntime`; `tokenizers`
+and `huggingface_hub` are only needed to *re-vendor* the encoder, not to run it.
 
 ## Setup
 
 ```bash
 cp imessage/.env.example imessage/.env      # then fill in LINQ_API_KEY (+ LINQ_WEBHOOK_SECRET later)
-python3 -m cubot_imessage.model.train       # ~1 minute, CPU only
+pip install numpy onnxruntime
 python3 -m cubot_imessage doctor
 ```
+
+That is the whole setup: **both halves of the model are committed**, so there is nothing to download
+and nothing to train. `data/encoder/minilm/` holds the frozen encoder and `data/intent_head.npz` the
+head that was fitted on it.
+
+## The model is in the repo, both halves
+
+A frozen sentence encoder plus a linear head is two artifacts, and shipping only one of them is what
+makes a "works on my laptop" demo. Both are committed:
+
+| | Path | Size | What it is |
+|---|---|---|---|
+| Encoder | `data/encoder/minilm/model.onnx` | 23 MB | all-MiniLM-L6-v2, dynamically quantized to int8 |
+| Tokenizer | `data/encoder/minilm/tokenizer.json` | 0.5 MB | its WordPiece vocabulary |
+| Head | `data/intent_head.npz` | 4.7 MB | 68-class softmax + the fitted TF-IDF vocabulary |
+
+Quantization is what makes this practical: the float weights are 90 MB, which GitHub warns about and
+every clone pays for. Int8 is 23 MB. Re-vendor with:
+
+```bash
+python3 -m cubot_imessage.model.vendor          # fetch, quantize to int8, checksum
+python3 -m cubot_imessage.model.vendor --check   # what is vendored, offline
+python3 -m cubot_imessage.model.vendor --drift   # int8 vs float embedding similarity
+python3 -m cubot_imessage.model.vendor --fp32    # don't quantize, if you have a reason
+```
+
+**Int8 costs nothing measurable here, but not for the reason you might assume.** Quantization moves
+the embeddings a long way in absolute terms — mean cosine against the float weights is 0.958, not
+0.999. It does not matter, because the head is a *linear* rule fitted on whatever space the encoder
+produces, and it is refitted on the quantized embeddings. The drift is largely a consistent
+transformation, and a linear model absorbs it:
+
+| | float32 (90 MB) | **int8 (23 MB)** |
+|---|---|---|
+| Top-1 accuracy | 0.934 ± 0.004 | **0.934 ± 0.006** |
+| Accuracy among accepted | 0.984 | 0.983 |
+| Coverage | 84.5% | 84.2% |
+| Chitchat declined | 97.4% | **98.7%** |
+
+The corollary is the trap: **fit the head on the same weights that will serve it.** A head trained on
+float embeddings and served by int8 ones is quietly mis-calibrated. `train.py` uses the vendored
+weights whenever they exist, so the order is vendor first, then train, and the encoder's name in the
+saved head records which it used (`hybrid:minilm@vendored:int8`) so `doctor` can show you.
 
 `doctor` is the pre-demo check. It prints the config, verifies every shipped fold path re-derives its
 own goal from its move deltas, loads the intent model, and probes it with the hero utterance.
@@ -46,12 +89,14 @@ own goal from its move deltas, loads the intent model, and probes it with the he
 The Linq key comes from the free Hack the North sandbox (`dashboard.linqapp.com/sandbox-signup`, or
 the event portal), which also provisions the phone number people will text.
 
-### Training the model
+### Retraining the model
+
+Only needed if you change the corpus. About two minutes on a laptop CPU.
 
 ```bash
 python3 -m cubot_imessage.model.train                   # evaluate, then fit and write the head
 python3 -m cubot_imessage.model.train --eval-only       # report without writing anything
-python3 -m cubot_imessage.model.train --encoder tfidf   # no download, no network
+python3 -m cubot_imessage.model.train --encoder tfidf   # pure numpy, no encoder at all
 python3 -m cubot_imessage.model.train --model bge-small # a different frozen encoder
 ```
 
@@ -192,7 +237,7 @@ simply omitting the header.
 python3 -m pytest imessage/tests -q
 ```
 
-83 tests, none of which touch the network or need a trained head: the classifier is faked for the
+86 tests, none of which touch the network or need a trained head: the classifier is faked for the
 bridge tests, the handoff folder is a fixture, and the model tests run on the pure-numpy TF-IDF
 encoder. `test_server.py` stands the webhook endpoint up on an ephemeral port to check the
 authentication gate end to end, because the mistake worth catching there is not in any one function

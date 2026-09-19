@@ -18,6 +18,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from cubot_imessage.captions import caption_for, extract_who, pretty          # noqa: E402
 from cubot_imessage.model.dataset import (Corpus, confusions, load_corpus,    # noqa: E402
                                           per_class_recall, stratified_split)
+from cubot_imessage.model import vendor                                      # noqa: E402
 from cubot_imessage.model.encoder import TfidfEncoder, normalize             # noqa: E402
 from cubot_imessage.model.head import (NONE_LABEL, IntentHead,               # noqa: E402
                                         choose_thresholds, softmax)
@@ -266,3 +267,42 @@ def test_pretty_names():
     assert pretty("digit_0") == "the number 0"
     assert pretty("square_wave") == "a square wave"
     assert pretty("anchor") == "an anchor"
+
+
+# ------------------------------------------------------------------------------- vendored encoder
+
+def test_vendored_returns_none_when_incomplete(tmp_path, monkeypatch):
+    """A half-written encoder directory must read as absent, not as usable — otherwise a failed
+    vendor run turns into a confusing onnxruntime error at demo time."""
+    monkeypatch.setattr(vendor, "VENDOR_DIR", str(tmp_path))
+    assert vendor.vendored("minilm") is None
+
+    (tmp_path / "minilm").mkdir()
+    (tmp_path / "minilm" / "model.onnx").write_bytes(b"not really onnx")
+    assert vendor.vendored("minilm") is None            # tokenizer still missing
+
+    (tmp_path / "minilm" / "tokenizer.json").write_text("{}")
+    entry = vendor.vendored("minilm")
+    assert entry is not None and entry["manifest"] == {}   # no manifest is tolerated
+
+
+def test_vendored_reads_the_manifest(tmp_path, monkeypatch):
+    monkeypatch.setattr(vendor, "VENDOR_DIR", str(tmp_path))
+    base = tmp_path / "minilm"
+    base.mkdir()
+    (base / "model.onnx").write_bytes(b"x")
+    (base / "tokenizer.json").write_text("{}")
+    (base / "manifest.json").write_text(json.dumps({"quantized": True, "model": "minilm"}))
+    assert vendor.vendored("minilm")["manifest"]["quantized"] is True
+
+
+def test_the_real_vendored_encoder_is_int8_and_matches_its_manifest():
+    """When weights are committed, their checksum must match what the manifest recorded. A silent
+    mismatch means the head is being served by bytes it was not fitted on."""
+    entry = vendor.vendored("minilm")
+    if not entry or not entry["manifest"]:
+        pytest.skip("no encoder vendored in this checkout")
+    manifest = entry["manifest"]
+    assert manifest["quantized"] is True
+    assert vendor.sha256(entry["weights"]) == manifest["weights_sha256"]
+    assert vendor.sha256(entry["tokenizer"]) == manifest["tokenizer_sha256"]
