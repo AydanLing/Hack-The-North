@@ -7563,6 +7563,68 @@
       ],
       "created": "2026-09-19T17:26:32.618168+00:00",
       "mask_variant": "duck-v1"
+    },
+    {
+      "number": 136,
+      "name": "cube-frame",
+      "dir": "shapes/136-cube-frame",
+      "moves": 15,
+      "complete": true,
+      "accept_profile": "loose",
+      "tier": 1,
+      "loose_hard_ok": true,
+      "platform_hard_ok": null,
+      "strict_hard_ok": false,
+      "loose_violations": 0,
+      "layered": true,
+      "final_upright": true,
+      "lattice_span": [
+        4,
+        3,
+        4
+      ],
+      "alternate_passing_routes": 0,
+      "human_pick": "cube-frame",
+      "ends_flat_on_table": false,
+      "start_base": 0,
+      "goal_base_nominal": 9,
+      "final_base_tracked": 9,
+      "goal_states": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        1,
+        0,
+        -1,
+        0,
+        1,
+        1,
+        0,
+        -1,
+        -1,
+        0,
+        0,
+        -1,
+        0,
+        0,
+        1,
+        0,
+        -1,
+        -1,
+        -1,
+        1,
+        0
+      ],
+      "created": "2026-09-19T20:50:50.642223+00:00",
+      "mask_variant": "cube-frame-v1",
+      "aliases": [
+        "cube",
+        "block",
+        "cube frame",
+        "cubeframe"
+      ]
     }
   ]
 }

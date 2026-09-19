@@ -43,7 +43,11 @@ How to choose (best → worst):
 3. Strong visual / cultural metaphor (lean into these — invent more like them):
    love→heart, cheese/wedge/pizza→triangle, coffee/drink→mug, storm→lightning,
    waves/wifi→square_wave, yes/done→checkmark, nature→tree, space→rocket, boat→boat,
-   circle/donut→ring, climb→staircase, time→hourglass, gym→dumbbell, etc.
+   circle/donut→ring, climb→staircase, time→hourglass, gym→dumbbell,
+   office clip / attach papers→paperclip, build / nail / tool→hammer, sit / seat→stool or lounge
+   or bench, write / sketch→pencil, look closer / investigate / clue→magnifier,
+   drink container→bottle, furniture / lamp table→side_table, chunky block→half_cube,
+   on/off / boot / energy button→power, etc.
 4. Booth jokes: Jerry/name → letter_j; creator/"who's your daddy"/who made you → letter_u.
 5. Soft chitchat / food / random → still invent a playful non-letter link when you can.
 6. Absolute last resort ONLY: first letter of the most contentful real word (never the word

@@ -25,7 +25,7 @@ from .linq import InboundMessage, LinqClient, LinqError
 from .openai_fallback import OpenAIFallback
 from .robot import Executor, FoldPlan, ShapeLibrary, build_executor
 from .vocab import (STATUS_PLANNABLE, STATUS_PLAYABLE, STATUS_REJECTED, STATUS_UNMAPPED,
-                    STATUS_UNSURE, Resolution, Vocabulary)
+                    STATUS_UNSURE, CUBOT_ALIASES, Resolution, Vocabulary)
 
 THINKING_EMOJI = "🤔"
 
@@ -124,7 +124,23 @@ class Bridge:
                 known = self.classifier.labels
             except Exception:
                 known = None
-            self._playable_labels = self.vocab.playable_labels(known)
+            base = self.vocab.playable_labels(known)
+            # Handoff concepts MiniLM has never seen (e.g. volumetric paperclip/hammer) must still
+            # be choosable by the OpenAI fallback — expose them as underscore labels.
+            for concept in self.vocab.playable_concepts:
+                shape = self.vocab.shape_for_icon(concept)
+                if not shape:
+                    continue
+                for lab in {concept, concept.replace("-", "_")}:
+                    base.setdefault(lab, shape)
+            # Expose aliases (cube/block → cube-frame) so OpenAI can name them directly.
+            for alias, canonical in CUBOT_ALIASES.items():
+                shape = self.vocab.shape_for_icon(canonical)
+                if not shape:
+                    continue
+                for lab in {alias, alias.replace("-", "_")}:
+                    base.setdefault(lab, shape)
+            self._playable_labels = base
         return self._playable_labels
 
     # -- replies -----------------------------------------------------------------------------

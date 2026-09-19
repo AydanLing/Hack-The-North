@@ -53,9 +53,19 @@ CUBOT_ALIASES: dict[str, str] = {
     "bolt": "lightning", "lightning-bolt": "lightning", "cross": "plus", "+": "plus",
     "note": "music-note", "music": "music-note", "question": "question-mark", "?": "question-mark",
     "smile": "smiley", "wave": "square-wave", "signal": "square-wave", "zigzag": "square-wave",
-    "cup": "mug", "check": "checkmark", "tick": "checkmark", "stairs": "staircase",
-    "barbell": "dumbbell", "box": "square", "o": "ring", "circle": "ring", "ship": "boat",
+    "cup": "mug", "check": "checkmark", "tick": "checkmark",
+    # "stairs" is its own handoff shape (100+); only map near-synonyms onto staircase.
+    "stair": "staircase", "stair-case": "staircase",
+    "barbell": "dumbbell",
+    # "box" stays the flat 2-D square glyph; 3-D "cube"/"block" route to cube-frame.
+    "box": "square", "o": "ring", "circle": "ring", "ship": "boat",
     "arrow-up": "up-arrow", "plane": "aeroplane",
+    "cube": "cube-frame", "block": "cube-frame", "cubeframe": "cube-frame",
+    "cube-frame": "cube-frame",
+    # newly playable concepts that used to live only under CUBOT_REJECTED / near-synonyms
+    "television": "tv", "telly": "tv", "happy-face": "smiley", "chat-bubble": "speech-bubble",
+    "moon": "crescent-moon", "wineglass": "wine-glass", "rubbish": "trash", "bin": "trash",
+    "mobile": "phone", "cellphone": "phone",
     **{f"letter-{c}": c for c in "abcdefghijklmnopqrstuvwxyz"},
     # cubot writes digits both ways depending on the run: "d0" in the exploration export, "0" in
     # parametric's registry. Accept either and canonicalise on the "d" form.
