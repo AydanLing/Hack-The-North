@@ -122,17 +122,20 @@ class PlanCandidate:
     def rank_key(self) -> tuple[int, float, float, float, int, int]:
         """Contract ordering for passing, violating, and partial plans.
 
-        Completion class is always primary.  For complete violating plans the
-        normalized violation count precedes soft scores.  For partial plans,
-        remaining goal distance precedes violation severity, so a useful
-        near-complete route cannot be hidden by a shallow route whose only
+        Completion class is always primary.  For complete hard-OK plans, move
+        count precedes soft scores (stress is gated in check_move).  For complete
+        violating plans the normalized violation count precedes soft scores.  For
+        partial plans, remaining goal distance precedes violation severity, so a
+        useful near-complete route cannot be hidden by a shallow route whose only
         advantage is that it has accumulated fewer soft measurements.
         """
 
         violation_count = sum(1 for violation in self.violations if violation)
         worst = min(self.scores.values(), default=1.0)
         if self.complete and self.hard_ok:
-            return (0, 0.0, -worst, 0.0, len(self.moves), -self.goal_progress)
+            # Stress is gated in check_move; among passers prefer fewer moves,
+            # then better soft scores as a tie-break.
+            return (0, float(len(self.moves)), -worst, 0.0, 0, -self.goal_progress)
         if self.complete:
             normalized = violation_count / max(1, len(self.moves))
             return (1, normalized, -worst, 0.0, len(self.moves), -self.goal_progress)

@@ -10,8 +10,10 @@ summarized later by ``tools/explore_summary.py``.
 
 Usage (from ``cubot-v2/``)::
 
-    uv run python tools/explore_shape.py --name l data/candidates/letters/l-v1.txt
-    uv run python tools/explore_shape.py --name l data/candidates/letters/l-v*.txt --time-budget 90
+    python tools/explore_shape.py --name l data/candidates/letters/l-v1.txt
+    python tools/explore_shape.py --name l data/candidates/letters/l-v*.txt --time-budget 90
+    python tools/explore_shape.py --name checkmark data/candidates/geometric/checkmark-v1.txt \\
+        --profile gentle --yaw-expand
 
 Mask files are top-first ASCII rows using ``#`` for filled and ``.`` for empty.
 """
@@ -37,7 +39,7 @@ from cubot.lattice import fk  # noqa: E402
 from cubot.match import MatchResult, recognition_distance  # noqa: E402
 from cubot.pipeline import run_pipeline  # noqa: E402
 from cubot.records import Move, Pose  # noqa: E402
-from cubot.shapes import canonical_planar, screen  # noqa: E402
+from cubot.shapes import canonical_planar, planar_views, screen  # noqa: E402
 from cubot.solver import solve  # noqa: E402
 
 
@@ -72,6 +74,107 @@ def ends_flat(plan: dict) -> bool | None:
     return span[2] == 0
 
 
+def planar_view_to_grid(view: tuple[tuple[int, int], ...]) -> np.ndarray:
+    """Rebuild a top-first boolean grid from a normalized planar view."""
+
+    if not view:
+        raise ValueError("empty planar view")
+    max_x = max(x for x, _ in view)
+    max_y = max(y for _, y in view)
+    height = max_y + 1
+    width = max_x + 1
+    grid = np.zeros((height, width), dtype=bool)
+    for x, y in view:
+        # PixelTarget.cells uses (x, height-1-row, 0) from np.argwhere rows.
+        grid[height - 1 - y, x] = True
+    return grid
+
+
+def cells_to_grid(cells: tuple[tuple[int, int, int], ...]) -> np.ndarray:
+    max_x = max(c[0] for c in cells)
+    max_y = max(c[1] for c in cells)
+    height = max_y + 1
+    width = max_x + 1
+    grid = np.zeros((height, width), dtype=bool)
+    for x, y, _z in cells:
+        grid[height - 1 - y, x] = True
+    return grid
+
+
+def yaw_expanded_targets(name: str, cells: tuple[tuple[int, int, int], ...], caption: str) -> list[PixelTarget]:
+    """Distinct planar yaw/mirror views of ``cells`` as PixelTargets."""
+
+    concept_key = canonical_planar(cells)
+    seen: set[tuple[tuple[int, int], ...]] = set()
+    targets: list[PixelTarget] = []
+    for view in planar_views(cells, reflect=True):
+        if view in seen:
+            continue
+        seen.add(view)
+        grid = planar_view_to_grid(view)
+        target = PixelTarget(grid=grid, concept=name, caption=caption, source="explore-yaw")
+        if canonical_planar(target.cells) != concept_key:
+            continue
+        targets.append(target)
+    return targets or [
+        PixelTarget(grid=cells_to_grid(cells), concept=name, caption=caption, source="explore")
+    ]
+
+
+def _threading_l1(pose: Pose) -> int:
+    return int(sum(abs(int(s)) for s in pose.states))
+
+
+def collect_yaw_threadings(
+    name: str,
+    cells: tuple[tuple[int, int, int], ...],
+    caption: str,
+    machine,
+    *,
+    yaw_expand: bool,
+    max_solutions: int = 64,
+) -> tuple[list[MatchResult], int, str | None]:
+    """Thread the mask (and optional yaw views); return MatchResults sorted by L1."""
+
+    concept_key = canonical_planar(cells)
+    if yaw_expand:
+        targets = yaw_expanded_targets(name, cells, caption)
+    else:
+        targets = [
+            PixelTarget(grid=cells_to_grid(cells), concept=name, caption=caption, source="explore")
+        ]
+
+    exact: list[MatchResult] = []
+    seen_states: set[tuple[int, ...]] = set()
+    thread_status: str | None = None
+    total_threadings = 0
+    for target in targets:
+        threaded = solve(
+            tuple(target.cells),
+            machine.roll,
+            all_solutions=True,
+            max_solutions=max_solutions,
+            tether=machine.has_tether,
+        )
+        thread_status = threaded.status.value
+        if not threaded.found:
+            continue
+        total_threadings += len(threaded.solutions)
+        for pose in threaded.poses:
+            pose_cells, _ = fk(pose.states, machine.roll, base=pose.base)
+            if canonical_planar(pose_cells) != concept_key:
+                continue
+            key = tuple(int(s) for s in pose.states)
+            if key in seen_states:
+                continue
+            seen_states.add(key)
+            distance, transform = recognition_distance(pose_cells, target)
+            exact.append(MatchResult(pose, tuple(pose_cells), distance, "exact", transform))
+
+    exact.sort(key=lambda m: (_threading_l1(m.pose), m.distance))
+    return exact, total_threadings, thread_status
+
+
 def explore_one(
     name: str,
     mask_path: Path,
@@ -82,6 +185,8 @@ def explore_one(
     k: int,
     max_candidates: int,
     seed: int,
+    profile: str = "gentle",
+    yaw_expand: bool = True,
 ) -> dict:
     machine = load_machine()
     rows = read_mask(mask_path)
@@ -105,6 +210,8 @@ def explore_one(
         "screen_reason": None,
         "threadings": 0,
         "thread_status": None,
+        "yaw_expand": yaw_expand,
+        "profile": profile,
         "complete": None,
         "hard_ok": None,
         "violations": [],
@@ -128,21 +235,21 @@ def explore_one(
         row["elapsed_s"] = round(time.monotonic() - started, 2)
         return row
 
-    threaded = solve(cells, machine.roll, all_solutions=True, max_solutions=64, tether=machine.has_tether)
-    row["thread_status"] = threaded.status.value
-    row["threadings"] = len(threaded.solutions)
-    if not threaded.found:
+    exact, total_threadings, thread_status = collect_yaw_threadings(
+        name,
+        cells,
+        target.caption,
+        machine,
+        yaw_expand=yaw_expand,
+    )
+    row["thread_status"] = thread_status
+    row["threadings"] = total_threadings
+    if not exact:
         row["elapsed_s"] = round(time.monotonic() - started, 2)
         return row
 
-    # Fold only exact threadings of this mask.  Left to itself the pipeline's
-    # matcher also folds nearby family drawings, and a "PASS" for a substitute
-    # silhouette is not evidence about the mask we are exploring.
-    exact: list[MatchResult] = []
-    for pose in threaded.poses[:k]:
-        pose_cells, _ = fk(pose.states, machine.roll, base=pose.base)
-        distance, transform = recognition_distance(pose_cells, target)
-        exact.append(MatchResult(pose, tuple(pose_cells), distance, "exact", transform))
+    # Fold only exact threadings (incl. yaw views). Prefer low-L1 goals first.
+    match_results = exact[: max(k, 1)]
 
     run_dir = out_root / "runs" / variant
     run = run_pipeline(
@@ -150,12 +257,13 @@ def explore_one(
         run_dir,
         machine=machine,
         family=family,
-        match_results=exact,
+        match_results=match_results,
         seed=seed,
         k=k,
         time_budget_s=time_budget_s,
         max_candidates=max_candidates,
         include_heart_certificate=False,
+        profile=profile,
     )
     record = json.loads(run.record_path.read_text())
     row["record_json"] = str(run.record_path)
@@ -202,12 +310,19 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("masks", nargs="+", type=Path, help="ASCII mask files (top row first)")
     parser.add_argument("--name", required=True, help="concept name, e.g. 'l' or 'umbrella'")
-    parser.add_argument("--out", type=Path, default=Path("out/explore-20260919"))
+    parser.add_argument("--out", type=Path, default=Path("out/explore-gentle"))
     parser.add_argument("--family", type=Path, default=Path("data/family/shipped-8x8.npz"))
     parser.add_argument("--time-budget", type=float, default=90.0, help="total fold-search seconds per mask")
     parser.add_argument("-k", type=int, default=3)
     parser.add_argument("--max-candidates", type=int, default=4)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--profile", default="gentle", help="fold acceptance profile (default: gentle)")
+    parser.add_argument(
+        "--yaw-expand",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="also thread planar yaw/mirror views of the mask (default: on)",
+    )
     parser.add_argument("--gate-only", action="store_true", help="screen + thread only; never fold")
     args = parser.parse_args()
 
@@ -240,6 +355,8 @@ def main() -> int:
             k=args.k,
             max_candidates=args.max_candidates,
             seed=args.seed,
+            profile=args.profile,
+            yaw_expand=args.yaw_expand,
         )
         with results_path.open("a") as handle:
             handle.write(json.dumps(row) + "\n")

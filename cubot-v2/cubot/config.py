@@ -63,6 +63,10 @@ class Profile:
     node_budget: int
     detour_budget: int
     side_ambiguity_ratio: float
+    # Optional stress hard gates (defaults = effectively off for legacy profiles).
+    holding_hard_nm: float = 1e9
+    pivot_dip_hard_mm: float = 1e9
+    balance_hard_mm: float = -1e9
 
 
 def escapes_a4(roll: str) -> bool:

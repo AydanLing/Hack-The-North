@@ -277,14 +277,24 @@ def balance_margin(
 
 
 def score_balance(pose: Pose, machine: Machine, profile: Profile) -> CheckReport:
-    """Report the configured balance preference as a soft score."""
+    """Report the configured balance preference; large overhangs can hard-fail."""
 
     margin = balance_margin(pose, machine)
     desired = profile.balance_margin_mm
     lower = desired - machine.side_mm
     value = 0.0 if not np.isfinite(margin) else max(0.0, min(1.0, (margin - lower) / machine.side_mm))
     note = f"support margin {margin:.3f} mm (preferred {desired:.3f} mm)"
+    # Non-finite margin means no support footprint — always a hard overhang failure
+    # when a finite balance_hard_mm is configured.
+    hard_floor = profile.balance_hard_mm
+    if not np.isfinite(margin):
+        balance_ok = hard_floor <= -1e8  # only legacy profiles with -1e9 default pass
+        hard_note = f"no table-support footprint (limit {hard_floor:.3f} mm)"
+    else:
+        balance_ok = margin >= hard_floor - 1e-9
+        hard_note = f"support margin {margin:.3f} mm (hard floor {hard_floor:.3f} mm)"
     return CheckReport(
+        hard={"balance_hard": (balance_ok, hard_note)},
         soft={"balance": (value, note)},
         measurements={"balance_margin_mm": margin},
     )
@@ -588,11 +598,17 @@ def score_sweep(report: SweepReport, profile: Profile) -> CheckReport:
         f"tether keep-out table incursion {report.max_tether_ground_mm:.3f} mm"
         + (f" (limit {profile.ground_hard_mm:.3f} mm)" if table_present else " (table removed)")
     )
+    pivot_reason = (
+        f"pivoting hinge half dips {report.max_pivot_dip_mm:.3f} mm "
+        f"(hard limit {profile.pivot_dip_hard_mm:.3f} mm)"
+    )
+    pivot_ok = report.max_pivot_dip_mm <= profile.pivot_dip_hard_mm + 1e-9
     return CheckReport(
         hard={
             "cad_penetration": (collision_ok, collision_reason),
             "ground": (ground_ok, ground_reason),
             "tether_table": (tether_ok, tether_reason),
+            "pivot_dip_hard": (pivot_ok, pivot_reason),
         },
         soft={
             "near_contact": (
@@ -605,7 +621,7 @@ def score_sweep(report: SweepReport, profile: Profile) -> CheckReport:
             ),
             "pivot_dip": (
                 _band_score(report.max_pivot_dip_mm, profile.pivot_dip_exempt_mm, profile.ground_hard_mm),
-                f"pivoting hinge half dips {report.max_pivot_dip_mm:.3f} mm",
+                pivot_reason,
             ),
         },
         measurements={

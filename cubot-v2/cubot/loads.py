@@ -348,8 +348,17 @@ def score(report: MomentReport, profile: Profile) -> CheckReport:
         if report.ambiguity_ratio < profile.side_ambiguity_ratio
         else _band_score(report.ambiguity_ratio, profile.side_ambiguity_ratio, 1.0)
     )
+    holding_reason = (
+        f"peak holding load {report.holding_peak_nm:.3f} N·m"
+        + (f" at joint {report.holding_joint}" if report.holding_joint is not None else "")
+        + f" (hard limit {profile.holding_hard_nm:.3f} N·m)"
+    )
+    holding_ok = report.holding_peak_nm <= profile.holding_hard_nm + 1e-9
     return CheckReport(
-        hard={"torque_stall": (torque_ok, torque_reason)},
+        hard={
+            "torque_stall": (torque_ok, torque_reason),
+            "holding_hard": (holding_ok, holding_reason),
+        },
         soft={
             "torque": (
                 _band_score(report.peak_demand_nm, profile.torque_cap_nm, profile.torque_stall_nm),
@@ -357,8 +366,7 @@ def score(report: MomentReport, profile: Profile) -> CheckReport:
             ),
             "holding_load": (
                 _band_score(report.holding_peak_nm, 0.0, profile.torque_stall_nm),
-                f"peak holding load {report.holding_peak_nm:.3f} N·m"
-                + (f" at joint {report.holding_joint}" if report.holding_joint is not None else ""),
+                holding_reason,
             ),
             "moving_side": (
                 ambiguity_score,
