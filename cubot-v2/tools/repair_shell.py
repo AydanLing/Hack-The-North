@@ -43,7 +43,7 @@ from cubot.shapes import (  # noqa: E402
     to_layers,
 )
 from cubot.solver import solve  # noqa: E402
-from cubot.viz import render_iso  # noqa: E402
+from cubot.viz import render_voxels  # noqa: E402
 
 
 def read_layers(path: Path) -> tuple[tuple, ...]:
@@ -151,7 +151,7 @@ def main() -> int:
                 continue
             print(gate_line(path.stem, gate_one(cells, roll)), flush=True)
             if args.iso and cells:
-                render_iso(cells, path.with_suffix(".png"))
+                render_voxels(cells, path.with_suffix(".png"))
         return 0
 
     index = args.start_index
@@ -170,7 +170,7 @@ def main() -> int:
                 cells,
                 f"repaired from {path.name}: moved {rem} -> {add}; {n} threadings; dense {dense_cell_count(cells)}",
             )
-            png = render_iso(cells, args.out / f"{args.name}-r{index}.png")
+            png = render_voxels(cells, args.out / f"{args.name}-r{index}.png")
             print(f"  wrote {out_path} ({n} threadings) -> {png}")
             index += 1
     return 0

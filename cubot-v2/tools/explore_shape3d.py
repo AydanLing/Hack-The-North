@@ -68,7 +68,7 @@ from cubot.records import Move, PlanCandidate, Pose, ShapeRecord, dump_json  # n
 from cubot.runtime import run_meta  # noqa: E402
 from cubot.shapes import canonical_3d, dense_cell_count, has_2x2x2_block, parse_layers, screen, to_layers  # noqa: E402
 from cubot.solver import solve  # noqa: E402
-from cubot.viz import contact_sheet, render_iso, render_silhouette, render_top  # noqa: E402
+from cubot.viz import contact_sheet, render_iso, render_silhouette, render_top, render_voxels  # noqa: E402
 
 AXIS_NAMES = {(1, 0, 0): "+x", (-1, 0, 0): "-x", (0, 1, 0): "+y", (0, -1, 0): "-y", (0, 0, 1): "+z", (0, 0, -1): "-z"}
 
@@ -381,9 +381,9 @@ def explore_one(
     goal_cells = tuple(pose_cells(primary.goal))
     top_path = render_silhouette(goal_cells, render_dir / "top.png")
     engineering_path = render_top(goal_cells, render_dir / "engineering.png", numbered=True)
-    iso_path = render_iso(goal_cells, render_dir / "iso.png")
-    rotated = tuple((-y, x, z) for x, y, z in goal_cells)
-    iso2_path = render_iso(rotated, render_dir / "iso-90.png")
+    iso_path = render_voxels(goal_cells, render_dir / "iso.png")
+    iso2_path = render_voxels(goal_cells, render_dir / "iso-90.png", yaw_quarter_turns=1)
+    render_iso(goal_cells, render_dir / "iso-exploded.png")
     contact_path = contact_sheet(
         [(f"{name} iso", iso_path), (f"{name} iso 90", iso2_path), (f"{name} top", top_path)],
         run_dir / "contact-sheet.png",
