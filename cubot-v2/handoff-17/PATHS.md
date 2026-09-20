@@ -12,6 +12,8 @@ source of truth, this page is for reading.  Move tuples are `(joint, delta, side
 | 3 | L | 1 | pass | fail | STANDING | 4 |  |
 | 4 | triangle | 5 | pass | fail | STANDING | 5 |  |
 | 5 | zigzag | 6 | pass | fail | STANDING | 3 |  |
+| 6 | C | 2 | pass | fail | STANDING | 3 |  |
+| 7 | U | 3 | pass | fail | STANDING | 3 |  |
 
 ## 1. heart  (`shapes/01-heart/`)
 
@@ -180,4 +182,63 @@ Alternate loose-passing routes to the same goal (3, in `path.json` → `alternat
 - plan 1: 7 moves — `[(0, -1, 'in'), (9, -1, 'out'), (11, -1, 'out'), (10, -1, 'out'), (12, -1, 'out'), (13, 1, 'out'), (14, 1, 'out')]`
 - plan 2: 8 moves — `[(2, -1, 'in'), (4, -1, 'in'), (6, -1, 'in'), (3, 1, 'in'), (8, -1, 'in'), (7, 1, 'in'), (8, 1, 'in'), (5, -1, 'in')]`
 - plan 3: 10 moves — `[(9, -1, 'out'), (11, -1, 'out'), (13, 1, 'out'), (10, -1, 'out'), (12, -1, 'out'), (9, 1, 'out'), (7, -1, 'in'), (9, -1, 'in'), (7, 1, 'in'), (14, 1, 'out')]`
+
+## 6. C  (`shapes/06-C/`)
+
+```
+########
+.......#
+.......#
+.......#
+..######
+```
+
+- start: straight chain, base orientation 8 (lying 3)
+- goal states: `[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0]`
+- 2 moves, 4 s at 2.0 s per detent; 1 `in` / 1 `out`
+- peak torque demand 3.55 N·m, max CAD penetration 0.398 mm, max table incursion 0.0 mm
+- predicted final orientation: base 22, lattice span [4, 0, 7], STANDING on edge (drawing plane vertical)
+
+```python
+moves = [
+    (11, +1, 'out'),  # step  1: joint 11 +0 -> +1
+    ( 7, +1, 'in'),  # step  2: joint 7 +0 -> +1
+]
+```
+
+Alternate loose-passing routes to the same goal (3, in `path.json` → `alternates`):
+- plan 1: 2 moves — `[(11, 1, 'out'), (7, 1, 'out')]`
+- plan 2: 3 moves — `[(0, 1, 'in'), (11, 1, 'out'), (7, 1, 'in')]`
+- plan 3: 3 moves — `[(0, -1, 'in'), (11, 1, 'out'), (7, 1, 'in')]`
+
+## 7. U  (`shapes/07-U/`)
+
+```
+...##
+#...#
+#...#
+#...#
+#...#
+#...#
+#####
+```
+
+- start: straight chain, base orientation 8 (lying 3)
+- goal states: `[0, -1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0]`
+- 3 moves, 6 s at 2.0 s per detent; 2 `in` / 1 `out`
+- peak torque demand 3.49 N·m, max CAD penetration 0.398 mm, max table incursion 0.0 mm
+- predicted final orientation: base 18, lattice span [4, 0, 6], STANDING on edge (drawing plane vertical)
+
+```python
+moves = [
+    ( 1, -1, 'in'),  # step  1: joint 1 +0 -> -1
+    (11, +1, 'out'),  # step  2: joint 11 +0 -> +1
+    ( 7, +1, 'in'),  # step  3: joint 7 +0 -> +1
+]
+```
+
+Alternate loose-passing routes to the same goal (3, in `path.json` → `alternates`):
+- plan 1: 3 moves — `[(1, -1, 'in'), (11, 1, 'out'), (7, 1, 'out')]`
+- plan 2: 5 moves — `[(1, -1, 'in'), (11, -1, 'out'), (7, 1, 'out'), (11, 1, 'out'), (11, 1, 'out')]`
+- plan 3: 6 moves — `[(0, 1, 'in'), (1, -1, 'in'), (11, -1, 'out'), (7, 1, 'out'), (11, 1, 'out'), (11, 1, 'out')]`
 
