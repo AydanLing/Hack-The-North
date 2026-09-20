@@ -96,6 +96,10 @@ def capture_homes(
             st = bus.read_state(sid)
             ax.update(st["position"])
             ax.set_zero()
+            # set_zero burns EEPROM center-cal: this pose now READS ~2048.
+            # Snapshot the relabeled frame, not the pre-calibration one.
+            st = bus.read_state(sid)
+            ax.update(st["position"])
             homes_rows[str(sid)] = {
                 "present_position": int(st["position"]),
                 "degrees_reported": round(sts3215.steps_to_deg(st["position"] % 4096), 2),

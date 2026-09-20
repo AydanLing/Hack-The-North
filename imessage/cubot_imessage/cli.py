@@ -245,7 +245,62 @@ def cmd_play(args, settings: Settings) -> int:
         print(f"error: {e}", file=sys.stderr)
         return 1
     print(json.dumps(result, indent=2))
+    hold_s = float(getattr(args, "hold_s", 0.0) or 0.0)
+    if hold_s > 0 and hasattr(executor, "hold_trim"):
+        try:
+            executor.hold_trim(hold_s)
+        except KeyboardInterrupt:
+            pass
     return 0 if result.get("accepted", True) else 1
+
+
+def cmd_hw(args, settings: Settings) -> int:
+    """Operator hardware tools: zero / home / states / test-joint on the live bus."""
+    from .hardware import HardwareExecutor  # noqa: PLC0415 — keeps --help import-light
+    hx = HardwareExecutor(
+        hw_root=settings.hw_root, serial_port=settings.serial_port,
+        gear=settings.gear, power=settings.power,
+        mirror_mujoco=False, log=print,
+    )
+    # No shutdown on exit: torque stays on so the chain holds its pose, and
+    # the state store has already persisted the turn counts.
+    if args.hw_cmd == "states":
+        r = hx.read_states()
+        if not r.get("ok"):
+            print(f"error: {r.get('error')}", file=sys.stderr)
+            return 1
+        print(f"{'sid':>3} {'pos':>7} {'deg':>8} {'from_home':>10}  V")
+        for s in r["servos"]:
+            if "error" in s:
+                print(f"{s['sid']:>3}  ERROR {s['error']}")
+            else:
+                print(f"{s['sid']:>3} {s['present_position']:>7} {s['degrees']:>8.2f} "
+                      f"{s['from_home']:>10} {s.get('voltage')}")
+        return 0
+    if args.hw_cmd == "zero":
+        print("zeroing HERE: the chain must be lying physically straight.")
+        r = hx.soft_zero()
+        print(json.dumps({k: r[k] for k in ("ok", "online", "path", "servo_ids", "error")
+                          if k in r}, indent=2))
+        return 0 if r.get("ok") else 1
+    if args.hw_cmd == "home":
+        try:
+            r = hx.home_all()
+        except Exception as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 1
+        print(json.dumps(r, indent=2))
+        return 0 if r.get("formed") else 1
+    if args.hw_cmd == "test-joint":
+        try:
+            r = hx.nudge_joint(args.joint, deg=args.deg, pause_s=args.pause)
+        except Exception as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 1
+        print(json.dumps(r, indent=2))
+        return 0 if r.get("out_arrived") and r.get("back_arrived") else 1
+    print(f"unknown hw command {args.hw_cmd!r}", file=sys.stderr)
+    return 2
 
 
 def cmd_serve(args, settings: Settings) -> int:
@@ -345,7 +400,21 @@ def build_parser() -> argparse.ArgumentParser:
     py.add_argument("--executor",
                     choices=("dryrun", "spool", "viewer", "mujoco", "hardware", "none"),
                     help="override BRIDGE_EXECUTOR for this run")
+    py.add_argument("--hold-s", type=float, default=0.0,
+                    help="after the fold, keep re-trimming sagged joints this long")
     py.set_defaults(func=cmd_play)
+
+    hw = sub.add_parser("hw", help="operator hardware tools on the live servo bus")
+    hws = hw.add_subparsers(dest="hw_cmd", required=True)
+    hws.add_parser("states", help="read every servo's position / from-home / voltage")
+    hws.add_parser("zero", help="zero HERE (chain must be lying physically straight)")
+    hws.add_parser("home", help="drive every joint back to the straight zero")
+    tj = hws.add_parser("test-joint", help="fold one joint out and back to verify "
+                                           "direction and true output angle")
+    tj.add_argument("--joint", type=int, required=True, help="joint index 0..25 (sid = joint+1)")
+    tj.add_argument("--deg", type=float, default=120.0, help="output degrees (default 120)")
+    tj.add_argument("--pause", type=float, default=2.0, help="hold seconds before returning")
+    hw.set_defaults(func=cmd_hw)
 
     sv = sub.add_parser("serve", help="run the webhook server")
     sv.add_argument("--host")

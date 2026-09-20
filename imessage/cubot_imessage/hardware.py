@@ -5,21 +5,38 @@ Imports Jerry's proven driver in-place via ``CUBOT_HW_ROOT`` (default
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 import threading
 import time
 from typing import Any
 
-from .mujoco_replay import STEPS_PER_STATE, hardware_wall_s
+from .mujoco_replay import LOAD_SPEED_FRACTION, SETTLE_S, STEPS_PER_STATE, hardware_wall_s
 
 DEFAULT_HW_ROOT = "/Users/jerryli/Downloads/cubot"
-EXPECTED_SIDS = list(range(1, 27))  # servo id i+1 ↔ handoff joint i
+# Chain length is physical, not universal: CUBOT_CHAIN_JOINTS trims the fold
+# chain (N cubes → N-1 joints, sids 1..N-1; servo id i+1 ↔ handoff joint i).
+try:
+    CHAIN_JOINTS = max(1, min(26, int(os.environ.get("CUBOT_CHAIN_JOINTS", "26") or "26")))
+except ValueError:
+    CHAIN_JOINTS = 26
+EXPECTED_SIDS = list(range(1, CHAIN_JOINTS + 1))
 DETENT_OUT_DEG = 120.0
 POLL_S = 0.04
 # Chase speed index into rc.SPEEDS; power preset still caps via Axis._capped.
 DEFAULT_SPEED_IDX = 3  # 800 steps/s before power cap
 PID_PATH = os.path.join(os.path.expanduser("~"), ".cache", "cubot-hardware.pid")
+# A wheel-mode "hold" is goal_speed 0, not a position hold: gravity creeps a
+# loaded joint off its detent. Re-chase any joint that sagged past this.
+TRIM_STEPS = 150
+TRACK_NAME = "servo_state.json"    # rc.StateStore dead-reckoned turn counts
+SIGNS_NAME = "joint_signs.json"    # optional per-joint direction map [±1]×26
+
+
+def _calibration_path(name: str):
+    from .homes import homes_path  # noqa: PLC0415 — avoid import cycle at module load
+    return homes_path().parent / name
 
 
 def _ensure_hw_path(hw_root: str) -> str:
@@ -96,6 +113,11 @@ class HardwareExecutor:
         self._rc = None
         self._sts = None
         self._mujoco = None
+        self._store = None
+        self._sign = [1] * len(EXPECTED_SIDS)
+        # One 120° detent in motor steps for THIS gear, not the 4:1 constant.
+        self._steps_per_state = self.gear * 4096.0 / 3.0
+        self._last_targets: dict[int, int] = {}
 
     # -- bus lifecycle -------------------------------------------------------
 
@@ -119,40 +141,56 @@ class HardwareExecutor:
                 f"missing {missing} (found {found})"
             )
         geo = rc.Geometry(gear=self.gear, limit_deg=self.limit_deg)
-        axes = [rc.Axis(bus, sid, geo) for sid in EXPECTED_SIDS]
+        # rc.StateStore dead-reckons each shaft's TURN COUNT across runs. The
+        # encoder is absolute within one motor turn only, and a detent is 1.33
+        # turns, so a fresh process aligning by nearest wrap loses whole turns
+        # on any folded joint — goals and homing then land 90° off at the
+        # output. Falls back to the servo's EEPROM center zero (straight =
+        # 2048, burned by soft_zero) when a servo has no store entry.
+        store = rc.StateStore(str(_calibration_path(TRACK_NAME)))
+        axes = [rc.Axis(bus, sid, geo, store) for sid in EXPECTED_SIDS]
         for ax in axes:
             # Seed continuous track from the live encoder.
             st = bus.read_state(ax.sid)
             ax.update(st["position"])
             ax.set_power(self.power)
             ax.set_torque(True)
-        # Align software home to the shared straight-line calibration when
-        # present. Pipeline still commands go(home) / state 0 — never a raw
-        # encoder reading as "zero". Fallback: soft-zero wherever we sit now
-        # (caller must leave the chain straight).
-        try:
-            from .homes import apply_homes, homes_path, load_homes  # noqa: PLC0415
-            homes = load_homes()
-            aligned = apply_homes(axes, homes, rc)
-            self.log(f"[hardware] software home from {homes_path()} "
-                     f"({len(aligned)}/{len(axes)} axes)")
-        except FileNotFoundError:
-            for ax in axes:
-                ax.set_zero()
-            self.log("[hardware] no software_homes.json — soft-zeroed at current pose")
-        except Exception as e:
-            for ax in axes:
-                ax.set_zero()
-            self.log(f"[hardware] homes load failed ({type(e).__name__}: {e}); "
-                     f"soft-zeroed at current pose")
+            note = ax.restore_note or ""
+            if "DISAGREES" in note or "CHECK IT" in note:
+                self.log(f"[hardware] sid {ax.sid}: {note}")
+        self._load_signs()
         self._bus = bus
         self._axes = axes
+        self._store = store
+        store.remember(axes, time.monotonic(), min_interval=0.0)
         self.log(f"[hardware] torque on · {len(axes)} axes · power "
                  f"{rc.power_name(self.power)}")
 
+    def _load_signs(self) -> None:
+        path = _calibration_path(SIGNS_NAME)
+        if not path.is_file():
+            return
+        try:
+            raw = json.loads(path.read_text(encoding="utf-8"))
+            signs = [1 if int(v) >= 0 else -1 for v in raw]
+        except (OSError, ValueError) as e:
+            self.log(f"[hardware] {SIGNS_NAME} unreadable ({e}); all joints +1")
+            return
+        if len(signs) != len(EXPECTED_SIDS):
+            self.log(f"[hardware] {SIGNS_NAME} has {len(signs)} entries, "
+                     f"need {len(EXPECTED_SIDS)}; all joints +1")
+            return
+        self._sign = signs
+        flipped = [j for j, s in enumerate(signs) if s < 0]
+        self.log(f"[hardware] joint signs from {path}"
+                 + (f" (flipped: {flipped})" if flipped else " (none flipped)"))
+
     def _close(self) -> None:
         axes, bus = self._axes, self._bus
+        if self._store is not None and axes:
+            self._store.remember(axes, time.monotonic(), min_interval=0.0)
         self._axes, self._bus = [], None
+        self._store = None
         for ax in axes:
             try:
                 ax.shutdown()
@@ -195,9 +233,9 @@ class HardwareExecutor:
 
     # -- motion --------------------------------------------------------------
 
-    def _dest_cont(self, axis, state: int) -> int:
+    def _dest_cont(self, axis, joint: int, state: int) -> int:
         """Continuous encoder target for handoff state in {-1,0,+1}."""
-        steps = int(round(int(state) * STEPS_PER_STATE))
+        steps = int(round(int(state) * self._steps_per_state * self._sign[joint]))
         return axis.home + steps
 
     def _chase(self, axis, timeout_s: float, speed: int) -> bool:
@@ -212,21 +250,45 @@ class HardwareExecutor:
                 return False
             axis.update(st["position"])
             axis.drive(speed)
+            if self._store is not None:
+                self._store.remember(self._axes, time.monotonic())
             time.sleep(POLL_S)
         arrived = axis.dest is None
         if not arrived:
             axis.stop("timeout")
+        if self._store is not None:
+            self._store.remember(self._axes, time.monotonic(), min_interval=0.0)
         return arrived
+
+    def _retrim(self, targets: dict[int, int], speed: int) -> None:
+        """Re-chase held joints that crept off their detent (wheel hold is a
+        zero-speed command, not a position hold)."""
+        for j, dest in targets.items():
+            ax = self._axes[j]
+            try:
+                st = self._bus.read_state(ax.sid)
+            except Exception:
+                continue
+            ax.update(st["position"])
+            err = dest - ax.cont
+            if abs(err) <= TRIM_STEPS:
+                continue
+            self.log(f"[hardware] trim j{j}: sagged {err:+d} steps — re-chasing")
+            ax.go(dest, f"trim j{j}")
+            self._chase(ax, 3.0 + abs(err) / max(1.0, speed * LOAD_SPEED_FRACTION), speed)
 
     def _run_plan(self, plan) -> dict[str, Any]:
         assert self._rc is not None and self._axes
         speed = self._rc.SPEEDS[min(DEFAULT_SPEED_IDX, len(self._rc.SPEEDS) - 1)]
-        state = [0] * 26
+        state = [0] * len(self._axes)
+        targets: dict[int, int] = {}
         arrived_all = True
         for m in plan.moves:
             j = int(m.joint)
-            if j < 0 or j >= 26:
-                raise ValueError(f"joint {j} out of range 0..25")
+            if j < 0 or j >= len(self._axes):
+                raise ValueError(
+                    f"joint {j} out of range 0..{len(self._axes) - 1} "
+                    f"(this chain has {len(self._axes) + 1} cubes — the plan needs more)")
             nxt = state[j] + int(m.delta)
             if nxt not in (-1, 0, 1):
                 self.log(f"[hardware] clamp j{j} state {state[j]}{m.delta:+d} → "
@@ -234,10 +296,12 @@ class HardwareExecutor:
                 nxt = max(-1, min(1, nxt))
             state[j] = nxt
             axis = self._axes[j]
-            dest = self._dest_cont(axis, state[j])
+            dest = self._dest_cont(axis, j, state[j])
             wall = hardware_wall_s(abs(int(m.delta)) or 1, float(m.duration_s) or 2.0)
-            # Give the chase a little slack beyond the load estimate.
-            timeout = max(wall * 1.35, float(m.duration_s) or 2.0, 1.0)
+            # The chase drives at `speed`, not the plan's ideal speed, so the
+            # timeout must also cover the travel at that rate under load.
+            chase_s = abs(dest - axis.cont) / max(1.0, speed * LOAD_SPEED_FRACTION) + SETTLE_S
+            timeout = max(wall * 1.35, chase_s * 1.35, float(m.duration_s) or 2.0, 1.0)
             self.log(
                 f"[hardware] step {m.step:3d}  j{j:<2d} → state {state[j]:+d}  "
                 f"side={m.side}  wall≈{wall:.1f}s  timeout={timeout:.1f}s"
@@ -249,6 +313,12 @@ class HardwareExecutor:
                 self.log(f"[hardware]   ! did not arrive (status={axis.status})")
             else:
                 self.log(f"[hardware]   arrived ({axis.status})")
+            targets[j] = dest
+            self._retrim(targets, speed)
+        self._retrim(targets, speed)
+        self._last_targets = dict(targets)
+        if self._store is not None:
+            self._store.remember(self._axes, time.monotonic(), min_interval=0.0)
         return {
             "executor": self.name,
             "accepted": True,
@@ -256,6 +326,19 @@ class HardwareExecutor:
             "formed": arrived_all,
             "final_states": list(state),
         }
+
+    def hold_trim(self, seconds: float) -> None:
+        """Keep re-chasing the last commanded pose so it stays crisp on display."""
+        targets = dict(self._last_targets)
+        if not targets or self._bus is None or self._rc is None:
+            return
+        speed = self._rc.SPEEDS[min(DEFAULT_SPEED_IDX, len(self._rc.SPEEDS) - 1)]
+        deadline = time.monotonic() + max(0.0, float(seconds))
+        self.log(f"[hardware] holding pose (trim) for {seconds:.0f}s — ctrl-c to stop")
+        while time.monotonic() < deadline:
+            with self._lock:
+                self._retrim(targets, speed)
+            time.sleep(0.5)
 
     def _spawn_mujoco(self, plan, context: dict, *, force: bool = False) -> dict | None:
         """Fire-and-forget MuJoCo viewer; never blocks the bus fold."""
@@ -272,6 +355,63 @@ class HardwareExecutor:
             self.log(f"[hardware] MuJoCo mirror failed: {type(e).__name__}: {e}")
             return {"executor": "mujoco", "accepted": False, "error": str(e)}
 
+    def _home_core(self) -> dict:
+        """Drive every axis to software home. Caller holds the lock and mutex."""
+        assert self._rc is not None and self._axes
+        speed = self._rc.SPEEDS[min(DEFAULT_SPEED_IDX, len(self._rc.SPEEDS) - 1)]
+        # Snapshot how far we are before chasing — if already home, drive is a no-op.
+        start_err = {ax.sid: abs(ax.from_home()) for ax in self._axes}
+        max_err = max(start_err.values()) if start_err else 0
+        self.log(f"[hardware] homing {len(self._axes)} axes → software zero "
+                 f"(max err {max_err} steps)")
+        for ax in self._axes:
+            ax.go(ax.home, "HOME")
+        pending = {ax.sid for ax in self._axes}
+        # Enough wall-clock for the farthest axis at the chase speed under load.
+        deadline = time.monotonic() + 6.0 + max_err / max(1.0, speed * LOAD_SPEED_FRACTION)
+        while pending and time.monotonic() < deadline:
+            for ax in self._axes:
+                if ax.sid not in pending:
+                    continue
+                try:
+                    st = self._bus.read_state(ax.sid)
+                except Exception as e:
+                    self.log(f"[hardware] home read failed sid={ax.sid}: {e}")
+                    ax.stop("read failed")
+                    pending.discard(ax.sid)
+                    continue
+                ax.update(st["position"])
+                if ax.dest is None:
+                    pending.discard(ax.sid)
+                    continue
+                ax.drive(speed)
+            if self._store is not None:
+                self._store.remember(self._axes, time.monotonic())
+            time.sleep(POLL_S)
+        timed_out = []
+        for ax in self._axes:
+            if ax.dest is not None:
+                timed_out.append(ax.sid)
+                ax.stop("home timeout")
+        ok = not timed_out
+        self._last_targets = {j: self._axes[j].home for j in range(len(self._axes))}
+        if self._store is not None:
+            self._store.remember(self._axes, time.monotonic(), min_interval=0.0)
+        self.log(
+            f"[hardware] home {'ok' if ok else 'partial'} "
+            f"max_err_steps={max_err} timed_out={timed_out or '—'}"
+        )
+        return {
+            "executor": self.name,
+            "accepted": True,
+            "home": True,
+            "formed": ok,
+            "timed_out": timed_out,
+            "hardware_online": True,
+            "max_err_steps": max_err,
+            "already_home": max_err <= 20,
+        }
+
     def home_all(self, context: dict | None = None) -> dict:
         """Drive every axis to software home (straight chain). Used for 'straight line' texts."""
         if not self._lock.acquire(blocking=False):
@@ -279,53 +419,7 @@ class HardwareExecutor:
         try:
             self._claim_mutex()
             self._open()
-            assert self._rc is not None and self._axes
-            speed = self._rc.SPEEDS[min(DEFAULT_SPEED_IDX, len(self._rc.SPEEDS) - 1)]
-            self.log(f"[hardware] homing {len(self._axes)} axes → software zero")
-            # Snapshot how far we are before chasing — if already home, drive is a no-op.
-            start_err = {ax.sid: abs(ax.from_home()) for ax in self._axes}
-            max_err = max(start_err.values()) if start_err else 0
-            for ax in self._axes:
-                ax.go(ax.home, "HOME")
-            pending = {ax.sid for ax in self._axes}
-            deadline = time.monotonic() + 12.0
-            while pending and time.monotonic() < deadline:
-                for ax in self._axes:
-                    if ax.sid not in pending:
-                        continue
-                    try:
-                        st = self._bus.read_state(ax.sid)
-                    except Exception as e:
-                        self.log(f"[hardware] home read failed sid={ax.sid}: {e}")
-                        ax.stop("read failed")
-                        pending.discard(ax.sid)
-                        continue
-                    ax.update(st["position"])
-                    if ax.dest is None:
-                        pending.discard(ax.sid)
-                        continue
-                    ax.drive(speed)
-                time.sleep(POLL_S)
-            timed_out = []
-            for ax in self._axes:
-                if ax.dest is not None:
-                    timed_out.append(ax.sid)
-                    ax.stop("home timeout")
-            ok = not timed_out
-            self.log(
-                f"[hardware] home {'ok' if ok else 'partial'} "
-                f"max_err_steps={max_err} timed_out={timed_out or '—'}"
-            )
-            return {
-                "executor": self.name,
-                "accepted": True,
-                "home": True,
-                "formed": ok,
-                "timed_out": timed_out,
-                "hardware_online": True,
-                "max_err_steps": max_err,
-                "already_home": max_err <= 20,
-            }
+            return self._home_core()
         finally:
             self._release_mutex()
             self._lock.release()
@@ -363,6 +457,18 @@ class HardwareExecutor:
                 if mujoco_info is not None:
                     result["mujoco"] = mujoco_info
                 return result
+
+            # Fold plans assume every joint starts at state 0. If the chain is
+            # still bent (a prior fold, sag, a crash mid-shape), home it first
+            # rather than folding garbage on top.
+            bent = max((abs(ax.from_home()) for ax in self._axes), default=0)
+            if bent > 2 * TRIM_STEPS:
+                self.log(f"[hardware] chain not straight (max {bent} steps from home) "
+                         f"— homing before the fold")
+                home_res = self._home_core()
+                if not home_res.get("formed"):
+                    self.log("[hardware]   ! pre-fold homing incomplete "
+                             f"(timed_out={home_res.get('timed_out')})")
 
             self.log(f"[hardware] folding {plan.summary_line()}")
             for w in plan.warnings:
@@ -466,6 +572,11 @@ class HardwareExecutor:
                 st = self._bus.read_state(ax.sid)
                 ax.update(st["position"])
                 ax.set_zero()
+                # set_zero burns EEPROM center-cal: this pose now READS
+                # ~2048. Snapshot the relabeled frame, not the old one, or
+                # every later session aims half a motor turn off.
+                st = self._bus.read_state(ax.sid)
+                ax.update(st["position"])
                 ids.append(ax.sid)
                 homes_rows[str(ax.sid)] = {
                     "present_position": int(st["position"]),
@@ -474,11 +585,13 @@ class HardwareExecutor:
                     "cont_at_home": int(ax.cont),
                     "home": int(ax.home),
                 }
-            # Also capture sid 27 if present on the bus (not in the fold chain).
+            # Also capture the tip cube's spare servo if present on the bus
+            # (not in the fold chain).
             try:
-                extra = self._bus.scan([27])
+                extra = self._bus.scan([len(EXPECTED_SIDS) + 1])
             except Exception:
                 extra = []
+            extras: list = []
             for sid in extra:
                 if sid in ids:
                     continue
@@ -488,6 +601,9 @@ class HardwareExecutor:
                     st = self._bus.read_state(sid)
                     ax.update(st["position"])
                     ax.set_zero()
+                    st = self._bus.read_state(sid)
+                    ax.update(st["position"])
+                    extras.append(ax)
                     ids.append(sid)
                     homes_rows[str(sid)] = {
                         "present_position": int(st["position"]),
@@ -520,6 +636,12 @@ class HardwareExecutor:
             with open(out_path, "w", encoding="utf-8") as f:
                 json.dump(doc, f, indent=2)
                 f.write("\n")
+            if self._store is not None:
+                # A fresh zero resets every turn count; stale dead-reckoning
+                # from before the zero must not survive it.
+                self._store.remember(self._axes + extras, time.monotonic(),
+                                     min_interval=0.0)
+            self._last_targets = {}
             self.log(f"[hardware] soft-zeroed {len(ids)} axes → {out_path} (no motion)")
             return {
                 "ok": True,
@@ -528,3 +650,53 @@ class HardwareExecutor:
                 "servo_ids": ids,
                 "homes": homes_rows,
             }
+
+    def nudge_joint(self, joint: int, deg: float = DETENT_OUT_DEG,
+                    pause_s: float = 2.0) -> dict[str, Any]:
+        """Fold one joint to +deg output and back — the operator's calibration
+        probe for direction (does + go the way the sim's + goes?) and for the
+        true output angle (is the gear ratio right?)."""
+        if not 0 <= joint < len(EXPECTED_SIDS):
+            raise ValueError(f"joint {joint} out of range 0..{len(EXPECTED_SIDS) - 1}")
+        if not self._lock.acquire(blocking=False):
+            raise RuntimeError("hardware busy: another fold is in progress")
+        try:
+            self._claim_mutex()
+            self._open()
+            assert self._rc is not None
+            speed = self._rc.SPEEDS[min(DEFAULT_SPEED_IDX, len(self._rc.SPEEDS) - 1)]
+            ax = self._axes[joint]
+            st = self._bus.read_state(ax.sid)
+            ax.update(st["position"])
+            start_cont = ax.cont
+            steps = int(round(self._sign[joint] * float(deg) / DETENT_OUT_DEG
+                              * self._steps_per_state))
+            wall = 3.0 + abs(steps) / max(1.0, speed * LOAD_SPEED_FRACTION)
+            out: dict[str, Any] = {
+                "joint": joint, "sid": ax.sid, "deg": float(deg),
+                "sign": self._sign[joint], "steps": steps,
+                "start_from_home": int(ax.from_home()),
+            }
+            self.log(f"[hardware] test j{joint} (sid {ax.sid}): "
+                     f"{deg:+g}° output = {steps:+d} steps")
+            ax.go(start_cont + steps, f"test j{joint} out")
+            out["out_arrived"] = self._chase(ax, wall * 1.35, speed)
+            st = self._bus.read_state(ax.sid)
+            ax.update(st["position"])
+            out["moved_steps"] = int(ax.cont - start_cont)
+            out["moved_deg_out"] = round((ax.cont - start_cont)
+                                         / self._steps_per_state * DETENT_OUT_DEG, 1)
+            self.log(f"[hardware]   moved {out['moved_steps']:+d} steps "
+                     f"≈ {out['moved_deg_out']:+.1f}° output — check it by eye")
+            time.sleep(max(0.0, float(pause_s)))
+            ax.go(start_cont, f"test j{joint} back")
+            out["back_arrived"] = self._chase(ax, wall * 1.35, speed)
+            st = self._bus.read_state(ax.sid)
+            ax.update(st["position"])
+            out["end_from_home"] = int(ax.from_home())
+            if self._store is not None:
+                self._store.remember(self._axes, time.monotonic(), min_interval=0.0)
+            return out
+        finally:
+            self._release_mutex()
+            self._lock.release()
