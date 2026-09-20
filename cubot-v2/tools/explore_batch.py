@@ -88,7 +88,7 @@ def retry_items(out: Path, *, only_unpassed_concepts: bool) -> list[dict]:
 
 
 def fold_task(item: dict, out_root: Path, time_budget_s: float, k: int, max_candidates: int,
-              seed: int, profile: str = "loose") -> dict:
+              seed: int, profile: str = "loose", machine_path: str | None = None) -> dict:
     mask = Path(item["mask"])
     out_dir = out_root / item["category"]
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -98,6 +98,7 @@ def fold_task(item: dict, out_root: Path, time_budget_s: float, k: int, max_cand
             item["name"], mask, out_dir,
             family=None, time_budget_s=time_budget_s, k=k, max_candidates=max_candidates, seed=seed,
             profile=profile,
+            machine_path=Path(machine_path) if machine_path else None,
         )
     with (out_dir / "results.jsonl").open("a") as handle:
         handle.write(json.dumps(row) + "\n")
@@ -123,6 +124,8 @@ def main() -> int:
     parser.add_argument("--only-unpassed-concepts", action="store_true",
                         help="with --retry-violating, skip variants of concepts that already have a PASS")
     parser.add_argument("--dry-run", action="store_true", help="list what would be folded")
+    parser.add_argument("--machine", type=Path, default=None,
+                        help="machine.toml override (e.g. config/machine-17.toml)")
     args = parser.parse_args()
 
     if args.retry_violating:
@@ -139,18 +142,20 @@ def main() -> int:
         pending = pending[: args.limit]
     print(f"{len(items)} items, {len(items) - len(pending)} already folded under {out_root}, {len(pending)} to fold "
           f"with {args.workers} workers at -k {args.k} --time-budget {args.time_budget} "
-          f"--profile {args.profile}", flush=True)
+          f"--profile {args.profile}"
+          + (f" --machine {args.machine}" if args.machine else ""), flush=True)
     if args.dry_run or not pending:
         for item in pending:
             print(f"  {item['name']}: {item['mask']}")
         return 0
 
+    machine_path = str(args.machine) if args.machine else None
     started = time.monotonic()
     passes = 0
     with ProcessPoolExecutor(max_workers=args.workers) as pool:
         futures = {
             pool.submit(fold_task, item, out_root, args.time_budget, args.k, args.max_candidates,
-                        args.seed, args.profile): item
+                        args.seed, args.profile, machine_path): item
             for item in pending
         }
         for index, future in enumerate(as_completed(futures), start=1):

@@ -8,6 +8,8 @@ dependencies = []          # the bridge itself is stdlib only
 [project.optional-dependencies]
 # Training and the semantic half of the encoder. The bridge runs without these on `--encoder tfidf`.
 model = ["numpy>=1.24", "onnxruntime>=1.16", "tokenizers>=0.15", "huggingface_hub>=0.20"]
+# Talking to the servo bus. Only needed for `--executor hardware`.
+hardware = ["pyserial>=3.5"]
 dev = ["pytest>=8", "numpy>=1.24"]
 
 [project.scripts]
