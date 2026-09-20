@@ -15,13 +15,6 @@ from typing import Any
 from .mujoco_replay import LOAD_SPEED_FRACTION, SETTLE_S, STEPS_PER_STATE, hardware_wall_s
 
 DEFAULT_HW_ROOT = "/Users/jerryli/Downloads/cubot"
-# Chain length is physical, not universal: CUBOT_CHAIN_JOINTS trims the fold
-# chain (N cubes → N-1 joints, sids 1..N-1; servo id i+1 ↔ handoff joint i).
-try:
-    CHAIN_JOINTS = max(1, min(26, int(os.environ.get("CUBOT_CHAIN_JOINTS", "26") or "26")))
-except ValueError:
-    CHAIN_JOINTS = 26
-EXPECTED_SIDS = list(range(1, CHAIN_JOINTS + 1))
 DETENT_OUT_DEG = 120.0
 POLL_S = 0.04
 # Chase speed index into rc.SPEEDS; power preset still caps via Axis._capped.
@@ -37,6 +30,17 @@ SIGNS_NAME = "joint_signs.json"    # optional per-joint direction map [±1]×26
 def _calibration_path(name: str):
     from .homes import homes_path  # noqa: PLC0415 — avoid import cycle at module load
     return homes_path().parent / name
+
+
+def expected_sids(n_modules: int | None = None) -> list[int]:
+    """Servo ids for fold joints: modules N → joints N-1 → sids 1..N-1."""
+    from .config import DEFAULT_N_MODULES
+    n = int(n_modules if n_modules is not None else DEFAULT_N_MODULES)
+    return list(range(1, n))  # servo id i+1 ↔ handoff joint i
+
+
+# Back-compat for imports / doctor text.
+EXPECTED_SIDS = expected_sids()
 
 
 def _ensure_hw_path(hw_root: str) -> str:
@@ -69,7 +73,7 @@ def _env_bool(name: str, default: bool) -> bool:
 
 
 class HardwareExecutor:
-    """Replay a FoldPlan on the real STS3215 chain (ids 1..26).
+    """Replay a FoldPlan on the real STS3215 chain (ids 1..N-1 for an N-cube robot).
 
     Soft-zeros at the current encoder pose (caller must leave the robot straight),
     then applies each handoff detent as ``state[j] * 120°`` output via ``Axis.go``.
@@ -89,6 +93,7 @@ class HardwareExecutor:
         limit_deg: float = DETENT_OUT_DEG,
         mirror_mujoco: bool | None = None,
         scene_xml: str = "",
+        n_modules: int | None = None,
         log=print,
     ):
         self.hw_root = hw_root or os.environ.get("CUBOT_HW_ROOT", DEFAULT_HW_ROOT)
@@ -105,6 +110,14 @@ class HardwareExecutor:
             mirror_mujoco = _env_bool("CUBOT_MUJOCO_MIRROR", True)
         self.mirror_mujoco = bool(mirror_mujoco)
         self.scene_xml = scene_xml
+        from .config import DEFAULT_N_MODULES
+        try:
+            env_n = (os.environ.get("CUBOT_N_MODULES") or "").strip()
+            self.n_modules = int(env_n) if env_n else int(n_modules or DEFAULT_N_MODULES)
+        except ValueError:
+            self.n_modules = int(n_modules or DEFAULT_N_MODULES)
+        self.sids = expected_sids(self.n_modules)
+        self.n_joints = len(self.sids)
         self.log = log
         self.submitted: list = []
         self._lock = threading.Lock()
@@ -114,7 +127,7 @@ class HardwareExecutor:
         self._sts = None
         self._mujoco = None
         self._store = None
-        self._sign = [1] * len(EXPECTED_SIDS)
+        self._sign = [1] * self.n_joints
         # One 120° detent in motor steps for THIS gear, not the 4:1 constant.
         self._steps_per_state = self.gear * 4096.0 / 3.0
         self._last_targets: dict[int, int] = {}
@@ -129,15 +142,15 @@ class HardwareExecutor:
         port = self.serial_port or sts.autodetect_port()
         self.log(f"[hardware] opening bus on {port} (gear={self.gear}, power={self.power})")
         bus = sts.Bus(port)
-        found = bus.scan(EXPECTED_SIDS)
-        missing = [s for s in EXPECTED_SIDS if s not in found]
+        found = bus.scan(self.sids)
+        missing = [s for s in self.sids if s not in found]
         if missing:
             try:
                 bus.close()
             except Exception:
                 pass
             raise RuntimeError(
-                f"robot offline / incomplete bus: need servos {EXPECTED_SIDS[0]}..{EXPECTED_SIDS[-1]}, "
+                f"robot offline / incomplete bus: need servos {self.sids[0]}..{self.sids[-1]}, "
                 f"missing {missing} (found {found})"
             )
         geo = rc.Geometry(gear=self.gear, limit_deg=self.limit_deg)
@@ -148,7 +161,7 @@ class HardwareExecutor:
         # output. Falls back to the servo's EEPROM center zero (straight =
         # 2048, burned by soft_zero) when a servo has no store entry.
         store = rc.StateStore(str(_calibration_path(TRACK_NAME)))
-        axes = [rc.Axis(bus, sid, geo, store) for sid in EXPECTED_SIDS]
+        axes = [rc.Axis(bus, sid, geo, store) for sid in self.sids]
         for ax in axes:
             # Seed continuous track from the live encoder.
             st = bus.read_state(ax.sid)
@@ -176,9 +189,9 @@ class HardwareExecutor:
         except (OSError, ValueError) as e:
             self.log(f"[hardware] {SIGNS_NAME} unreadable ({e}); all joints +1")
             return
-        if len(signs) != len(EXPECTED_SIDS):
+        if len(signs) != self.n_joints:
             self.log(f"[hardware] {SIGNS_NAME} has {len(signs)} entries, "
-                     f"need {len(EXPECTED_SIDS)}; all joints +1")
+                     f"need {self.n_joints}; all joints +1")
             return
         self._sign = signs
         flipped = [j for j, s in enumerate(signs) if s < 0]
@@ -585,11 +598,14 @@ class HardwareExecutor:
                     "cont_at_home": int(ax.cont),
                     "home": int(ax.home),
                 }
-            # Also capture the tip cube's spare servo if present on the bus
-            # (not in the fold chain).
-            try:
-                extra = self._bus.scan([len(EXPECTED_SIDS) + 1])
-            except Exception:
+            # Also capture tip / spare sids past the fold chain when present.
+            tip = self.n_modules
+            if tip not in self.sids:
+                try:
+                    extra = self._bus.scan([tip])
+                except Exception:
+                    extra = []
+            else:
                 extra = []
             extras: list = []
             for sid in extra:
@@ -656,8 +672,8 @@ class HardwareExecutor:
         """Fold one joint to +deg output and back — the operator's calibration
         probe for direction (does + go the way the sim's + goes?) and for the
         true output angle (is the gear ratio right?)."""
-        if not 0 <= joint < len(EXPECTED_SIDS):
-            raise ValueError(f"joint {joint} out of range 0..{len(EXPECTED_SIDS) - 1}")
+        if not 0 <= joint < self.n_joints:
+            raise ValueError(f"joint {joint} out of range 0..{self.n_joints - 1}")
         if not self._lock.acquire(blocking=False):
             raise RuntimeError("hardware busy: another fold is in progress")
         try:

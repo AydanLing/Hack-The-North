@@ -28,7 +28,7 @@ from cubot_imessage.vocab import (STATUS_PLANNABLE, STATUS_PLAYABLE,        # no
                                   label_to_icon, strip_variant)
 
 REAL_HANDOFF = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
-    os.path.abspath(__file__)))), "cubot-v2", "handoff")
+    os.path.abspath(__file__)))), "cubot-v2", "handoff-17")
 
 
 # ------------------------------------------------------------------------------- fixtures
@@ -600,7 +600,7 @@ def test_reply_goes_only_to_the_originating_chat(handoff):
 
 # ------------------------------------------------------------------------------- the real handoff
 
-@pytest.mark.skipif(not os.path.isdir(REAL_HANDOFF), reason="cubot-v2/handoff not present")
+@pytest.mark.skipif(not os.path.isdir(REAL_HANDOFF), reason="cubot-v2/handoff-17 not present")
 def test_real_handoff_is_internally_consistent():
     """Every shipped path's deltas must reach its recorded goal, and every concept must resolve."""
     vocab, library = Vocabulary(REAL_HANDOFF), ShapeLibrary(REAL_HANDOFF)

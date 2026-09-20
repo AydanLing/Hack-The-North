@@ -41,6 +41,8 @@ def _bridge(settings: Settings, execute: bool = True, log=print) -> Bridge:
         hw_root=settings.hw_root, serial_port=settings.serial_port,
         gear=settings.gear, power=settings.power,
         mirror_mujoco=settings.mirror_mujoco,
+        scene_xml=settings.scene_xml,
+        n_modules=settings.n_modules,
     )
     return Bridge(settings, executor=executor, client=client, log=log)
 
@@ -235,6 +237,8 @@ def cmd_play(args, settings: Settings) -> int:
         hw_root=settings.hw_root, serial_port=settings.serial_port,
         gear=settings.gear, power=settings.power,
         mirror_mujoco=settings.mirror_mujoco,
+        scene_xml=settings.scene_xml,
+        n_modules=settings.n_modules,
     )
     print(f"executor {executor.name}"
           + (" + mujoco mirror" if settings.executor == "hardware"

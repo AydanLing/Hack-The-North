@@ -40,7 +40,9 @@ class Threading:
 
     def as_pose(self, roll: str, *, lying: int | None = None) -> Pose:
         if len(self.states) != len(roll):
-            raise ValueError("only a machine-size threading can be converted to Pose")
+            raise ValueError(
+                f"threading has {len(self.states)} joints but roll has {len(roll)} digits"
+            )
         return Pose(states=self.states, roll=roll, base=self.base, lying=lying)
 
 

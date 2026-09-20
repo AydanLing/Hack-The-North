@@ -3,7 +3,9 @@ modules = 17                   # the first 17 modules of the shipped 27 (decisio
 side_mm = 80.0                 # current CAD bounding box
 gap_mm = 2.0                   # design value; spacer CAD measures 2.2 mm
 chamfer_mm = 8.0               # current printed part
-roll = "1200130013310123"       # first 16 digits of the shipped roll word
+# First 16 digits of the shipped 26-digit roll word — modules 1..17 counted from
+# the wire end (module 1) toward the tip. Modules 18..27 of the full chain are cut.
+roll = "1200130013310123"
 mass_kg = 0.223                # BOM roll-up; remeasure when hardware exists
 stall_torque_nm = 10.6         # STS3215 x 4:1 x 0.9
 move_time_s = 2.0              # minimum single-detent move time

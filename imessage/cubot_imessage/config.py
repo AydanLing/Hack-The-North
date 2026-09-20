@@ -11,11 +11,14 @@ from typing import Optional
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 DEFAULT_BASE_URL = "https://api.linqapp.com/api/partner/v3"
-DEFAULT_HANDOFF = os.path.join(REPO_ROOT, "cubot-v2", "handoff")
+DEFAULT_HANDOFF = os.path.join(REPO_ROOT, "cubot-v2", "handoff-17")
+DEFAULT_SCENE = os.path.join(REPO_ROOT, "cubot_urdf", "n17", "scene.xml")
 DEFAULT_DATA = os.path.join(REPO_ROOT, "imessage", "data")
 DEFAULT_HEAD = os.path.join(DEFAULT_DATA, "intent_head.npz")
 DEFAULT_CORPUS = os.path.join(DEFAULT_DATA, "utterances.jsonl")
 DEFAULT_HW_ROOT = "/Users/jerryli/Downloads/cubot"
+# 17 modules → 16 fold joints; servo id i+1 ↔ handoff joint i (tip module has no joint).
+DEFAULT_N_MODULES = 17
 
 
 def _env(name: str, default: str = "") -> str:
@@ -93,6 +96,8 @@ class Settings:
     gear: float = 4.0
     power: int = 3
     mirror_mujoco: bool = True
+    scene_xml: str = DEFAULT_SCENE
+    n_modules: int = DEFAULT_N_MODULES
 
     @classmethod
     def load(cls, use_dotenv: bool = True) -> "Settings":
@@ -106,6 +111,10 @@ class Settings:
             gear = float(_env("CUBOT_GEAR", "4") or "4")
         except ValueError:
             gear = 4.0
+        try:
+            n_modules = int(_env("CUBOT_N_MODULES", str(DEFAULT_N_MODULES)) or str(DEFAULT_N_MODULES))
+        except ValueError:
+            n_modules = DEFAULT_N_MODULES
         return cls(
             api_key=_env("LINQ_API_KEY"),
             base_url=_env("LINQ_BASE_URL", DEFAULT_BASE_URL).rstrip("/"),
@@ -135,6 +144,8 @@ class Settings:
             gear=gear,
             power=power,
             mirror_mujoco=_env_bool("CUBOT_MUJOCO_MIRROR", True),
+            scene_xml=_env("CUBOT_SCENE_XML", DEFAULT_SCENE),
+            n_modules=n_modules,
         )
 
     def describe(self) -> list[tuple[str, str]]:
@@ -152,6 +163,8 @@ class Settings:
             ("webhook path", self.webhook_path),
             ("allowed senders", ", ".join(self.allowed_senders) or "(any)"),
             ("handoff dir", self.handoff_dir),
+            ("modules", str(self.n_modules)),
+            ("mujoco scene", self.scene_xml),
             ("intent head", self.head_path if os.path.exists(self.head_path)
              else f"{self.head_path} (MISSING — run python3 -m cubot_imessage.model.train)"),
             ("corpus", self.corpus_path),
