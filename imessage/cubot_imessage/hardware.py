@@ -119,13 +119,30 @@ class HardwareExecutor:
         geo = rc.Geometry(gear=self.gear, limit_deg=self.limit_deg)
         axes = [rc.Axis(bus, sid, geo) for sid in EXPECTED_SIDS]
         for ax in axes:
-            # Seed continuous track from the live encoder, then soft-zero here
-            # (straight chain is the session origin for handoff state 0).
+            # Seed continuous track from the live encoder.
             st = bus.read_state(ax.sid)
             ax.update(st["position"])
-            ax.set_zero()
             ax.set_power(self.power)
             ax.set_torque(True)
+        # Align software home to the shared straight-line calibration when
+        # present. Pipeline still commands go(home) / state 0 — never a raw
+        # encoder reading as "zero". Fallback: soft-zero wherever we sit now
+        # (caller must leave the chain straight).
+        try:
+            from .homes import apply_homes, homes_path, load_homes  # noqa: PLC0415
+            homes = load_homes()
+            aligned = apply_homes(axes, homes, rc)
+            self.log(f"[hardware] software home from {homes_path()} "
+                     f"({len(aligned)}/{len(axes)} axes)")
+        except FileNotFoundError:
+            for ax in axes:
+                ax.set_zero()
+            self.log("[hardware] no software_homes.json — soft-zeroed at current pose")
+        except Exception as e:
+            for ax in axes:
+                ax.set_zero()
+            self.log(f"[hardware] homes load failed ({type(e).__name__}: {e}); "
+                     f"soft-zeroed at current pose")
         self._bus = bus
         self._axes = axes
         self.log(f"[hardware] torque on · {len(axes)} axes · power "
