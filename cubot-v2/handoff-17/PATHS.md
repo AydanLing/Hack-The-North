@@ -22,7 +22,7 @@ source of truth, this page is for reading.  Move tuples are `(joint, delta, side
 | 13 | E | 13 | pass | fail | STANDING | 3 |  |
 | 14 | spiral | 13 | pass | fail | STANDING | 3 |  |
 | 15 | T | 3 | pass | fail | flat on table | 5 |  |
-| 16 | N | 12 | pass | fail | flat on table | 4 |  |
+| 16 | N | 2 | pass | fail | STANDING | 3 |  |
 
 ## 1. heart  (`shapes/01-heart/`)
 
@@ -524,39 +524,28 @@ Alternate loose-passing routes to the same goal (5, in `path.json` → `alternat
 ## 16. N  (`shapes/16-N/`)
 
 ```
-.##......
-#########
-#.......#
-#.......#
-.......##
+########
+.......#
+.......#
+.......#
+..######
 ```
 
-- start: straight chain, base orientation 0 (lying 0)
-- goal states: `[-1, 0, -1, 1, -1, -1, -1, 0, 0, 0, 0, 0, 1, 0, 0, 1]`
-- 12 moves, 24 s at 2.0 s per detent; 9 `in` / 3 `out`
-- peak torque demand 2.60 N·m, max CAD penetration 0.398 mm, max table incursion 29.3 mm
-- predicted final orientation: base 9, lattice span [4, 8, 0], flat on the table
+- start: straight chain, base orientation 8 (lying 3)
+- goal states: `[0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0]`
+- 2 moves, 4 s at 2.0 s per detent; 1 `in` / 1 `out`
+- peak torque demand 3.55 N·m, max CAD penetration 0.398 mm, max table incursion 0.0 mm
+- predicted final orientation: base 22, lattice span [4, 0, 7], STANDING on edge (drawing plane vertical)
 
 ```python
 moves = [
-    ( 0, -1, 'in'),  # step  1: joint 0 +0 -> -1
-    (15, +1, 'out'),  # step  2: joint 15 +0 -> +1
-    ( 2, -1, 'in'),  # step  3: joint 2 +0 -> -1
-    ( 4, -1, 'in'),  # step  4: joint 4 +0 -> -1
-    ( 3, +1, 'in'),  # step  5: joint 3 +0 -> +1
-    ( 6, -1, 'in'),  # step  6: joint 6 +0 -> -1
-    ( 8, -1, 'in'),  # step  7: joint 8 +0 -> -1
-    ( 5, -1, 'in'),  # step  8: joint 5 +0 -> -1
-    (10, -1, 'out'),  # step  9: joint 10 +0 -> -1
-    (12, +1, 'in'),  # step 10: joint 12 +0 -> +1
-    (10, +1, 'in'),  # step 11: joint 10 -1 -> +0
-    ( 8, +1, 'out'),  # step 12: joint 8 -1 -> +0
+    (11, +1, 'out'),  # step  1: joint 11 +0 -> +1
+    ( 7, +1, 'in'),  # step  2: joint 7 +0 -> +1
 ]
 ```
 
-Alternate loose-passing routes to the same goal (4, in `path.json` → `alternates`):
-- plan 1: 12 moves — `[(15, 1, 'out'), (2, -1, 'in'), (0, 1, 'in'), (4, -1, 'in'), (3, 1, 'in'), (6, -1, 'in'), (8, -1, 'in'), (5, -1, 'in'), (10, -1, 'out'), (12, 1, 'in'), (10, 1, 'in'), (8, 1, 'out')]`
-- plan 2: 13 moves — `[(15, 1, 'out'), (2, -1, 'in'), (4, -1, 'in'), (3, 1, 'in'), (6, -1, 'in'), (8, -1, 'in'), (5, -1, 'in'), (10, -1, 'in'), (8, 1, 'in'), (11, 1, 'in'), (10, 1, 'out'), (11, -1, 'out'), (12, 1, 'out')]`
-- plan 3: 14 moves — `[(15, 1, 'out'), (2, -1, 'in'), (0, 1, 'in'), (4, -1, 'in'), (3, 1, 'in'), (6, -1, 'in'), (8, -1, 'in'), (5, -1, 'in'), (10, -1, 'out'), (12, 1, 'in'), (10, 1, 'in'), (5, 1, 'in'), (8, 1, 'in'), (5, -1, 'in')]`
-- plan 4: 14 moves — `[(0, -1, 'in'), (15, 1, 'out'), (2, -1, 'in'), (4, -1, 'in'), (3, 1, 'in'), (6, -1, 'in'), (8, -1, 'in'), (5, -1, 'in'), (10, -1, 'out'), (12, 1, 'in'), (10, 1, 'in'), (5, 1, 'in'), (8, 1, 'in'), (5, -1, 'in')]`
+Alternate loose-passing routes to the same goal (3, in `path.json` → `alternates`):
+- plan 1: 2 moves — `[(11, 1, 'out'), (7, 1, 'out')]`
+- plan 2: 3 moves — `[(0, 1, 'in'), (11, 1, 'out'), (7, 1, 'in')]`
+- plan 3: 3 moves — `[(0, -1, 'in'), (11, 1, 'out'), (7, 1, 'in')]`
 
