@@ -44,7 +44,37 @@ python -c "import cubot; print('ok')"
 
 ---
 
-## 2) Start the 8-hour campaign (paste this)
+## Auto-stop after 8h + export + push
+
+If you want it to **kill the fold job at 8 hours**, then export only PASSes into
+`handoff/` and `git push`:
+
+```powershell
+cd $HOME\Downloads\Hack-The-North
+git pull
+cd cubot-v2
+powershell -ExecutionPolicy Bypass -File .\tools\run_campaign_friend_8h.ps1 -Hours 8
+```
+
+Options:
+
+```powershell
+# stop + export, but don't push
+powershell -ExecutionPolicy Bypass -File .\tools\run_campaign_friend_8h.ps1 -Hours 8 -NoPush
+
+# stop only (no handoff write)
+powershell -ExecutionPolicy Bypass -File .\tools\run_campaign_friend_8h.ps1 -Hours 8 -NoExport
+```
+
+Notes:
+
+- Push needs GitHub login on that PC (`gh auth login` or a credential helper).
+- `out\` stays local (gitignored); only **PASS** paths go into `handoff\` and get pushed.
+- If a fold is already running from the old paste, **Ctrl+C** it first, then start this script (resume-safe).
+
+---
+
+## Manual candidates run (no auto-stop)
 
 Still in `Hack-The-North\cubot-v2`, with venv active:
 
