@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass
 import hashlib
 import json
+import os
 from pathlib import Path
 import tomllib
 
@@ -74,8 +75,10 @@ def escapes_a4(roll: str) -> bool:
 
 
 def _validate_machine(machine: Machine) -> None:
-    if machine.modules != 27:
-        raise ValueError("CuBot V2 requires exactly 27 modules")
+    # The shipped machine has 27 modules; shorter chains (the first N modules of
+    # the shipped assembly, see config/machine-17.toml) share every other rule.
+    if not 2 <= machine.modules <= 27:
+        raise ValueError("CuBot V2 chains have 2..27 modules")
     if len(machine.roll) != machine.joints or any(c not in "0123" for c in machine.roll):
         raise ValueError("roll length/digits do not match the machine")
     if not escapes_a4(machine.roll):
@@ -93,6 +96,14 @@ def _validate_machine(machine: Machine) -> None:
 
 
 def load_machine(path: str | Path | None = None) -> Machine:
+    """Load ``path``, else ``$CUBOT_MACHINE``, else ``config/machine.toml``.
+
+    The environment override lets every tool (explore, summary, export) run
+    against an alternate chain such as ``config/machine-17.toml`` unchanged.
+    """
+
+    if path is None:
+        path = os.environ.get("CUBOT_MACHINE") or None
     source = Path(path) if path else CONFIG_ROOT / "machine.toml"
     raw = tomllib.loads(source.read_text())
     machine = Machine(**raw["machine"])

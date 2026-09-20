@@ -1,0 +1,85 @@
+6/6-v1: UNSAT, 0 threadings
+7/7-v1: UNSAT, 0 threadings
+apple/apple-v1: UNSAT, 0 threadings
+apple/apple-v2: STRUCTURAL FAIL at hamiltonian — no Hamiltonian path exists after exhaustive search of 62 nodes
+axe/axe-v1: UNSAT, 0 threadings
+axe/axe-v2: STRUCTURAL FAIL at parity — checkerboard split 8/9, but odd-cell path endpoints must have majority parity 1; bad endpoint(s): ((2, 0, 0),)
+balloon/balloon-v1: FOUND, 3 threadings
+balloon/balloon-v2: UNSAT, 0 threadings
+bat/bat-v1: UNSAT, 0 threadings
+bat/bat-v2: FOUND, 6 threadings
+bat/bat-v3: FOUND, 3 threadings
+bat/bat-v4: FOUND, 6 threadings
+battery/battery-v1: UNSAT, 0 threadings
+boot/boot-v1: UNSAT, 0 threadings
+c/c-v1: UNSAT, 0 threadings
+c/c-v2: UNSAT, 0 threadings
+c/c-v3: FOUND, 12 threadings
+c/c-v4: UNSAT, 0 threadings
+check/check-v1: UNSAT, 0 threadings
+check/check-v2: UNSAT, 0 threadings
+check/check-v3: UNSAT, 0 threadings
+check/check-v4: UNSAT, 0 threadings
+cross/cross-v1: STRUCTURAL FAIL at degree — 4 degree-1 cells ((0, 10, 0), (2, 0, 0), (2, 12, 0), (4, 10, 0)); a path has at most 2 endpoints
+dumbbell/dumbbell-v1: UNSAT, 0 threadings
+dumbbell/dumbbell-v2: STRUCTURAL FAIL at parity — checkerboard split 8/9, but odd-cell path endpoints must have majority parity 1; bad endpoint(s): ((0, 0, 0), (10, 0, 0))
+e/e-v1: UNSAT, 0 threadings
+flag/flag-v1: FOUND, 6 threadings
+flag/flag-v2: UNSAT, 0 threadings
+goal/goal-v1: FOUND, 12 threadings
+goal/goal-v2: UNSAT, 0 threadings
+goal/goal-v3: UNSAT, 0 threadings
+goal/goal-v4: UNSAT, 0 threadings
+goal/goal-v5: FOUND, 6 threadings
+hammer/hammer-v1: UNSAT, 0 threadings
+hammer/hammer-v2: FOUND, 3 threadings
+hammer/hammer-v3: UNSAT, 0 threadings
+headphones/headphones-v1: UNSAT, 0 threadings
+heart/heart-v1: STRUCTURAL FAIL at parity — checkerboard split 9/8, but odd-cell path endpoints must have majority parity 0; bad endpoint(s): ((3, 0, 0),)
+heart/heart-v2: STRUCTURAL FAIL at degree — 3 degree-1 cells ((1, 5, 0), (2, 0, 0), (3, 5, 0)); a path has at most 2 endpoints
+house/house-v1: UNSAT, 0 threadings
+house/house-v2: UNSAT, 0 threadings
+j/j-v1: FOUND, 9 threadings
+j/j-v2: FOUND, 3 threadings
+j/j-v3: UNSAT, 0 threadings
+j/j-v4: FOUND, 3 threadings
+key/key-v1: UNSAT, 0 threadings
+l/l-v1: FOUND, 12 threadings
+l/l-v2: FOUND, 12 threadings
+l/l-v3: FOUND, 12 threadings
+l/l-v4: FOUND, 12 threadings
+laptop/laptop-v1: UNSAT, 0 threadings
+laptop/laptop-v2: FOUND, 2 threadings
+lollipop/lollipop-v1: STRUCTURAL FAIL at parity — checkerboard split 9/8, but odd-cell path endpoints must have majority parity 0; bad endpoint(s): ((1, 0, 0),)
+n/n-v1: UNSAT, 0 threadings
+paperclip/paperclip-v1: UNSAT, 0 threadings
+paperclip/paperclip-v2: UNSAT, 0 threadings
+plus/plus-v1: STRUCTURAL FAIL at parity — checkerboard split 11/6; need a 1-cell imbalance
+pyramid/pyramid-v1: UNSAT, 0 threadings
+pyramid/pyramid-v2: UNSAT, 0 threadings
+ring/ring-v1: UNSAT, 0 threadings
+ring/ring-v2: FOUND, 6 threadings
+ring/ring-v3: UNSAT, 0 threadings
+ring/ring-v4: UNSAT, 0 threadings
+s/s-v1: FOUND, 6 threadings
+s/s-v2: FOUND, 3 threadings
+s/s-v3: UNSAT, 0 threadings
+s/s-v4: UNSAT, 0 threadings
+spiral/spiral-v1: UNSAT, 0 threadings
+spiral/spiral-v2: UNSAT, 0 threadings
+spiral/spiral-v3: UNSAT, 0 threadings
+spiral/spiral-v4: UNSAT, 0 threadings
+stairs/stairs-v1: UNSAT, 0 threadings
+stairs/stairs-v2: FOUND, 6 threadings
+stairs/stairs-v3: UNSAT, 0 threadings
+stairs/stairs-v4: UNSAT, 0 threadings
+t/t-v1: UNSAT, 0 threadings
+t/t-v2: FOUND, 3 threadings
+t/t-v3: STRUCTURAL FAIL at degree — 3 degree-1 cells ((0, 12, 0), (2, 0, 0), (4, 12, 0)); a path has at most 2 endpoints
+tent/tent-v1: UNSAT, 0 threadings
+tent/tent-v2: UNSAT, 0 threadings
+tent/tent-v3: UNSAT, 0 threadings
+v/v-v1: UNSAT, 0 threadings
+v/v-v2: UNSAT, 0 threadings
+w/w-v1: UNSAT, 0 threadings
+z/z-v1: UNSAT, 0 threadings

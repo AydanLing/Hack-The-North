@@ -47,10 +47,12 @@ class Pose:
     lying: int | None = None
 
     def __post_init__(self) -> None:
-        if len(self.states) != 26:
-            raise ValueError(f"expected 26 joint states, got {len(self.states)}")
-        if len(self.roll) != 26 or any(c not in "0123" for c in self.roll):
-            raise ValueError("roll must contain 26 digits in 0..3")
+        # One joint state per roll digit: 26 for the shipped 27-module chain,
+        # fewer for a truncated chain (config/machine-17.toml).
+        if not 1 <= len(self.roll) <= 26 or any(c not in "0123" for c in self.roll):
+            raise ValueError("roll must contain 1..26 digits in 0..3")
+        if len(self.states) != len(self.roll):
+            raise ValueError(f"expected {len(self.roll)} joint states, got {len(self.states)}")
         if any(
             isinstance(state, bool)
             or not isinstance(state, Integral)
