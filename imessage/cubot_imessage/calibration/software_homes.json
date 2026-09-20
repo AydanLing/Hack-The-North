@@ -5,7 +5,7 @@
     "handoff_state_0": "software home (straight line)",
     "command": "axis.go(axis.home) or home + state*steps"
   },
-  "captured_at": "2026-09-20T01:52:52-0400",
+  "captured_at": "2026-09-20T03:17:21-0400",
   "port": "/dev/cu.usbmodem5B610351481",
   "servo_ids": [
     1,
@@ -38,164 +38,164 @@
   ],
   "homes": {
     "1": {
-      "present_position": 2045,
-      "degrees_reported": 179.74,
+      "present_position": 2046,
+      "degrees_reported": 179.82,
       "cont_at_home": 0,
       "home": 0
     },
     "2": {
-      "present_position": 2049,
-      "degrees_reported": 180.09,
+      "present_position": 2052,
+      "degrees_reported": 180.35,
       "cont_at_home": 0,
       "home": 0
     },
     "3": {
-      "present_position": 1306,
-      "degrees_reported": 114.79,
+      "present_position": 1071,
+      "degrees_reported": 94.13,
       "cont_at_home": 0,
       "home": 0
     },
     "4": {
-      "present_position": 2048,
-      "degrees_reported": 180.0,
+      "present_position": 54,
+      "degrees_reported": 4.75,
       "cont_at_home": 0,
       "home": 0
     },
     "5": {
-      "present_position": 2185,
-      "degrees_reported": 192.04,
+      "present_position": 2346,
+      "degrees_reported": 206.19,
       "cont_at_home": 0,
       "home": 0
     },
     "6": {
-      "present_position": 4071,
-      "degrees_reported": 357.8,
+      "present_position": 290,
+      "degrees_reported": 25.49,
       "cont_at_home": 0,
       "home": 0
     },
     "7": {
-      "present_position": 2077,
-      "degrees_reported": 182.55,
+      "present_position": 2356,
+      "degrees_reported": 207.07,
       "cont_at_home": 0,
       "home": 0
     },
     "8": {
-      "present_position": 2040,
-      "degrees_reported": 179.3,
+      "present_position": 2041,
+      "degrees_reported": 179.38,
       "cont_at_home": 0,
       "home": 0
     },
     "9": {
-      "present_position": 2049,
-      "degrees_reported": 180.09,
+      "present_position": 709,
+      "degrees_reported": 62.31,
       "cont_at_home": 0,
       "home": 0
     },
     "10": {
-      "present_position": 2050,
-      "degrees_reported": 180.18,
+      "present_position": 2053,
+      "degrees_reported": 180.44,
       "cont_at_home": 0,
       "home": 0
     },
     "11": {
-      "present_position": 1814,
-      "degrees_reported": 159.43,
+      "present_position": 2192,
+      "degrees_reported": 192.66,
       "cont_at_home": 0,
       "home": 0
     },
     "12": {
-      "present_position": 2048,
-      "degrees_reported": 180.0,
-      "cont_at_home": 0,
-      "home": 0
+      "present_position": 1727,
+      "degrees_reported": 151.79,
+      "cont_at_home": 1,
+      "home": 1
     },
     "13": {
-      "present_position": 1775,
-      "degrees_reported": 156.01,
+      "present_position": 3739,
+      "degrees_reported": 328.62,
       "cont_at_home": 0,
       "home": 0
     },
     "14": {
-      "present_position": 2051,
-      "degrees_reported": 180.26,
+      "present_position": 2266,
+      "degrees_reported": 199.16,
       "cont_at_home": 0,
       "home": 0
     },
     "15": {
-      "present_position": 2048,
-      "degrees_reported": 180.0,
+      "present_position": 1865,
+      "degrees_reported": 163.92,
       "cont_at_home": 0,
       "home": 0
     },
     "16": {
-      "present_position": 2048,
-      "degrees_reported": 180.0,
+      "present_position": 2788,
+      "degrees_reported": 245.04,
       "cont_at_home": 0,
       "home": 0
     },
     "17": {
-      "present_position": 2047,
-      "degrees_reported": 179.91,
+      "present_position": 1966,
+      "degrees_reported": 172.79,
       "cont_at_home": 0,
       "home": 0
     },
     "18": {
-      "present_position": 2049,
-      "degrees_reported": 180.09,
+      "present_position": 2516,
+      "degrees_reported": 221.13,
       "cont_at_home": 0,
       "home": 0
     },
     "19": {
-      "present_position": 2047,
-      "degrees_reported": 179.91,
+      "present_position": 46,
+      "degrees_reported": 4.04,
       "cont_at_home": 0,
       "home": 0
     },
     "20": {
-      "present_position": 2047,
-      "degrees_reported": 179.91,
+      "present_position": 3081,
+      "degrees_reported": 270.79,
       "cont_at_home": 0,
       "home": 0
     },
     "21": {
-      "present_position": 2048,
-      "degrees_reported": 180.0,
+      "present_position": 1683,
+      "degrees_reported": 147.92,
       "cont_at_home": 0,
       "home": 0
     },
     "22": {
-      "present_position": 2046,
-      "degrees_reported": 179.82,
+      "present_position": 3334,
+      "degrees_reported": 293.03,
       "cont_at_home": 0,
       "home": 0
     },
     "23": {
-      "present_position": 2047,
-      "degrees_reported": 179.91,
+      "present_position": 1877,
+      "degrees_reported": 164.97,
       "cont_at_home": 0,
       "home": 0
     },
     "24": {
-      "present_position": 2050,
-      "degrees_reported": 180.18,
-      "cont_at_home": 0,
-      "home": 0
-    },
-    "25": {
-      "present_position": 2046,
-      "degrees_reported": 179.82,
-      "cont_at_home": 0,
-      "home": 0
-    },
-    "26": {
       "present_position": 2048,
       "degrees_reported": 180.0,
       "cont_at_home": 0,
       "home": 0
     },
+    "25": {
+      "present_position": 1046,
+      "degrees_reported": 91.93,
+      "cont_at_home": 0,
+      "home": 0
+    },
+    "26": {
+      "present_position": 49,
+      "degrees_reported": 4.31,
+      "cont_at_home": 0,
+      "home": 0
+    },
     "27": {
-      "present_position": 2047,
-      "degrees_reported": 179.91,
+      "present_position": 2046,
+      "degrees_reported": 179.82,
       "cont_at_home": 0,
       "home": 0
     }

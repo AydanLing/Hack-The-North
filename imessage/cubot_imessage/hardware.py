@@ -68,7 +68,7 @@ class HardwareExecutor:
         hw_root: str = "",
         serial_port: str = "",
         gear: float = 4.0,
-        power: int = 0,
+        power: int = 3,
         limit_deg: float = DETENT_OUT_DEG,
         mirror_mujoco: bool | None = None,
         scene_xml: str = "",
@@ -77,10 +77,12 @@ class HardwareExecutor:
         self.hw_root = hw_root or os.environ.get("CUBOT_HW_ROOT", DEFAULT_HW_ROOT)
         self.serial_port = (serial_port or os.environ.get("CUBOT_SERIAL_PORT", "")).strip()
         self.gear = float(os.environ.get("CUBOT_GEAR", gear) or gear)
+        # Prefer the Settings-resolved power arg; only fall back to env if somehow unset.
         try:
-            self.power = int(os.environ.get("CUBOT_POWER", str(power)))
+            env_p = (os.environ.get("CUBOT_POWER") or "").strip()
+            self.power = int(env_p) if env_p != "" else int(power)
         except ValueError:
-            self.power = power
+            self.power = int(power)
         self.limit_deg = float(limit_deg)
         if mirror_mujoco is None:
             mirror_mujoco = _env_bool("CUBOT_MUJOCO_MIRROR", True)
@@ -269,6 +271,64 @@ class HardwareExecutor:
             # Viewer is optional for demos — robot fold still proceeds when the bus is up.
             self.log(f"[hardware] MuJoCo mirror failed: {type(e).__name__}: {e}")
             return {"executor": "mujoco", "accepted": False, "error": str(e)}
+
+    def home_all(self, context: dict | None = None) -> dict:
+        """Drive every axis to software home (straight chain). Used for 'straight line' texts."""
+        if not self._lock.acquire(blocking=False):
+            raise RuntimeError("hardware busy: another fold is in progress")
+        try:
+            self._claim_mutex()
+            self._open()
+            assert self._rc is not None and self._axes
+            speed = self._rc.SPEEDS[min(DEFAULT_SPEED_IDX, len(self._rc.SPEEDS) - 1)]
+            self.log(f"[hardware] homing {len(self._axes)} axes → software zero")
+            # Snapshot how far we are before chasing — if already home, drive is a no-op.
+            start_err = {ax.sid: abs(ax.from_home()) for ax in self._axes}
+            max_err = max(start_err.values()) if start_err else 0
+            for ax in self._axes:
+                ax.go(ax.home, "HOME")
+            pending = {ax.sid for ax in self._axes}
+            deadline = time.monotonic() + 12.0
+            while pending and time.monotonic() < deadline:
+                for ax in self._axes:
+                    if ax.sid not in pending:
+                        continue
+                    try:
+                        st = self._bus.read_state(ax.sid)
+                    except Exception as e:
+                        self.log(f"[hardware] home read failed sid={ax.sid}: {e}")
+                        ax.stop("read failed")
+                        pending.discard(ax.sid)
+                        continue
+                    ax.update(st["position"])
+                    if ax.dest is None:
+                        pending.discard(ax.sid)
+                        continue
+                    ax.drive(speed)
+                time.sleep(POLL_S)
+            timed_out = []
+            for ax in self._axes:
+                if ax.dest is not None:
+                    timed_out.append(ax.sid)
+                    ax.stop("home timeout")
+            ok = not timed_out
+            self.log(
+                f"[hardware] home {'ok' if ok else 'partial'} "
+                f"max_err_steps={max_err} timed_out={timed_out or '—'}"
+            )
+            return {
+                "executor": self.name,
+                "accepted": True,
+                "home": True,
+                "formed": ok,
+                "timed_out": timed_out,
+                "hardware_online": True,
+                "max_err_steps": max_err,
+                "already_home": max_err <= 20,
+            }
+        finally:
+            self._release_mutex()
+            self._lock.release()
 
     def submit(self, plan, context: dict) -> dict:
         self.submitted.append(plan)

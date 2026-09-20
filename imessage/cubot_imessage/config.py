@@ -91,7 +91,7 @@ class Settings:
     hw_root: str = DEFAULT_HW_ROOT
     serial_port: str = ""
     gear: float = 4.0
-    power: int = 0
+    power: int = 3
     mirror_mujoco: bool = True
 
     @classmethod
@@ -99,9 +99,9 @@ class Settings:
         if use_dotenv:
             load_dotenv()
         try:
-            power = int(_env("CUBOT_POWER", "0") or "0")
+            power = int(_env("CUBOT_POWER", "3") or "3")
         except ValueError:
-            power = 0
+            power = 3
         try:
             gear = float(_env("CUBOT_GEAR", "4") or "4")
         except ValueError:

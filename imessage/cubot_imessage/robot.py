@@ -191,6 +191,10 @@ class DryRunExecutor:
                                                  for m in plan.moves))
         return {"executor": self.name, "accepted": True, "moves": len(plan.moves)}
 
+    def home_all(self, context: dict | None = None) -> dict:
+        self.log("[dryrun] home_all → software zero (straight line)")
+        return {"executor": self.name, "accepted": True, "home": True}
+
 
 class SpoolExecutor:
     """Appends one JSON line per request to a queue file for the sim / hardware owner to consume.
@@ -363,7 +367,7 @@ def build_executor(kind: str, spool_path: str = "", log=print,
                    viewer_base: str = "", viewer_html: str = "",
                    scene_xml: str = "",
                    hw_root: str = "", serial_port: str = "",
-                   gear: float = 4.0, power: int = 0,
+                   gear: float = 4.0, power: int = 3,
                    mirror_mujoco: bool | None = None) -> Executor:
     kind = (kind or "dryrun").lower()
     if kind == "none":

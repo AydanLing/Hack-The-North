@@ -289,13 +289,13 @@ def test_react_thinking_when_unsure(handoff):
 
 
 def test_letter_fallback_when_openai_returns_none(handoff):
-    """API-down recovery must still fold something — prefer a non-letter icon over spelling."""
+    """Vague chitchat must ask again — never invent cheese→C or a random glyph."""
     class NoneOpenAI:
         enabled = True
 
         def resolve(self, text, allowed_labels):
-            from cubot_imessage.openai_fallback import first_letter_fallback
-            return first_letter_fallback(text, allowed_labels)
+            from cubot_imessage.openai_fallback import first_letter_fallback, clarify_guess
+            return first_letter_fallback(text, allowed_labels) or clarify_guess()
 
     client = LinqClient("key", "https://example.invalid/v3", dry_run=True)
     clf = FakeClassifier(label="none", accepted=False, confidence=0.1, margin=0.0)
@@ -325,11 +325,53 @@ def test_letter_fallback_when_openai_returns_none(handoff):
     inbound = _inbound("i like cheese")
     inbound.message_id = "msg-cheese"
     out = bridge.handle(inbound)
+    assert out.status == STATUS_UNSURE
+    assert out.via == "clarify"
+    assert out.plan is None
+    assert "not sure" in (out.reply or "").lower() or "name a shape" in (out.reply or "").lower()
+    reacts = [c["body"] for c in client.sent if c["url"].endswith("/messages/msg-cheese/reactions")]
+    assert reacts == [{"operation": "add", "type": "custom", "custom_emoji": "🤔"}]
+
+
+def test_explicit_letter_still_folds_without_openai(handoff):
+    """Bare / explicit letter asks still map without inventing other shapes."""
+    class NoneOpenAI:
+        enabled = True
+
+        def resolve(self, text, allowed_labels):
+            from cubot_imessage.openai_fallback import first_letter_fallback, clarify_guess
+            return first_letter_fallback(text, allowed_labels) or clarify_guess()
+
+    client = LinqClient("key", "https://example.invalid/v3", dry_run=True)
+    clf = FakeClassifier(label="none", accepted=False, confidence=0.1, margin=0.0)
+    clf.labels = list(clf.labels) + ["letter_c", "c"]
+    bridge = Bridge(_settings(handoff), classifier=clf,
+                    executor=DryRunExecutor(log=lambda *a: None), client=client,
+                    openai=NoneOpenAI(), log=lambda *a: None)
+    import json as _json
+    from pathlib import Path
+    root = Path(handoff)
+    if not (root / "shapes" / "91-c").exists():
+        d = root / "shapes" / "91-c"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "path.json").write_text(_json.dumps(_path_doc("c", 91, [(1, 1, "out")])))
+        idx = _json.loads((root / "index.json").read_text())
+        idx["shapes"].append({"number": 91, "name": "c", "dir": "shapes/91-c",
+                              "moves": 1, "complete": True, "loose_hard_ok": True,
+                              "ends_flat_on_table": True, "aliases": []})
+        (root / "index.json").write_text(_json.dumps(idx))
+    from cubot_imessage.vocab import Vocabulary
+    from cubot_imessage.robot import ShapeLibrary
+    bridge.vocab = Vocabulary(handoff)
+    bridge.library = ShapeLibrary(handoff)
+    bridge._playable_labels = None
+
+    inbound = _inbound("make a C")
+    inbound.message_id = "msg-letter-c"
+    out = bridge.handle(inbound)
     assert out.resolution and out.resolution.ok
     assert out.plan is not None
-    assert not (out.intent and out.intent.label in ("letter_c", "c"))
-    assert "first letter" not in (out.reply or "").lower()
-    reacts = [c["body"] for c in client.sent if c["url"].endswith("/messages/msg-cheese/reactions")]
+    reacts = [c["body"] for c in client.sent if c["url"].endswith("/messages/msg-letter-c/reactions")]
     assert reacts == [{"operation": "add", "type": "like"}]
 
 
@@ -504,14 +546,23 @@ def test_handle_warns_on_a_flagged_shape(handoff):
 
 
 def test_handle_declines_below_threshold_without_executing(handoff):
-    """MiniLM miss + OpenAI/letter fallback must still fold something (never blank)."""
+    """MiniLM miss + no clear shape → ask again, do not invent a fold."""
+    class ClarifyOpenAI:
+        enabled = True
+
+        def resolve(self, text, allowed_labels):
+            from cubot_imessage.openai_fallback import clarify_guess
+            return clarify_guess("Not sure what to fold — name a shape?")
+
     clf = FakeClassifier(label="none", accepted=False, margin=0.02, confidence=0.1)
     clf.labels = list(clf.labels) + ["letter_h", "heart"]
     bridge = _bridge(handoff, clf)
+    bridge.openai = ClarifyOpenAI()
     out = bridge.handle(_inbound("hey what's up"))
-    assert out.resolution and out.resolution.ok
-    assert out.plan is not None
-    assert out.via == "openai"
+    assert out.status == STATUS_UNSURE
+    assert out.via == "clarify"
+    assert out.plan is None
+    assert "name a shape" in (out.reply or "").lower() or "not sure" in (out.reply or "").lower()
 
 
 def test_handle_offers_the_nearest_playable_for_a_plannable_shape(handoff):

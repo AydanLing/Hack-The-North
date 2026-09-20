@@ -8,10 +8,10 @@
 HTTP layer in `server.py` only does transport, auth, dedupe and rate limiting.
 
 The inbound text is treated as data throughout. It is fed to a classifier whose output space is a fixed
-label set (MiniLM first; OpenAI only as a fallback that must still pick from that same set), and the
-only thing that reaches the robot is a shape name that was already present in `handoff/index.json`
-before the message arrived. Text in a message cannot name a file, a command or a number to message:
-replies go to the `chat_id` the message came from and nowhere else.
+label set (MiniLM first; OpenAI only as a fallback that may pick from that same set — or admit
+``none`` and ask again). The only thing that reaches the robot is a shape name already present in
+`handoff/index.json`. Vague or nonsense text must not invent a booth glyph. Replies go to the
+`chat_id` the message came from and nowhere else.
 """
 from __future__ import annotations
 
@@ -31,6 +31,21 @@ THINKING_EMOJI = "🤔"
 
 HELP_WORDS = {"help", "?", "shapes", "shape list", "what can you do", "what can you make",
               "what shapes", "commands", "menu", "list", "options"}
+
+# Unfolded chain = software home. Handled before MiniLM/OpenAI so we never fold a random glyph.
+HOME_PHRASES = {
+    "straight", "straight line", "a straight line", "the straight line",
+    "line", "a line", "home", "go home", "go to home", "return home",
+    "zero", "zeros", "all zero", "at zero", "unfold", "unfolded",
+    "reset", "flat", "flat line", "straight chain", "make it straight",
+    "fold straight", "be straight",
+}
+
+
+def _wants_home(text: str) -> bool:
+    key = " ".join(text.lower().strip("!?. ").replace("_", " ").replace("-", " ").split())
+    return key in HOME_PHRASES
+
 
 # Exact / near-exact booth prompts for gear-safe tip demos. Checked before MiniLM so
 # "easy c" never gets stolen by letter_c → the mid-chain 7 N·m C.
@@ -71,7 +86,7 @@ class Outcome:
     replied: bool = False
     error: str = ""
     elapsed_ms: float = 0.0
-    via: str = "minilm"          # "minilm" | "openai" | "help"
+    via: str = "minilm"          # "minilm" | "openai" | "clarify" | "help" | "home" | "demo"
 
     @property
     def status(self) -> str:
@@ -226,10 +241,33 @@ class Bridge:
             line += "\nHeads up: " + "; ".join(plan.warnings) + "."
         return line
 
+    def _clarify(self, out: Outcome, inbound: InboundMessage, text: str,
+                 caption: str, t0: float, conf: float = 0.1) -> Outcome:
+        """Ask again — never invent a booth shape when we do not know."""
+        from .openai_fallback import clarify_guess
+        msg = (caption or "").strip() or clarify_guess().caption
+        out.via = "clarify"
+        out.intent = IntentResult(
+            text=text, label="none", confidence=conf, margin=0.0, accepted=False,
+            caption=msg, who=None, latency_ms=0.0, ranked=[("none", conf)],
+        )
+        out.resolution = Resolution(
+            status=STATUS_UNSURE, label="none", icon="", shape="",
+            nearest_playable="", nearest_score=0.0,
+        )
+        out.reply = msg
+        self.react(inbound, ok=False)
+        out.elapsed_ms = (time.perf_counter() - t0) * 1000.0
+        return out
+
     def _try_openai(self, text: str, out: Outcome) -> Optional[tuple[IntentResult, Resolution]]:
-        """Second opinion when MiniLM declined. Always tries to land on a playable shape."""
+        """Second opinion when MiniLM declined.
+
+        Returns a playable (intent, resolution) only when the text clearly maps to a shape.
+        On ``label=none`` / clarify, sets ``out.via="clarify"`` and ``out.reply`` and returns None
+        so the caller can ask again — never invents plus/heart/letter filler.
+        """
         allowed = list(self.playable_labels.keys()) or list(getattr(self.classifier, "labels", []) or [])
-        # Even without an API key, letter-fallback must still fire so the booth never blanks.
         from .openai_fallback import first_letter_fallback
         guess = self.openai.resolve(text, allowed) if self.openai.enabled \
             else first_letter_fallback(text, allowed)
@@ -237,11 +275,12 @@ class Bridge:
             return None
         self.log(f"[openai] {text!r} -> {guess.label} ({guess.confidence:.2f}, "
                  f"{getattr(guess, 'via', 'openai')}, {guess.latency_ms:.0f}ms)")
-        if guess.label == "none":
-            guess = first_letter_fallback(text, allowed)
-            if guess is None:
-                return None
-            self.log(f"[openai] forced letter fallback -> {guess.label}")
+        if guess.label == "none" or getattr(guess, "via", "") == "clarify":
+            out.via = "clarify"
+            out.reply = (guess.caption or "").strip() or (
+                "Not sure what to fold — try a shape name like checkmark, heart, C, or headphones?"
+            )
+            return None
         intent = IntentResult(
             text=text, label=guess.label, confidence=guess.confidence, margin=guess.confidence,
             accepted=True, caption=guess.caption or "", who=None, latency_ms=guess.latency_ms,
@@ -250,21 +289,14 @@ class Bridge:
         res = self.vocab.resolve(intent.label, accepted=True, nearest=None,
                                  nearest_label_map=self.playable_labels)
         if not res.ok:
-            # Last ditch: walk playable labels until one resolves.
-            for label in allowed:
-                res2 = self.vocab.resolve(label, accepted=True, nearest=None,
-                                          nearest_label_map=self.playable_labels)
-                if res2.ok:
-                    intent = IntentResult(
-                        text=text, label=label, confidence=0.2, margin=0.2, accepted=True,
-                        caption=f"Going with {label.replace('_', ' ')}", who=None,
-                        ranked=[(label, 0.2)],
-                    )
-                    res = res2
-                    break
-            else:
-                return None
-        out.via = "openai" if getattr(guess, "via", "openai") == "openai" else "minilm"
+            # Unknown / unplayable label from the model — ask again, do not pick a random glyph.
+            out.via = "clarify"
+            out.reply = (
+                "Not sure what to fold — try a shape name like checkmark, heart, C, or headphones?"
+            )
+            return None
+        via = getattr(guess, "via", "openai")
+        out.via = "openai" if via in ("openai", "letter_fallback") else via
         out.intent = intent
         out.resolution = res
         return intent, res
@@ -322,6 +354,36 @@ class Bridge:
             out.elapsed_ms = (time.perf_counter() - t0) * 1000.0
             return out
 
+        if _wants_home(text):
+            out.via = "home"
+            out.reply = "Going back to a straight line (home)."
+            self.log(f"[home] {text!r}")
+            self.react(inbound, ok=True)
+            if execute:
+                home_fn = getattr(self.executor, "home_all", None)
+                if callable(home_fn):
+                    try:
+                        out.executed = home_fn({"sender": inbound.sender, "text": text})
+                        executed = out.executed or {}
+                        if executed.get("already_home"):
+                            out.reply = ("Already at the straight-line home — nothing to drive. "
+                                         "If the chain isn't straight, soft-zero it again.")
+                        elif executed.get("formed") is False:
+                            timed = executed.get("timed_out") or []
+                            out.reply = (f"Tried to drive home but timed out on servo(s) {timed}. "
+                                         "Tell my operator.")
+                            self.react(inbound, ok=False)
+                    except Exception as e:
+                        out.error = f"home failed: {e}"
+                        out.reply = ("I know you want a straight line, but I couldn't drive home. "
+                                     "Tell my operator.")
+                        self.react(inbound, ok=False)
+                else:
+                    out.executed = {"executor": self.executor.name, "accepted": True, "home": True}
+                    out.reply += f" ({self.executor.name} has no motors — noted only.)"
+            out.elapsed_ms = (time.perf_counter() - t0) * 1000.0
+            return out
+
         demo_shape = _demo_shape_from_text(text)
         if demo_shape and demo_shape in self.library.names:
             intent = IntentResult(
@@ -346,6 +408,8 @@ class Bridge:
             if recovered:
                 intent, res = recovered
                 return self._finish_plan(out, inbound, text, intent, res, execute, t0)
+            if out.via == "clarify":
+                return self._clarify(out, inbound, text, out.reply, t0)
             out.error = str(e)
             out.reply = ("My shape model isn't loaded, so I can't read that right now. "
                          f"I can still fold: {self.shape_list()}.")
@@ -364,13 +428,15 @@ class Bridge:
         out.resolution = res
 
         if not res.ok:
-            # Always invent a fold for "I have no idea" — never blank the booth.
-            # Plannable/rejected keep their honest decline (we know the shape, we just can't fold it).
+            # Unsure/unmapped: ask OpenAI. If it also has no idea, ask the human again —
+            # do not invent plus/heart/letter filler for the booth.
             if res.status in (STATUS_UNSURE, STATUS_UNMAPPED):
                 recovered = self._try_openai(text, out)
                 if recovered:
                     intent, res = recovered
                     return self._finish_plan(out, inbound, text, intent, res, execute, t0)
+                if out.via == "clarify":
+                    return self._clarify(out, inbound, text, out.reply, t0)
             out.reply = self._decline(res, intent)
             self.react(inbound, ok=False)
             out.elapsed_ms = (time.perf_counter() - t0) * 1000.0

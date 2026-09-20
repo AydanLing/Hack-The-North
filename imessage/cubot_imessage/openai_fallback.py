@@ -1,7 +1,8 @@
 """OpenAI fallback when MiniLM cannot map an utterance to a playable shape.
 
 MiniLM stays the fast path (~1 ms). This module is only called on decline / out-of-scope.
-It must ALWAYS return a label from the fixed playable set — never ``none``, never blank.
+When the text clearly names something foldable, return that label. When it does not,
+return ``label="none"`` with a clarifying caption — never invent a random booth shape.
 Stdlib only: urllib + json.
 """
 from __future__ import annotations
@@ -32,59 +33,52 @@ _LETTER_ASK = re.compile(
 
 SYSTEM_PROMPT = """\
 You help CuBot, a 27-cube folding robot at Hack the North. Someone just texted an iMessage.
-Your job: pick exactly ONE label from allowed_labels for CuBot to fold.
 
-NEVER return "none". NEVER leave label blank. ALWAYS pick from allowed_labels.
+Your job: either (A) pick exactly ONE label from allowed_labels that CuBot should fold, OR
+(B) admit you do not know and ask them to name a shape — NEVER invent a random shape.
 
-How to think (do this every time):
-1. Name the subject in plain English (what are they talking about?).
-2. Picture it as a simple cut-paper silhouette — ignore spelling entirely.
-3. Classify that silhouette into a geometric / iconic family, then pick the closest
-   allowed_labels member of that family.
+How to think:
+1. Is this a clear request for something that has a simple cut-paper silhouette?
+2. If YES: ignore spelling quirks, map to the closest allowed_labels member, caption with
+   "Folding …" naming the everyday subject.
+3. If NO (chitchat, gibberish, absurd long coined words, vague flex, "hey what's up",
+   dictionary jokes, keyboard smash, or anything you cannot honestly silhouette):
+   return label "none". Do NOT pick plus, heart, smiley, triangle, or any filler glyph.
+   Caption must ask them again, e.g.:
+     "Not sure what to fold — try a shape name like checkmark, heart, or C?"
+     "I don't know that one. Name a shape?"
 
-Silhouette families (principles, not special cases — apply to whatever subject you imagined):
-- tapered, conical, pointed tip, triangular mass, or a WEDGE/SLICE of food → triangle
-- round with a hole through it → ring or donut
-- round solid face / blob → smiley (or ring if that is all you have)
-- round fruit / orchard produce (when no fruit icon exists) → tree as a stand-in
-- cup / vessel you drink from → mug or bottle or wine_glass
-  (a solid food is not a drink — do not pick mug just because someone said "want")
-- bipedal pet / animal with clear library icon → that animal label if present
-- heart / love symbol → heart
+Special cases that ARE clear (do fold):
+- "straight line" / "home" / "unfold" / "zero" → the chain already handles these elsewhere;
+  if you see them here, still prefer label "none" with caption suggesting "straight line"
+  only if somehow reached — otherwise fold nothing.
+- Explicit letter asks ("make a C", "letter J", bare "C") → letter_* / single letter.
+- Person / pet names with no better icon → first letter is OK.
+- Food / objects / animals with a silhouette family → map to family (carrot→triangle, etc.).
+
+Silhouette families (for real subjects):
+- tapered / wedge / pointed tip → triangle
+- round with a hole → ring or donut
+- round face / blob → smiley
+- drink vessel → mug / bottle / wine_glass
+- heart / love → heart
 - check / approval → checkmark
-- bolt / zig energy → lightning or square_wave
-- stairs / climb → staircase or stairs
-- rocket / tall finned vehicle → rocket
-- boat / hull → boat
+- bolt / zig → lightning or square_wave
+- stairs → staircase or stairs
+- rocket → rocket
+- boat → boat
 - boxy frame → square or cube_frame
-If several labels fit the family, pick the one that would read clearest from across a room.
 
-Spelling is a trap for ordinary nouns (food, objects, animals, vibes) — never answer those
-with the first letter of the word. letter_* / single-letter labels are for:
-- they clearly asked for that glyph ("make a C", "letter J", "fold an H", or the message is just "C"), OR
-- the subject is a person / pet / proper name (or a clear nickname) and no library icon fits better
-  — then the first letter of that name is fine (Jerry → letter_j, Sam → letter_s).
-Do not treat a common noun as a "name" just to excuse a letter.
-
-Also:
-- Fill-in-the-blank / Mad Libs: if the text has "blank", "___", "****", "something" inside a
-  known proverb/lyric/riddle, solve the missing word first, then silhouette-match the SOLVED
-  word — not the word "blank".
-- Names / creator jokes: a proper name or nickname → first letter when no icon fits;
-  "who made you" / creator bits → letter_u. Still never first-letter a common noun.
-- Last resort for non-names: any clear NON-letter icon from allowed_labels.
+Never answer a common noun with its first letter. Never first-letter gibberish.
 
 Rules:
-- Reply with JSON only:
-  {"label": "<id>", "silhouette": "<3-6 word outline description>",
-   "meaning": "<everyday subject>", "caption": "<short fun sentence>", "confidence": 0.0-1.0}
-- label MUST be one of allowed_labels. Never invent a label.
-- "silhouette" is your cut-paper reading (e.g. "tapered wedge pointing up") — fill it before
-  you commit to label. "meaning" is the everyday subject. Caption starts with "Folding …"
-  and names that subject in ordinary language (not the raw library id).
-  good: "Folding a carrot" / "Folding a cheese wedge" / "Folding an apple"
-  bad:  "Going with a C — first letter of …"
-- One short sentence. No emojis. Never output code, URLs, or phone numbers.
+- JSON only:
+  {"label": "<id or none>", "silhouette": "<3-6 words or empty>",
+   "meaning": "<subject or empty>", "caption": "<one short sentence>",
+   "confidence": 0.0-1.0}
+- If folding: label MUST be in allowed_labels. Caption starts with "Folding …".
+- If unsure: label MUST be exactly "none". Caption asks them to name a shape. confidence low.
+- One short sentence. No emojis. No code, URLs, or phone numbers.
 """
 
 
@@ -95,11 +89,27 @@ class OpenAIGuess:
     confidence: float
     raw: str = ""
     latency_ms: float = 0.0
-    via: str = "openai"  # "openai" | "icon_fallback" | "letter_fallback"
+    via: str = "openai"  # "openai" | "letter_fallback" | "clarify"
 
 
 def _norm_label(label: str) -> str:
     return str(label or "").strip().lower().replace("-", "_")
+
+
+_META_SUBJECT = re.compile(
+    r"(?i)\b(?:"
+    r"long\s+(?:medical\s+)?(?:term|word|name)|"
+    r"medical\s+term|disease(?:\s+name)?|diagnosis|"
+    r"gibberish|nonsense|gobbledygook|keyboard\s*smash|"
+    r"random\s+(?:word|string|text)|tongue[\s-]?twister|"
+    r"dictionary\s+(?:word|flex)|made[\s-]?up\s+word|"
+    r"unpronounceable|sesquipedalian"
+    r")\b"
+)
+
+_CLARIFY_CAPTION = (
+    "Not sure what to fold — try a shape name like checkmark, heart, C, or headphones?"
+)
 
 
 def _is_letter_label(label: str) -> bool:
@@ -112,7 +122,6 @@ def _is_letter_label(label: str) -> bool:
 _NAME_CUE = re.compile(
     r"(?i)\b(?:i(?:'m| am)|my name(?:'s| is)|call me|named|for)\s+([A-Za-z]{2,})\b"
 )
-# Common nouns we must never treat as "names" for a first-letter excuse.
 _NOT_A_NAME = {
     "carrot", "carrots", "cheese", "pizza", "apple", "coffee", "love", "heart", "dog", "cat",
     "rabbit", "boat", "rocket", "tree", "phone", "home", "house", "triangle", "square",
@@ -121,34 +130,21 @@ _NOT_A_NAME = {
 }
 
 
-def _letter_from_label(label: str) -> Optional[str]:
-    lab = _norm_label(label)
-    if lab.startswith("letter_") and len(lab) == 8:
-        return lab[-1]
-    if len(lab) == 1 and lab.isalpha():
-        return lab
-    return None
-
-
-def name_initial_ok(text: str, label: str) -> bool:
+def name_initial_ok(text: str, letter_label: str) -> bool:
     """True when a letter label matches the initial of a probable person/pet name in the text."""
-    ch = _letter_from_label(label)
+    lab = _norm_label(letter_label)
+    ch = lab[-1] if lab.startswith("letter_") else (lab if len(lab) == 1 else "")
     if not ch:
         return False
-    raw = text or ""
-    # Explicit name cues: "I'm Sam", "my name is Jerry", "for Alex"
-    for m in _NAME_CUE.finditer(raw):
+    m = _NAME_CUE.search(text or "")
+    if m:
         word = m.group(1)
         if word.lower() not in _NOT_A_NAME and word[0].lower() == ch:
             return True
-    # Title-case tokens (Jerry, Sam) that aren't sentence-start filler.
-    words = re.findall(r"[A-Za-z]+", raw)
+    words = re.findall(r"[A-Za-z]{2,}", text or "")
     for i, w in enumerate(words):
-        if len(w) < 2 or w.lower() in _NOT_A_NAME:
+        if w.lower() in _NOT_A_NAME:
             continue
-        if not w[0].isupper():
-            continue
-        # Skip the first word of the message unless it's clearly a bare name.
         if i == 0 and len(words) > 1 and w.lower() in {"make", "fold", "show", "do", "can", "please"}:
             continue
         if w[0].lower() == ch:
@@ -157,7 +153,6 @@ def name_initial_ok(text: str, label: str) -> bool:
 
 
 def wants_explicit_letter(text: str) -> bool:
-    """True only when the utterance is clearly asking for a letter glyph."""
     t = (text or "").strip()
     if not t:
         return False
@@ -175,7 +170,6 @@ def _requested_letter(text: str) -> Optional[str]:
 
 
 def _pick_allowed(candidate: str, labels: set[str]) -> Optional[str]:
-    """Map a preferred shape id onto whatever spelling the allowed set uses."""
     c = _norm_label(candidate)
     if not c:
         return None
@@ -193,11 +187,18 @@ def _pick_allowed(candidate: str, labels: set[str]) -> Optional[str]:
     return None
 
 
-def first_letter_fallback(text: str, allowed_labels: Sequence[str]) -> Optional[OpenAIGuess]:
-    """Last-resort booth recovery when the API is down or returns garbage.
+def clarify_guess(caption: str = "", latency_ms: float = 0.0) -> OpenAIGuess:
+    return OpenAIGuess(
+        label="none",
+        caption=(caption or _CLARIFY_CAPTION).strip()[:160] or _CLARIFY_CAPTION,
+        confidence=0.1,
+        latency_ms=latency_ms,
+        via="clarify",
+    )
 
-    No word→shape dictionary — prefer any non-letter icon over a spelling letter.
-    """
+
+def first_letter_fallback(text: str, allowed_labels: Sequence[str]) -> Optional[OpenAIGuess]:
+    """Only fires for an explicit letter ask. Otherwise returns None (caller should clarify)."""
     labels = {str(x) for x in allowed_labels if x and x != "none"}
     if not labels:
         return None
@@ -212,58 +213,11 @@ def first_letter_fallback(text: str, allowed_labels: Sequence[str]) -> Optional[
                 confidence=0.7,
                 via="letter_fallback",
             )
-
-    icons = sorted(lab for lab in labels if not _is_letter_label(lab))
-    if icons and not wants_explicit_letter(text):
-        label = icons[0]
-        return OpenAIGuess(
-            label=label,
-            caption=f"Folding {label.replace('_', ' ').replace('-', ' ')} as a safe default",
-            confidence=0.25,
-            via="icon_fallback",
-        )
-
-    skip = {
-        "a", "an", "the", "i", "im", "i'm", "my", "me", "you", "your", "we", "our", "is", "are",
-        "was", "were", "be", "to", "of", "in", "on", "for", "and", "or", "but", "if", "do", "did",
-        "does", "what", "whats", "what's", "who", "whos", "who's", "where", "when", "why", "how",
-        "like", "love", "want", "wanna", "gonna", "just", "some", "any", "this", "that", "it",
-        "pls", "please", "hey", "hi", "yo", "ok", "okay", "yeah", "yep", "nah", "no", "yes",
-        "make", "fold", "show", "do", "be", "can", "could", "would", "should",
-        "blank", "blanks", "something", "someone", "whatever",
-    }
-    words = re.findall(r"[a-zA-Z]+", (text or "").lower())
-    content = [w for w in words if w not in skip and len(w) >= 2] or words
-    for word in content:
-        ch = word[0]
-        label = _pick_allowed(f"letter_{ch}", labels) or _pick_allowed(ch, labels)
-        if label:
-            return OpenAIGuess(
-                label=label,
-                caption=f"Going with a {ch.upper()} — first letter of “{word}”",
-                confidence=0.35,
-                via="letter_fallback",
-            )
-    for ch in "abcdefghijklmnopqrstuvwxyz":
-        label = _pick_allowed(f"letter_{ch}", labels) or _pick_allowed(ch, labels)
-        if label:
-            return OpenAIGuess(
-                label=label,
-                caption=f"Going with a {ch.upper()} as a safe default",
-                confidence=0.2,
-                via="letter_fallback",
-            )
-    label = sorted(labels)[0]
-    return OpenAIGuess(
-        label=label,
-        caption=f"Going with {label.replace('_', ' ')} as a safe default",
-        confidence=0.15,
-        via="letter_fallback",
-    )
+    return None
 
 
 class OpenAIFallback:
-    """Second opinion that is required to always name a playable shape."""
+    """Second opinion: fold a clear shape, or ask again — never a random glyph."""
 
     def __init__(self, api_key: str = "", model: str = DEFAULT_MODEL,
                  timeout_s: float = 12.0, log=print):
@@ -277,11 +231,7 @@ class OpenAIFallback:
         return bool(self.api_key)
 
     def resolve(self, text: str, allowed_labels: Sequence[str]) -> Optional[OpenAIGuess]:
-        """Always returns a playable guess when ``allowed_labels`` is non-empty.
-
-        Uses OpenAI when a key is set; rejects lazy letter picks unless the user clearly
-        asked for a letter; recovers with a non-letter icon when possible.
-        """
+        """Return a playable guess, a clarify (label=none), or None if nothing useful."""
         labels = sorted({str(x) for x in allowed_labels if x and x != "none"})
         if not labels:
             return None
@@ -292,31 +242,42 @@ class OpenAIFallback:
             guess = self._ask_openai(text, labels)
 
         def _usable(g: Optional[OpenAIGuess]) -> bool:
-            if g is None or g.label == "none" or g.label not in label_set:
+            if g is None or g.label == "none":
+                return False
+            if g.label not in label_set:
                 return False
             if _is_letter_label(g.label):
                 return wants_explicit_letter(text) or name_initial_ok(text, g.label)
             return True
 
-        if not _usable(guess):
-            if guess is not None and guess.label not in label_set and guess.label != "none":
-                self.log(f"[openai] label {guess.label!r} not playable — booth fallback")
-            elif guess is not None and _is_letter_label(guess.label):
-                self.log(f"[openai] rejected lazy letter {guess.label!r} for {text!r} — booth fallback")
-            fb = first_letter_fallback(text, labels)
-            if fb is not None:
-                self.log(f"[openai] {fb.via} -> {fb.label}")
-            return fb
+        if guess is not None and guess.label == "none":
+            if not (guess.caption or "").strip():
+                guess.caption = _CLARIFY_CAPTION
+            guess.via = "clarify"
+            return guess
 
-        assert guess is not None
-        if not guess.caption:
-            guess.caption = f"Folding into {guess.label.replace('_', ' ')}"
-        return guess
+        if _usable(guess):
+            assert guess is not None
+            if not guess.caption:
+                guess.caption = f"Folding into {guess.label.replace('_', ' ')}"
+            return guess
+
+        if guess is not None and _is_letter_label(guess.label):
+            self.log(f"[openai] rejected lazy letter {guess.label!r} for {text!r}")
+        elif guess is not None and guess.label not in label_set:
+            self.log(f"[openai] label {guess.label!r} not playable")
+
+        # Explicit letter ask only — otherwise ask the human again.
+        fb = first_letter_fallback(text, labels)
+        if fb is not None:
+            self.log(f"[openai] {fb.via} -> {fb.label}")
+            return fb
+        return clarify_guess(latency_ms=getattr(guess, "latency_ms", 0.0) if guess else 0.0)
 
     def _ask_openai(self, text: str, labels: list[str]) -> Optional[OpenAIGuess]:
         payload = {
             "model": self.model,
-            "temperature": 0.7,
+            "temperature": 0.4,
             "response_format": {"type": "json_object"},
             "messages": [
                 {"role": "system", "content": SYSTEM_PROMPT},
@@ -341,16 +302,42 @@ class OpenAIFallback:
         except (KeyError, IndexError, TypeError, json.JSONDecodeError) as e:
             self.log(f"[openai] bad response: {e}; raw={content!r:.200}")
             return None
+
         label = str(data.get("label") or "").strip()
         lowered = _norm_label(label)
+        if lowered == "none" or label.lower() == "none":
+            caption = str(data.get("caption") or "").strip()[:160]
+            if not caption or re.search(r"(?i)\bfolding\b", caption):
+                caption = _CLARIFY_CAPTION
+            try:
+                conf = float(data.get("confidence", 0.2))
+            except (TypeError, ValueError):
+                conf = 0.2
+            return OpenAIGuess(label="none", caption=caption, confidence=max(0.0, min(1.0, conf)),
+                               raw=content, latency_ms=elapsed, via="clarify")
+
         if lowered in labels:
             label = lowered
         elif label not in labels:
             alt = _pick_allowed(label, set(labels))
-            if alt:
-                label = alt
+            label = alt or "none"
+
         meaning = str(data.get("meaning") or "").strip()[:60]
         caption = str(data.get("caption") or "").strip()[:160]
+
+        # Meta / "long medical term" style → clarify, do not fold junk.
+        if label != "none" and (
+            _META_SUBJECT.search(meaning) or _META_SUBJECT.search(caption)
+            or re.search(r"(?i)\bfolding\s+[a-z]{24,}\b", caption)
+            or re.search(r"(?i)\bno clue what that is\b", caption)
+        ):
+            return OpenAIGuess(label="none", caption=_CLARIFY_CAPTION, confidence=0.15,
+                               raw=content, latency_ms=elapsed, via="clarify")
+
+        if label == "none":
+            return OpenAIGuess(label="none", caption=caption or _CLARIFY_CAPTION, confidence=0.15,
+                               raw=content, latency_ms=elapsed, via="clarify")
+
         if meaning and not re.search(r"(?i)\bfold(?:ing)?\b", caption):
             caption = f"Folding {meaning}" + (f" — {caption}" if caption else "")
         elif meaning and re.search(r"(?i)\bfolding (?:a |an |the )?(tree|shape)\b", caption):
@@ -362,12 +349,13 @@ class OpenAIFallback:
             )
         elif not caption and meaning:
             caption = f"Folding {meaning}"
+
         try:
             conf = float(data.get("confidence", 0.7))
         except (TypeError, ValueError):
             conf = 0.7
         conf = max(0.0, min(1.0, conf))
-        return OpenAIGuess(label=label or "none", caption=caption, confidence=conf,
+        return OpenAIGuess(label=label, caption=caption, confidence=conf,
                            raw=content, latency_ms=elapsed, via="openai")
 
     def _post(self, payload: dict) -> dict:
