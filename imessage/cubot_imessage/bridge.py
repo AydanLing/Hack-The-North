@@ -239,7 +239,7 @@ class Bridge:
                     break
             else:
                 return None
-        out.via = "openai" if getattr(guess, "via", "openai") == "openai" else "openai"
+        out.via = "openai" if getattr(guess, "via", "openai") == "openai" else "minilm"
         out.intent = intent
         out.resolution = res
         return intent, res

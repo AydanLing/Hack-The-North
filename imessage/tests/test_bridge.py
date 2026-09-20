@@ -289,16 +289,12 @@ def test_react_thinking_when_unsure(handoff):
 
 
 def test_letter_fallback_when_openai_returns_none(handoff):
-    """Cheese / chitchat must still fold something — never a blank decline."""
-    from cubot_imessage.openai_fallback import OpenAIGuess
-
+    """API-down recovery must still fold something — prefer a non-letter icon over spelling."""
     class NoneOpenAI:
         enabled = True
 
         def resolve(self, text, allowed_labels):
-            # Simulate the old bad behaviour, then the module/bridge must recover.
             from cubot_imessage.openai_fallback import first_letter_fallback
-            # Pretend API said none by returning the letter fallback ourselves via real resolve path
             return first_letter_fallback(text, allowed_labels)
 
     client = LinqClient("key", "https://example.invalid/v3", dry_run=True)
@@ -307,33 +303,32 @@ def test_letter_fallback_when_openai_returns_none(handoff):
     bridge = Bridge(_settings(handoff), classifier=clf,
                     executor=DryRunExecutor(log=lambda *a: None), client=client,
                     openai=NoneOpenAI(), log=lambda *a: None)
-    # Ensure C is playable in the miniature handoff
     import json as _json
     from pathlib import Path
     root = Path(handoff)
-    if not (root / "shapes" / "91-c").exists():
-        d = root / "shapes" / "91-c"
-        d.mkdir(parents=True, exist_ok=True)
-        (d / "path.json").write_text(_json.dumps(_path_doc("c", 91, [(1, 1, "out")])))
-        idx = _json.loads((root / "index.json").read_text())
-        idx["shapes"].append({"number": 91, "name": "c", "dir": "shapes/91-c", "moves": 1,
-                              "complete": True, "loose_hard_ok": True, "ends_flat_on_table": True,
-                              "aliases": []})
-        (root / "index.json").write_text(_json.dumps(idx))
-        # refresh vocab/library on the bridge
-        from cubot_imessage.vocab import Vocabulary
-        from cubot_imessage.robot import ShapeLibrary
-        bridge.vocab = Vocabulary(handoff)
-        bridge.library = ShapeLibrary(handoff)
-        bridge._playable_labels = None
+    for number, name in ((90, "triangle"), (91, "c")):
+        if not (root / "shapes" / f"{number}-{name}").exists():
+            d = root / "shapes" / f"{number}-{name}"
+            d.mkdir(parents=True, exist_ok=True)
+            (d / "path.json").write_text(_json.dumps(_path_doc(name, number, [(1, 1, "out")])))
+            idx = _json.loads((root / "index.json").read_text())
+            idx["shapes"].append({"number": number, "name": name, "dir": f"shapes/{number}-{name}",
+                                  "moves": 1, "complete": True, "loose_hard_ok": True,
+                                  "ends_flat_on_table": True, "aliases": []})
+            (root / "index.json").write_text(_json.dumps(idx))
+    from cubot_imessage.vocab import Vocabulary
+    from cubot_imessage.robot import ShapeLibrary
+    bridge.vocab = Vocabulary(handoff)
+    bridge.library = ShapeLibrary(handoff)
+    bridge._playable_labels = None
 
     inbound = _inbound("i like cheese")
     inbound.message_id = "msg-cheese"
     out = bridge.handle(inbound)
     assert out.resolution and out.resolution.ok
     assert out.plan is not None
-    assert "deciphered with ChatGPT" in out.reply or "deciphered using local MiniLM" in out.reply \
-        or "deciphered with" in out.reply
+    assert not (out.intent and out.intent.label in ("letter_c", "c"))
+    assert "first letter" not in (out.reply or "").lower()
     reacts = [c["body"] for c in client.sent if c["url"].endswith("/messages/msg-cheese/reactions")]
     assert reacts == [{"operation": "add", "type": "like"}]
 
