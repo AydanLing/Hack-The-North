@@ -60,6 +60,8 @@ def main() -> int:
     ap.add_argument("--machine", default="config/machine-17.toml")
     ap.add_argument("--min-iou", type=float, default=0.65)
     ap.add_argument("--max-ratio", type=float, default=1.5)
+    ap.add_argument("--keep-thrash", action="store_true",
+                    help="ship even when the path uses many extra detents (better than nothing)")
     ap.add_argument("--push", action="store_true", help="commit and push when anything is added")
     args = ap.parse_args()
 
@@ -148,7 +150,7 @@ def main() -> int:
             if doc["name"].lower() in have:
                 continue
             rec = audit_path(doc)
-            if rec["ratio"] > args.max_ratio:
+            if rec["ratio"] > args.max_ratio and not args.keep_thrash:
                 dropped.append((doc["name"], rec["ratio"]))
             else:
                 keep_new += ["--shape",
