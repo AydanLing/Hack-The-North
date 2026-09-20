@@ -11,6 +11,7 @@ param(
     [int]$Workers = 3,
     [double]$TimeBudget = 200,
     [int]$K = 4,
+    [string]$Profile = "loose",
     [switch]$NoPush,
     [switch]$NoExport
 )
@@ -19,7 +20,8 @@ $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $PSScriptRoot
 Set-Location $Root
 
-$Out = Join-Path $Root "out\campaign-friend"
+# Fresh out dir so prior gentle attempts do not block loose retries of the same masks.
+$Out = Join-Path $Root ("out\campaign-friend-" + $Profile)
 New-Item -ItemType Directory -Force -Path $Out | Out-Null
 $Log = Join-Path $Out "timed-campaign.log"
 $Queue = Join-Path $Out "queue.jsonl"
@@ -33,7 +35,7 @@ function Log([string]$msg) {
 $env:PYTHONPATH = $Root
 $Py = "python"
 
-Log "start hours=$Hours workers=$Workers out=$Out"
+Log "start hours=$Hours workers=$Workers profile=$Profile out=$Out"
 
 Log "building candidates queue"
 & $Py tools\build_campaign_queue.py --mode candidates -o $Queue
@@ -46,7 +48,8 @@ $argsList = @(
     "--workers", "$Workers",
     "--time-budget", "$TimeBudget",
     "-k", "$K",
-    "--max-candidates", "8"
+    "--max-candidates", "8",
+    "--profile", $Profile
 )
 
 Log "launching explore_batch (will stop after $Hours h if still running)"

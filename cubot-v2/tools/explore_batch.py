@@ -87,7 +87,8 @@ def retry_items(out: Path, *, only_unpassed_concepts: bool) -> list[dict]:
     return items
 
 
-def fold_task(item: dict, out_root: Path, time_budget_s: float, k: int, max_candidates: int, seed: int) -> dict:
+def fold_task(item: dict, out_root: Path, time_budget_s: float, k: int, max_candidates: int,
+              seed: int, profile: str = "loose") -> dict:
     mask = Path(item["mask"])
     out_dir = out_root / item["category"]
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -96,6 +97,7 @@ def fold_task(item: dict, out_root: Path, time_budget_s: float, k: int, max_cand
         row = explore_one(
             item["name"], mask, out_dir,
             family=None, time_budget_s=time_budget_s, k=k, max_candidates=max_candidates, seed=seed,
+            profile=profile,
         )
     with (out_dir / "results.jsonl").open("a") as handle:
         handle.write(json.dumps(row) + "\n")
@@ -111,6 +113,8 @@ def main() -> int:
     parser.add_argument("-k", type=int, default=1)
     parser.add_argument("--max-candidates", type=int, default=4)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--profile", default="loose",
+                        help="fold acceptance profile (default: loose for breadth campaigns; use gentle for hardware-safe)")
     parser.add_argument("--limit", type=int, default=None, help="fold at most this many items")
     parser.add_argument("--retry-violating", action="store_true",
                         help="re-fold every threadable non-passing row under --out into <out>/verify/")
@@ -134,7 +138,8 @@ def main() -> int:
     if args.limit is not None:
         pending = pending[: args.limit]
     print(f"{len(items)} items, {len(items) - len(pending)} already folded under {out_root}, {len(pending)} to fold "
-          f"with {args.workers} workers at -k {args.k} --time-budget {args.time_budget}", flush=True)
+          f"with {args.workers} workers at -k {args.k} --time-budget {args.time_budget} "
+          f"--profile {args.profile}", flush=True)
     if args.dry_run or not pending:
         for item in pending:
             print(f"  {item['name']}: {item['mask']}")
@@ -144,7 +149,8 @@ def main() -> int:
     passes = 0
     with ProcessPoolExecutor(max_workers=args.workers) as pool:
         futures = {
-            pool.submit(fold_task, item, out_root, args.time_budget, args.k, args.max_candidates, args.seed): item
+            pool.submit(fold_task, item, out_root, args.time_budget, args.k, args.max_candidates,
+                        args.seed, args.profile): item
             for item in pending
         }
         for index, future in enumerate(as_completed(futures), start=1):
