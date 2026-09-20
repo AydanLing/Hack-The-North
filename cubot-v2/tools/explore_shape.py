@@ -323,7 +323,8 @@ def main() -> int:
         "--machine",
         type=Path,
         default=None,
-        help="machine.toml override (e.g. config/machine-17.toml for a 17-cube chain)",
+        help="machine TOML (default: $CUBOT_MACHINE or config/machine.toml); "
+             "masks need machine.modules cells, e.g. config/machine-17.toml for a 17-cube chain",
     )
     parser.add_argument(
         "--yaw-expand",
@@ -332,8 +333,6 @@ def main() -> int:
         help="also thread planar yaw/mirror views of the mask (default: on)",
     )
     parser.add_argument("--gate-only", action="store_true", help="screen + thread only; never fold")
-    parser.add_argument("--machine", type=Path, default=None,
-                        help="machine TOML (default: $CUBOT_MACHINE or config/machine.toml); masks need machine.modules cells")
     args = parser.parse_args()
 
     out_root = args.out
