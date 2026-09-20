@@ -1,0 +1,9 @@
+// design_search: from t-ideal.txt, distance 4, 3 threadings
+########
+.....###
+.....#..
+.....#..
+.....#..
+.....#..
+.....#..
+.....#..

@@ -56,7 +56,7 @@ from cubot.shapes import canonical_planar, screen  # noqa: E402
 from cubot.solver import solve  # noqa: E402
 
 Cell2 = tuple[int, int]
-TARGET = 27
+DEFAULT_N = 27
 
 
 def read_ideal(path: Path, *, preferred: set[Cell2] | None = None) -> tuple[set[Cell2], set[Cell2], tuple[int, int]]:
@@ -116,27 +116,29 @@ def to_cells3(cells: set[Cell2]) -> tuple[tuple[int, int, int], ...]:
     return tuple((x, height - 1 - y, 0) for x, y in sorted(cells))
 
 
-def gate(task: tuple[frozenset, str] | tuple[frozenset, str, bool]) -> tuple[frozenset, str, int]:
+def gate(task: tuple) -> tuple[frozenset, str, int]:
     """Screen + thread one completion; returns ``(cells, status, threadings)`` (-1 = structural fail).
 
-    ``task`` is ``(cells, roll[, tether])``; the tether keep-out
+    ``task`` is ``(cells, roll[, tether[, n_cells]])``; the tether keep-out
     (``docs/TETHER.md``) is applied exactly as ``tools/explore_shape.py`` does.
     """
 
     cells, roll = task[0], task[1]
     tether = bool(task[2]) if len(task) > 2 else False
+    n_cells = int(task[3]) if len(task) > 3 else DEFAULT_N
     lattice = to_cells3(set(cells))
-    report = screen(lattice, TARGET)
+    report = screen(lattice, n_cells)
     if not report.ok:
         return cells, report.stage or "screen", -1
     result = solve(lattice, roll, all_solutions=True, max_solutions=64, tether=tether)
     return cells, result.status.value, len(result.solutions)
 
 
-def completions(required: set[Cell2], optional: set[Cell2], *, cap: int, rng: random.Random):
-    """Yield candidate 27-cell sets: all required cells plus a choice of optional ones."""
+def completions(required: set[Cell2], optional: set[Cell2], *, cap: int, rng: random.Random,
+                n_cells: int = DEFAULT_N):
+    """Yield candidate n-cell sets: all required cells plus a choice of optional ones."""
 
-    need = TARGET - len(required)
+    need = n_cells - len(required)
     pool = sorted(optional - required)
     if need < 0 or need > len(pool):
         return
@@ -162,10 +164,11 @@ def walk_region(
     roll: str,
     *,
     node_cap: int = 3_000_000,
+    n_cells: int = DEFAULT_N,
 ) -> tuple[list[frozenset], int, bool]:
     """Exhaustively walk the chain inside ``required | optional`` under the roll word.
 
-    Returns ``(drawings, nodes, capped)``: every distinct 27-cell in-plane chain
+    Returns ``(drawings, nodes, capped)``: every distinct n-cell in-plane chain
     footprint that covers all required cells, up to rotation/mirror.  Image
     coordinates map to the lattice as ``(x, y) -> (x, -y, 0)``.
     """
@@ -206,7 +209,7 @@ def walk_region(
         nodes += 1
         if nodes > node_cap:
             return
-        if count == TARGET:
+        if count == n_cells:
             if (visited & required_mask) == required_mask:
                 key = canonical_planar(to_cells3(set(path)))
                 found.setdefault(key, frozenset(path))
@@ -215,7 +218,7 @@ def walk_region(
         if state_key in failed:
             return
         before = len(found)
-        if reachable(visited, index[cell], TARGET - count):
+        if reachable(visited, index[cell], n_cells - count):
             for state in (0, 1, 2):
                 direction = DIRS[orientation, state]
                 if direction[2] != 0:
@@ -261,6 +264,8 @@ def main() -> int:
     parser.add_argument("--nudge", type=int, default=0, help="also sample N random perturbations of the '#' cells")
     parser.add_argument("--workers", type=int, default=2)
     parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--machine", type=Path, default=None,
+                        help="machine TOML (default: $CUBOT_MACHINE or config/machine.toml)")
     parser.add_argument("--dry-run", action="store_true", help="print the ranking; write nothing")
     args = parser.parse_args()
 
@@ -268,39 +273,41 @@ def main() -> int:
     required, optional, box = read_ideal(args.ideal, preferred=preferred)
     if args.ring:
         optional |= ring(required)
+        optional |= ring(preferred)
     rng = random.Random(args.seed)
-    machine = load_machine()
+    machine = load_machine(args.machine)
+    n_cells = machine.modules
     roll = machine.roll
     tether = bool(getattr(machine, "has_tether", False))
     ideal = set(required) | preferred
 
     candidates: dict[frozenset, None] = {}
-    if len(required) > TARGET:
-        print(f"{len(required)} required cells exceed {TARGET}; mark some as '?' or '+'")
+    if len(required) > n_cells:
+        print(f"{len(required)} required cells exceed {n_cells}; mark some as '?' or '+'")
         return 2
     if args.mode == "walk":
-        drawings, nodes, capped = walk_region(required, optional, roll, node_cap=args.nodes)
+        drawings, nodes, capped = walk_region(required, optional, roll, node_cap=args.nodes, n_cells=n_cells)
         for cells in drawings:
             candidates.setdefault(cells, None)
         print(f"{args.name}: {len(required)} required + {len(optional - required)} optional cells in {box[0]}x{box[1]}; "
-              f"walk visited {nodes} nodes{' (CAP HIT: raise --nodes or shrink the region)' if capped else ''}, "
+              f"n={n_cells}; walk visited {nodes} nodes{' (CAP HIT: raise --nodes or shrink the region)' if capped else ''}, "
               f"{len(candidates)} distinct chain footprints; confirming through the gate")
         if not candidates:
             return 1
     else:
-        for cells in completions(required, optional, cap=args.cap, rng=rng):
+        for cells in completions(required, optional, cap=args.cap, rng=rng, n_cells=n_cells):
             candidates.setdefault(frozenset(cells), None)
         if args.nudge:
             for _, cells in perturb_to_target(set(required), rng=rng, cap=args.nudge, expected_holes=None):
                 candidates.setdefault(frozenset(cells), None)
         if not candidates:
-            need = TARGET - len(required)
+            need = n_cells - len(required)
             print(f"no completions: {len(required)} required cells, {len(optional - required)} optional, need {need}")
             return 2
         print(f"{args.name}: {len(required)} required + {len(optional - required)} optional cells in {box[0]}x{box[1]}; "
               f"gating {len(candidates)} completions")
 
-    tasks = [(cells, roll, tether) for cells in candidates]
+    tasks = [(cells, roll, tether, n_cells) for cells in candidates]
     if args.workers > 1 and len(tasks) > 8:
         with ProcessPoolExecutor(max_workers=args.workers) as pool:
             results = list(pool.map(gate, tasks, chunksize=32))

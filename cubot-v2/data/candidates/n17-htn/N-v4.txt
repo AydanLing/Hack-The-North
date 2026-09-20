@@ -1,0 +1,6 @@
+// design_search: from n-ideal.txt, distance 6, 5 threadings
+##########.
+##.......#.
+.........#.
+.........#.
+.........##
