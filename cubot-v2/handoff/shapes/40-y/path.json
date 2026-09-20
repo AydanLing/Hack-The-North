@@ -5,7 +5,7 @@
   "aliases": [],
   "status": {
     "complete": true,
-    "accept_profile": "loose",
+    "accept_profile": "gentle",
     "tier": 1,
     "loose_hard_ok": true,
     "platform_hard_ok": null,
@@ -25,19 +25,19 @@
     "moves": 14,
     "ends_flat_on_table": false,
     "total_time_s": 28.0,
-    "in_moves": 8,
-    "out_moves": 6,
-    "peak_demand_nm": 9.258966121498581,
+    "in_moves": 6,
+    "out_moves": 8,
+    "peak_demand_nm": 8.091511117697232,
     "max_cad_penetration_mm": 0.3984185130402693,
-    "max_ground_depth_mm": 1.3500311979441904e-13,
+    "max_ground_depth_mm": 5.684341886080802e-14,
     "scores": {
-      "balance": 0.952777777777777,
+      "balance": 0.85462962962963,
       "ground": 1.0,
-      "holding_load": 0.26749685400408013,
-      "moving_side": 0.3508771929824587,
+      "holding_load": 0.44456214943285316,
+      "moving_side": 0.5714285714285686,
       "near_contact": 1.0,
-      "pivot_dip": 0.43232679279279257,
-      "torque": 0.2793820580211289
+      "pivot_dip": 0.0,
+      "torque": 0.5226018504797433
     }
   },
   "machine": {
@@ -4196,17 +4196,45 @@
       "hard_ok": true,
       "checks": {
         "hard": {
+          "balance_hard": [
+            true,
+            "support margin 43.037 mm (hard floor -50.000 mm)"
+          ],
           "cad_penetration": [
             true,
             "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
           ],
           "ground": [
             true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 0.000 N\u00b7m at joint 0 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 24.004 mm (hard limit 25.000 mm)"
           ],
           "rest_cell_overlap": [
             true,
             "0 duplicate occupied lattice cells at rest"
+          ],
+          "tether_cell": [
+            true,
+            "cell (0, 1, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "torque_stall": [
             true,
@@ -4222,26 +4250,29 @@
           "max_ground_depth_mm": 0.0,
           "max_penetration_mm": 0.3984185130400846,
           "max_pivot_dip_mm": 24.00390866666656,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
           "moving_side": "in",
           "peak_angle_deg": 0.0,
           "peak_demand_nm": 0.10676588481755647,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 0.1035683590897587
+          "static_peak_nm": 0.1035683590897587,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
             1.0,
-            "support margin 43.037 mm (preferred -20.000 mm)"
+            "support margin 43.037 mm (preferred 0.000 mm)"
           ],
           "ground": [
             1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "holding_load": [
             1.0,
-            "peak holding load 0.000 N\u00b7m at joint 0"
+            "peak holding load 0.000 N\u00b7m at joint 0 (hard limit 6.000 N\u00b7m)"
           ],
           "moving_side": [
             1.0,
@@ -4252,8 +4283,8 @@
             "max CAD penetration 0.398 mm for modules (0, 1) (limit 6.000 mm)"
           ],
           "pivot_dip": [
-            0.4323267927927956,
-            "pivoting hinge half dips 24.004 mm"
+            0.0,
+            "pivoting hinge half dips 24.004 mm (hard limit 25.000 mm)"
           ],
           "torque": [
             1.0,
@@ -4441,17 +4472,45 @@
       "hard_ok": true,
       "checks": {
         "hard": {
+          "balance_hard": [
+            true,
+            "support margin 43.037 mm (hard floor -50.000 mm)"
+          ],
           "cad_penetration": [
             true,
             "max CAD penetration 0.398 mm for modules (24, 25) (limit 6.000 mm)"
           ],
           "ground": [
             true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 0.000 N\u00b7m at joint 0 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 2.398 mm (hard limit 25.000 mm)"
           ],
           "rest_cell_overlap": [
             true,
             "0 duplicate occupied lattice cells at rest"
+          ],
+          "tether_cell": [
+            true,
+            "cell (0, 1, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "torque_stall": [
             true,
@@ -4467,26 +4526,29 @@
           "max_ground_depth_mm": 0.0,
           "max_penetration_mm": 0.3984185130402693,
           "max_pivot_dip_mm": 2.3984185130400064,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
           "moving_side": "out",
           "peak_angle_deg": 28.0,
           "peak_demand_nm": 0.3656246605650668,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 0.35855276620553345
+          "static_peak_nm": 0.35855276620553345,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
             1.0,
-            "support margin 43.037 mm (preferred -20.000 mm)"
+            "support margin 43.037 mm (preferred 0.000 mm)"
           ],
           "ground": [
             1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "holding_load": [
             1.0,
-            "peak holding load 0.000 N\u00b7m at joint 0"
+            "peak holding load 0.000 N\u00b7m at joint 0 (hard limit 6.000 N\u00b7m)"
           ],
           "moving_side": [
             1.0,
@@ -4498,7 +4560,7 @@
           ],
           "pivot_dip": [
             1.0,
-            "pivoting hinge half dips 2.398 mm"
+            "pivoting hinge half dips 2.398 mm (hard limit 25.000 mm)"
           ],
           "torque": [
             1.0,
@@ -4686,17 +4748,45 @@
       "hard_ok": true,
       "checks": {
         "hard": {
+          "balance_hard": [
+            true,
+            "support margin 40.000 mm (hard floor -50.000 mm)"
+          ],
           "cad_penetration": [
             true,
             "max CAD penetration 0.398 mm for modules (6, 7) (limit 6.000 mm)"
           ],
           "ground": [
             true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 3.314 N\u00b7m at joint 8 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 2.398 mm (hard limit 25.000 mm)"
           ],
           "rest_cell_overlap": [
             true,
             "0 duplicate occupied lattice cells at rest"
+          ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "torque_stall": [
             true,
@@ -4712,26 +4802,29 @@
           "max_ground_depth_mm": 0.0,
           "max_penetration_mm": 0.3984185130400988,
           "max_pivot_dip_mm": 2.3984185130397293,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
           "moving_side": "in",
           "peak_angle_deg": 28.0,
           "peak_demand_nm": 2.5825980767598278,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 2.4537250526776764
+          "static_peak_nm": 2.4537250526776764,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
             1.0,
-            "support margin 40.000 mm (preferred -20.000 mm)"
+            "support margin 40.000 mm (preferred 0.000 mm)"
           ],
           "ground": [
             1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "holding_load": [
             0.6873408027478984,
-            "peak holding load 3.314 N\u00b7m at joint 8"
+            "peak holding load 3.314 N\u00b7m at joint 8 (hard limit 6.000 N\u00b7m)"
           ],
           "moving_side": [
             1.0,
@@ -4743,7 +4836,7 @@
           ],
           "pivot_dip": [
             1.0,
-            "pivoting hinge half dips 2.398 mm"
+            "pivoting hinge half dips 2.398 mm (hard limit 25.000 mm)"
           ],
           "torque": [
             1.0,
@@ -4931,17 +5024,45 @@
       "hard_ok": true,
       "checks": {
         "hard": {
+          "balance_hard": [
+            true,
+            "support margin 33.926 mm (hard floor -50.000 mm)"
+          ],
           "cad_penetration": [
             true,
             "max CAD penetration 0.398 mm for modules (2, 3) (limit 6.000 mm)"
           ],
           "ground": [
             true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 2.693 N\u00b7m at joint 11 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 0.000 mm (hard limit 25.000 mm)"
           ],
           "rest_cell_overlap": [
             true,
             "0 duplicate occupied lattice cells at rest"
+          ],
+          "tether_cell": [
+            true,
+            "cell (0, 0, -1) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "torque_stall": [
             true,
@@ -4957,26 +5078,29 @@
           "max_ground_depth_mm": 0.0,
           "max_penetration_mm": 0.3984185130400988,
           "max_pivot_dip_mm": 0.0,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
           "moving_side": "in",
           "peak_angle_deg": 72.0,
           "peak_demand_nm": 0.3186091540732509,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 0.31634755115977403
+          "static_peak_nm": 0.31634755115977403,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
             1.0,
-            "support margin 33.926 mm (preferred -20.000 mm)"
+            "support margin 33.926 mm (preferred 0.000 mm)"
           ],
           "ground": [
             1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "holding_load": [
             0.7459644022326672,
-            "peak holding load 2.693 N\u00b7m at joint 11"
+            "peak holding load 2.693 N\u00b7m at joint 11 (hard limit 6.000 N\u00b7m)"
           ],
           "moving_side": [
             1.0,
@@ -4988,7 +5112,7 @@
           ],
           "pivot_dip": [
             1.0,
-            "pivoting hinge half dips 0.000 mm"
+            "pivoting hinge half dips 0.000 mm (hard limit 25.000 mm)"
           ],
           "torque": [
             1.0,
@@ -5176,17 +5300,45 @@
       "hard_ok": true,
       "checks": {
         "hard": {
+          "balance_hard": [
+            true,
+            "support margin 33.926 mm (hard floor -50.000 mm)"
+          ],
           "cad_penetration": [
             true,
             "max CAD penetration 0.398 mm for modules (25, 26) (limit 6.000 mm)"
           ],
           "ground": [
             true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 2.693 N\u00b7m at joint 11 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 0.000 mm (hard limit 25.000 mm)"
           ],
           "rest_cell_overlap": [
             true,
             "0 duplicate occupied lattice cells at rest"
+          ],
+          "tether_cell": [
+            true,
+            "cell (0, 0, -1) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "torque_stall": [
             true,
@@ -5202,26 +5354,29 @@
           "max_ground_depth_mm": 0.0,
           "max_penetration_mm": 0.3984185130402693,
           "max_pivot_dip_mm": 0.0,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
           "moving_side": "out",
           "peak_angle_deg": 92.0,
           "peak_demand_nm": 0.12111635159907651,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 0.11951758873517772
+          "static_peak_nm": 0.11951758873517772,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
             1.0,
-            "support margin 33.926 mm (preferred -20.000 mm)"
+            "support margin 33.926 mm (preferred 0.000 mm)"
           ],
           "ground": [
             1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "holding_load": [
             0.7459644022326672,
-            "peak holding load 2.693 N\u00b7m at joint 11"
+            "peak holding load 2.693 N\u00b7m at joint 11 (hard limit 6.000 N\u00b7m)"
           ],
           "moving_side": [
             1.0,
@@ -5233,7 +5388,7 @@
           ],
           "pivot_dip": [
             1.0,
-            "pivoting hinge half dips 0.000 mm"
+            "pivoting hinge half dips 0.000 mm (hard limit 25.000 mm)"
           ],
           "torque": [
             1.0,
@@ -5244,20 +5399,20 @@
     },
     {
       "step": 6,
-      "joint": 4,
-      "delta": 1,
+      "joint": 13,
+      "delta": -1,
       "side": "in",
       "moving_side_snake_pipeline": "parent",
       "duration_s": 2.0,
       "state_before": 0,
-      "state_after": 1,
-      "angle_after_deg": 120.0,
+      "state_after": -1,
+      "angle_after_deg": -120.0,
       "states_after": [
         0,
         1,
         -1,
         0,
-        1,
+        0,
         0,
         -1,
         0,
@@ -5266,7 +5421,7 @@
         0,
         0,
         0,
-        0,
+        -1,
         0,
         0,
         0,
@@ -5280,7 +5435,7 @@
         -1,
         -1
       ],
-      "base_after": 20,
+      "base_after": 11,
       "cells_after": [
         [
           0,
@@ -5288,215 +5443,246 @@
           0
         ],
         [
+          0,
           -1,
+          0
+        ],
+        [
+          1,
+          -1,
+          0
+        ],
+        [
+          1,
           0,
           0
         ],
         [
-          -1,
-          0,
-          -1
+          1,
+          1,
+          0
         ],
         [
-          0,
-          0,
+          1,
+          2,
+          0
+        ],
+        [
+          1,
+          3,
+          0
+        ],
+        [
+          1,
+          3,
           -1
         ],
         [
           1,
-          0,
-          -1
-        ],
-        [
-          1,
-          0,
+          3,
           -2
         ],
         [
           1,
-          0,
+          3,
           -3
+        ],
+        [
+          1,
+          3,
+          -4
+        ],
+        [
+          1,
+          3,
+          -5
+        ],
+        [
+          1,
+          3,
+          -6
+        ],
+        [
+          1,
+          3,
+          -7
         ],
         [
           2,
-          0,
-          -3
+          3,
+          -7
         ],
         [
           3,
-          0,
-          -3
+          3,
+          -7
         ],
         [
           4,
-          0,
-          -3
+          3,
+          -7
         ],
         [
           5,
-          0,
-          -3
+          3,
+          -7
         ],
         [
           6,
-          0,
-          -3
+          3,
+          -7
         ],
         [
           7,
-          0,
-          -3
+          3,
+          -7
         ],
         [
           8,
-          0,
-          -3
+          3,
+          -7
         ],
         [
           9,
-          0,
-          -3
+          3,
+          -7
         ],
         [
           10,
-          0,
-          -3
+          3,
+          -7
         ],
         [
           11,
-          0,
-          -3
+          3,
+          -7
         ],
         [
           12,
-          0,
-          -3
+          3,
+          -7
         ],
         [
-          13,
-          0,
-          -3
+          12,
+          3,
+          -6
         ],
         [
-          14,
-          0,
-          -3
-        ],
-        [
-          15,
-          0,
-          -3
-        ],
-        [
-          16,
-          0,
-          -3
-        ],
-        [
-          17,
-          0,
-          -3
-        ],
-        [
-          18,
-          0,
-          -3
-        ],
-        [
-          19,
-          0,
-          -3
-        ],
-        [
-          19,
-          0,
-          -2
-        ],
-        [
-          18,
-          0,
-          -2
+          11,
+          3,
+          -6
         ]
       ],
       "hard_ok": true,
       "checks": {
         "hard": {
+          "balance_hard": [
+            true,
+            "support margin -11.630 mm (hard floor -50.000 mm)"
+          ],
           "cad_penetration": [
             true,
-            "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+            "max CAD penetration 0.398 mm for modules (12, 13) (limit 6.000 mm)"
           ],
           "ground": [
             true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 5.888 N\u00b7m at joint 12 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 2.398 mm (hard limit 25.000 mm)"
           ],
           "rest_cell_overlap": [
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 1, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
+          ],
           "torque_stall": [
             true,
-            "peak static torque 0.633 N\u00b7m (eased demand 0.654) (cap 5.800, stall 10.600)"
+            "peak static torque 7.396 N\u00b7m (eased demand 8.092) (cap 5.800, stall 10.600)"
           ]
         },
         "measurements": {
-          "arc": "mixed",
-          "balance_margin_mm": 39.999999999999964,
+          "arc": "up",
+          "balance_margin_mm": -11.629629629629605,
           "first_contact_angle_deg": 12.0,
-          "holding_peak_nm": 2.7963456954234847,
-          "inertia_kgm2": 0.009948178666666667,
+          "holding_peak_nm": 5.887641216011756,
+          "inertia_kgm2": 0.3539640346666664,
           "max_ground_depth_mm": 0.0,
-          "max_penetration_mm": 0.3984185130400988,
-          "max_pivot_dip_mm": 0.0,
+          "max_penetration_mm": 0.3984185130401414,
+          "max_pivot_dip_mm": 2.3984185130400206,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
           "moving_side": "in",
-          "peak_angle_deg": 108.0,
-          "peak_demand_nm": 0.6542739234424371,
+          "peak_angle_deg": 16.0,
+          "peak_demand_nm": 8.091511117697232,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 0.6326951023195482
+          "static_peak_nm": 7.396136422872814,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
-            1.0,
-            "support margin 40.000 mm (preferred -20.000 mm)"
+            0.85462962962963,
+            "support margin -11.630 mm (preferred 0.000 mm)"
           ],
           "ground": [
             1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "holding_load": [
-            0.7361938023185391,
-            "peak holding load 2.796 N\u00b7m at joint 10"
+            0.44456214943285316,
+            "peak holding load 5.888 N\u00b7m at joint 12 (hard limit 6.000 N\u00b7m)"
           ],
           "moving_side": [
             1.0,
-            "side moment ratio 0.010; selected in"
+            "side moment ratio 0.782; selected in"
           ],
           "near_contact": [
             1.0,
-            "max CAD penetration 0.398 mm for modules (4, 5) (limit 6.000 mm)"
+            "max CAD penetration 0.398 mm for modules (12, 13) (limit 6.000 mm)"
           ],
           "pivot_dip": [
             1.0,
-            "pivoting hinge half dips 0.000 mm"
+            "pivoting hinge half dips 2.398 mm (hard limit 25.000 mm)"
           ],
           "torque": [
-            1.0,
-            "peak demand including inertia 0.654 N\u00b7m"
+            0.5226018504797433,
+            "peak demand including inertia 8.092 N\u00b7m"
           ]
         }
       }
     },
     {
       "step": 7,
-      "joint": 13,
-      "delta": -1,
+      "joint": 4,
+      "delta": 1,
       "side": "in",
       "moving_side_snake_pipeline": "parent",
       "duration_s": 2.0,
       "state_before": 0,
-      "state_after": -1,
-      "angle_after_deg": -120.0,
+      "state_after": 1,
+      "angle_after_deg": 120.0,
       "states_after": [
         0,
         1,
@@ -5666,68 +5852,99 @@
       "hard_ok": true,
       "checks": {
         "hard": {
+          "balance_hard": [
+            true,
+            "support margin 0.519 mm (hard floor -50.000 mm)"
+          ],
           "cad_penetration": [
             true,
-            "max CAD penetration 0.398 mm for modules (12, 13) (limit 6.000 mm)"
+            "max CAD penetration 0.398 mm for modules (3, 4) (limit 6.000 mm)"
           ],
           "ground": [
             true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 1.968 N\u00b7m at joint 11 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 0.000 mm (hard limit 25.000 mm)"
           ],
           "rest_cell_overlap": [
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (0, 0, -1) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
+          ],
           "torque_stall": [
             true,
-            "peak static torque 8.419 N\u00b7m (eased demand 9.259) (cap 5.800, stall 10.600)"
+            "peak static torque 0.633 N\u00b7m (eased demand 0.638) (cap 5.800, stall 10.600)"
           ]
         },
         "measurements": {
           "arc": "up",
           "balance_margin_mm": 0.5185185185184267,
           "first_contact_angle_deg": 12.0,
-          "holding_peak_nm": 6.888005914803564,
-          "inertia_kgm2": 0.45592677066666676,
+          "holding_peak_nm": 1.9677988227054155,
+          "inertia_kgm2": 0.009948178666666672,
           "max_ground_depth_mm": 0.0,
-          "max_penetration_mm": 0.39841851304015563,
-          "max_pivot_dip_mm": 2.398418513039708,
+          "max_penetration_mm": 0.3984185130400846,
+          "max_pivot_dip_mm": 0.0,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
           "moving_side": "in",
-          "peak_angle_deg": 20.0,
-          "peak_demand_nm": 9.258966121498581,
+          "peak_angle_deg": 48.00000000000001,
+          "peak_demand_nm": 0.6377553258352187,
           "rest_unique_cells": 27,
           "samples": 61,
-          "side_ambiguous": true,
-          "static_peak_nm": 8.419062617279403
+          "side_ambiguous": false,
+          "static_peak_nm": 0.632695102319548,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
             1.0,
-            "support margin 0.519 mm (preferred -20.000 mm)"
+            "support margin 0.519 mm (preferred 0.000 mm)"
           ],
           "ground": [
             1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "holding_load": [
-            0.35018812124494675,
-            "peak holding load 6.888 N\u00b7m at joint 12"
+            0.8143586016315646,
+            "peak holding load 1.968 N\u00b7m at joint 11 (hard limit 6.000 N\u00b7m)"
           ],
           "moving_side": [
-            0.8429118773946349,
-            "side moment ratio 0.874; selected in"
+            1.0,
+            "side moment ratio 0.091; selected in"
           ],
           "near_contact": [
             1.0,
-            "max CAD penetration 0.398 mm for modules (12, 13) (limit 6.000 mm)"
+            "max CAD penetration 0.398 mm for modules (3, 4) (limit 6.000 mm)"
           ],
           "pivot_dip": [
             1.0,
-            "pivoting hinge half dips 2.398 mm"
+            "pivoting hinge half dips 0.000 mm (hard limit 25.000 mm)"
           ],
           "torque": [
-            0.2793820580211289,
-            "peak demand including inertia 9.259 N\u00b7m"
+            1.0,
+            "peak demand including inertia 0.638 N\u00b7m"
           ]
         }
       }
@@ -5911,17 +6128,45 @@
       "hard_ok": true,
       "checks": {
         "hard": {
+          "balance_hard": [
+            true,
+            "support margin 40.000 mm (hard floor -50.000 mm)"
+          ],
           "cad_penetration": [
             true,
             "max CAD penetration 0.398 mm for modules (7, 8) (limit 6.000 mm)"
           ],
           "ground": [
             true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 2.175 N\u00b7m at joint 11 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 0.000 mm (hard limit 25.000 mm)"
           ],
           "rest_cell_overlap": [
             true,
             "0 duplicate occupied lattice cells at rest"
+          ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "torque_stall": [
             true,
@@ -5937,26 +6182,29 @@
           "max_ground_depth_mm": 0.0,
           "max_penetration_mm": 0.39841851304015563,
           "max_pivot_dip_mm": 0.0,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
           "moving_side": "in",
           "peak_angle_deg": 119.99999999999999,
           "peak_demand_nm": 2.3167468056593883,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 2.174935540884934
+          "static_peak_nm": 2.174935540884934,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
             1.0,
-            "support margin 40.000 mm (preferred -20.000 mm)"
+            "support margin 40.000 mm (preferred 0.000 mm)"
           ],
           "ground": [
             1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "holding_load": [
             0.7948174018033081,
-            "peak holding load 2.175 N\u00b7m at joint 11"
+            "peak holding load 2.175 N\u00b7m at joint 11 (hard limit 6.000 N\u00b7m)"
           ],
           "moving_side": [
             1.0,
@@ -5968,7 +6216,7 @@
           ],
           "pivot_dip": [
             1.0,
-            "pivoting hinge half dips 0.000 mm"
+            "pivoting hinge half dips 0.000 mm (hard limit 25.000 mm)"
           ],
           "torque": [
             1.0,
@@ -6156,17 +6404,45 @@
       "hard_ok": true,
       "checks": {
         "hard": {
+          "balance_hard": [
+            true,
+            "support margin 82.533 mm (hard floor -50.000 mm)"
+          ],
           "cad_penetration": [
             true,
             "max CAD penetration 0.398 mm for modules (20, 21) (limit 6.000 mm)"
           ],
           "ground": [
             true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 4.676 N\u00b7m at joint 15 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 24.004 mm (hard limit 25.000 mm)"
           ],
           "rest_cell_overlap": [
             true,
             "0 duplicate occupied lattice cells at rest"
+          ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "torque_stall": [
             true,
@@ -6182,26 +6458,29 @@
           "max_ground_depth_mm": 0.0,
           "max_penetration_mm": 0.3984185130402693,
           "max_pivot_dip_mm": 24.003908666666547,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
           "moving_side": "out",
           "peak_angle_deg": 119.99999999999999,
           "peak_demand_nm": 2.1367928974993173,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 1.967798822705415
+          "static_peak_nm": 1.967798822705415,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
             1.0,
-            "support margin 82.533 mm (preferred -20.000 mm)"
+            "support margin 82.533 mm (preferred 0.000 mm)"
           ],
           "ground": [
             1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "holding_load": [
             0.5588850354095931,
-            "peak holding load 4.676 N\u00b7m at joint 15"
+            "peak holding load 4.676 N\u00b7m at joint 15 (hard limit 6.000 N\u00b7m)"
           ],
           "moving_side": [
             1.0,
@@ -6212,8 +6491,8 @@
             "max CAD penetration 0.398 mm for modules (20, 21) (limit 6.000 mm)"
           ],
           "pivot_dip": [
-            0.432326792792796,
-            "pivoting hinge half dips 24.004 mm"
+            0.0,
+            "pivoting hinge half dips 24.004 mm (hard limit 25.000 mm)"
           ],
           "torque": [
             1.0,
@@ -6401,17 +6680,45 @@
       "hard_ok": true,
       "checks": {
         "hard": {
+          "balance_hard": [
+            true,
+            "support margin 33.387 mm (hard floor -50.000 mm)"
+          ],
           "cad_penetration": [
             true,
             "max CAD penetration 0.398 mm for modules (20, 21) (limit 6.000 mm)"
           ],
           "ground": [
             true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 3.521 N\u00b7m at joint 14 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 2.398 mm (hard limit 25.000 mm)"
           ],
           "rest_cell_overlap": [
             true,
             "0 duplicate occupied lattice cells at rest"
+          ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "torque_stall": [
             true,
@@ -6427,26 +6734,29 @@
           "max_ground_depth_mm": 0.0,
           "max_penetration_mm": 0.3984185130400988,
           "max_pivot_dip_mm": 2.3984185130399354,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
           "moving_side": "out",
           "peak_angle_deg": 40.0,
           "peak_demand_nm": 1.2365992644549129,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 1.213704838621194
+          "static_peak_nm": 1.213704838621194,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
             1.0,
-            "support margin 33.387 mm (preferred -20.000 mm)"
+            "support margin 33.387 mm (preferred 0.000 mm)"
           ],
           "ground": [
             1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "holding_load": [
             0.6677996029196422,
-            "peak holding load 3.521 N\u00b7m at joint 14"
+            "peak holding load 3.521 N\u00b7m at joint 14 (hard limit 6.000 N\u00b7m)"
           ],
           "moving_side": [
             1.0,
@@ -6458,7 +6768,7 @@
           ],
           "pivot_dip": [
             1.0,
-            "pivoting hinge half dips 2.398 mm"
+            "pivoting hinge half dips 2.398 mm (hard limit 25.000 mm)"
           ],
           "torque": [
             1.0,
@@ -6469,14 +6779,14 @@
     },
     {
       "step": 11,
-      "joint": 20,
+      "joint": 19,
       "delta": -1,
       "side": "out",
       "moving_side_snake_pipeline": "child",
       "duration_s": 2.0,
-      "state_before": 1,
-      "state_after": 0,
-      "angle_after_deg": 0.0,
+      "state_before": 0,
+      "state_after": -1,
+      "angle_after_deg": -120.0,
       "states_after": [
         0,
         1,
@@ -6497,8 +6807,8 @@
         0,
         0,
         0,
-        0,
-        0,
+        -1,
+        1,
         1,
         0,
         0,
@@ -6608,357 +6918,143 @@
           -8
         ],
         [
-          10,
-          0,
-          -8
-        ],
-        [
-          11,
-          0,
-          -8
-        ],
-        [
-          11,
+          9,
           1,
           -8
         ],
         [
-          11,
-          2,
-          -8
+          9,
+          1,
+          -7
         ],
         [
-          11,
-          3,
-          -8
+          8,
+          1,
+          -7
         ],
         [
-          12,
-          3,
-          -8
+          7,
+          1,
+          -7
         ],
         [
-          12,
-          2,
-          -8
+          6,
+          1,
+          -7
+        ],
+        [
+          6,
+          1,
+          -6
+        ],
+        [
+          7,
+          1,
+          -6
         ]
       ],
       "hard_ok": true,
       "checks": {
         "hard": {
+          "balance_hard": [
+            true,
+            "support margin 37.684 mm (hard floor -50.000 mm)"
+          ],
           "cad_penetration": [
             true,
-            "max CAD penetration 0.398 mm for modules (20, 21) (limit 6.000 mm)"
+            "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
           ],
           "ground": [
             true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 3.521 N\u00b7m at joint 14 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 24.004 mm (hard limit 25.000 mm)"
           ],
           "rest_cell_overlap": [
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
+          ],
           "torque_stall": [
             true,
-            "peak static torque 1.976 N\u00b7m (eased demand 2.114) (cap 5.800, stall 10.600)"
+            "peak static torque 1.864 N\u00b7m (eased demand 1.995) (cap 5.800, stall 10.600)"
           ]
         },
         "measurements": {
           "arc": "mixed",
-          "balance_margin_mm": 73.40740740740738,
+          "balance_margin_mm": 37.683650172283805,
           "first_contact_angle_deg": 12.0,
-          "holding_peak_nm": 4.8677128772186595,
-          "inertia_kgm2": 0.05640710666666669,
-          "max_ground_depth_mm": 1.3500311979441904e-13,
+          "holding_peak_nm": 3.5213242090517927,
+          "inertia_kgm2": 0.05064716533333335,
+          "max_ground_depth_mm": 5.684341886080802e-14,
           "max_penetration_mm": 0.39841851304015563,
-          "max_pivot_dip_mm": 24.003908666666675,
+          "max_pivot_dip_mm": 24.00390866666666,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
           "moving_side": "out",
-          "peak_angle_deg": 116.00000000000001,
-          "peak_demand_nm": 2.1135466857089034,
+          "peak_angle_deg": 119.99999999999999,
+          "peak_demand_nm": 1.995095465398842,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 1.9755186747563909
+          "static_peak_nm": 1.8642304636156568,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
             1.0,
-            "support margin 73.407 mm (preferred -20.000 mm)"
+            "support margin 37.684 mm (preferred 0.000 mm)"
           ],
           "ground": [
             1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "holding_load": [
-            0.5407818040359755,
-            "peak holding load 4.868 N\u00b7m at joint 15"
+            0.6677996029196422,
+            "peak holding load 3.521 N\u00b7m at joint 14 (hard limit 6.000 N\u00b7m)"
           ],
           "moving_side": [
             1.0,
-            "side moment ratio 0.057; selected out"
+            "side moment ratio 0.125; selected out"
           ],
           "near_contact": [
             1.0,
-            "max CAD penetration 0.398 mm for modules (20, 21) (limit 6.000 mm)"
+            "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
           ],
           "pivot_dip": [
-            0.43232679279279257,
-            "pivoting hinge half dips 24.004 mm"
+            0.0,
+            "pivoting hinge half dips 24.004 mm (hard limit 25.000 mm)"
           ],
           "torque": [
             1.0,
-            "peak demand including inertia 2.114 N\u00b7m"
+            "peak demand including inertia 1.995 N\u00b7m"
           ]
         }
       }
     },
     {
       "step": 12,
-      "joint": 9,
-      "delta": -1,
-      "side": "in",
-      "moving_side_snake_pipeline": "parent",
-      "duration_s": 2.0,
-      "state_before": 0,
-      "state_after": -1,
-      "angle_after_deg": -120.0,
-      "states_after": [
-        0,
-        1,
-        -1,
-        0,
-        1,
-        0,
-        -1,
-        0,
-        1,
-        -1,
-        0,
-        0,
-        0,
-        -1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
-        1,
-        0,
-        0,
-        -1,
-        -1
-      ],
-      "base_after": 1,
-      "cells_after": [
-        [
-          0,
-          0,
-          0
-        ],
-        [
-          0,
-          1,
-          0
-        ],
-        [
-          1,
-          1,
-          0
-        ],
-        [
-          1,
-          0,
-          0
-        ],
-        [
-          1,
-          -1,
-          0
-        ],
-        [
-          2,
-          -1,
-          0
-        ],
-        [
-          3,
-          -1,
-          0
-        ],
-        [
-          3,
-          -2,
-          0
-        ],
-        [
-          3,
-          -3,
-          0
-        ],
-        [
-          4,
-          -3,
-          0
-        ],
-        [
-          4,
-          -3,
-          -1
-        ],
-        [
-          4,
-          -3,
-          -2
-        ],
-        [
-          4,
-          -3,
-          -3
-        ],
-        [
-          4,
-          -3,
-          -4
-        ],
-        [
-          5,
-          -3,
-          -4
-        ],
-        [
-          6,
-          -3,
-          -4
-        ],
-        [
-          7,
-          -3,
-          -4
-        ],
-        [
-          8,
-          -3,
-          -4
-        ],
-        [
-          9,
-          -3,
-          -4
-        ],
-        [
-          10,
-          -3,
-          -4
-        ],
-        [
-          11,
-          -3,
-          -4
-        ],
-        [
-          12,
-          -3,
-          -4
-        ],
-        [
-          12,
-          -2,
-          -4
-        ],
-        [
-          12,
-          -1,
-          -4
-        ],
-        [
-          12,
-          0,
-          -4
-        ],
-        [
-          13,
-          0,
-          -4
-        ],
-        [
-          13,
-          -1,
-          -4
-        ]
-      ],
-      "hard_ok": true,
-      "checks": {
-        "hard": {
-          "cad_penetration": [
-            true,
-            "max CAD penetration 0.398 mm for modules (8, 9) (limit 6.000 mm)"
-          ],
-          "ground": [
-            true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
-          ],
-          "rest_cell_overlap": [
-            true,
-            "0 duplicate occupied lattice cells at rest"
-          ],
-          "torque_stall": [
-            true,
-            "peak static torque 2.573 N\u00b7m (eased demand 2.496) (cap 5.800, stall 10.600)"
-          ]
-        },
-        "measurements": {
-          "arc": "down",
-          "balance_margin_mm": 16.10491221638724,
-          "first_contact_angle_deg": 12.0,
-          "holding_peak_nm": 4.453439440859626,
-          "inertia_kgm2": 0.06911632266666665,
-          "max_ground_depth_mm": 0.0,
-          "max_penetration_mm": 0.3984185130401414,
-          "max_pivot_dip_mm": 0.0,
-          "moving_side": "in",
-          "peak_angle_deg": 32.0,
-          "peak_demand_nm": 2.495833626157182,
-          "rest_unique_cells": 27,
-          "samples": 61,
-          "side_ambiguous": false,
-          "static_peak_nm": 2.573242641412853
-        },
-        "soft": {
-          "balance": [
-            1.0,
-            "support margin 16.105 mm (preferred -20.000 mm)"
-          ],
-          "ground": [
-            1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
-          ],
-          "holding_load": [
-            0.5798642036924881,
-            "peak holding load 4.453 N\u00b7m at joint 10"
-          ],
-          "moving_side": [
-            1.0,
-            "side moment ratio 0.236; selected in"
-          ],
-          "near_contact": [
-            1.0,
-            "max CAD penetration 0.398 mm for modules (8, 9) (limit 6.000 mm)"
-          ],
-          "pivot_dip": [
-            1.0,
-            "pivoting hinge half dips 0.000 mm"
-          ],
-          "torque": [
-            1.0,
-            "peak demand including inertia 2.496 N\u00b7m"
-          ]
-        }
-      }
-    },
-    {
-      "step": 13,
       "joint": 14,
       "delta": -1,
       "side": "out",
@@ -6977,25 +7073,25 @@
         -1,
         0,
         1,
+        0,
+        0,
+        0,
+        0,
+        -1,
         -1,
         0,
         0,
         0,
+        0,
         -1,
-        -1,
-        0,
-        0,
-        0,
-        0,
-        0,
-        0,
+        1,
         1,
         0,
         0,
         -1,
         -1
       ],
-      "base_after": 1,
+      "base_after": 20,
       "cells_after": [
         [
           0,
@@ -7003,189 +7099,220 @@
           0
         ],
         [
-          0,
-          1,
-          0
-        ],
-        [
-          1,
-          1,
-          0
-        ],
-        [
-          1,
-          0,
-          0
-        ],
-        [
-          1,
           -1,
+          0,
           0
+        ],
+        [
+          -1,
+          0,
+          -1
+        ],
+        [
+          0,
+          0,
+          -1
+        ],
+        [
+          1,
+          0,
+          -1
+        ],
+        [
+          1,
+          0,
+          -2
+        ],
+        [
+          1,
+          0,
+          -3
         ],
         [
           2,
-          -1,
-          0
-        ],
-        [
-          3,
-          -1,
-          0
-        ],
-        [
-          3,
-          -2,
-          0
-        ],
-        [
-          3,
-          -3,
-          0
-        ],
-        [
-          4,
-          -3,
-          0
-        ],
-        [
-          4,
-          -3,
-          -1
-        ],
-        [
-          4,
-          -3,
-          -2
-        ],
-        [
-          4,
-          -3,
+          0,
           -3
         ],
         [
+          3,
+          0,
+          -3
+        ],
+        [
+          3,
+          0,
+          -4
+        ],
+        [
+          3,
+          0,
+          -5
+        ],
+        [
+          3,
+          0,
+          -6
+        ],
+        [
+          3,
+          0,
+          -7
+        ],
+        [
+          3,
+          0,
+          -8
+        ],
+        [
           4,
-          -3,
+          0,
+          -8
+        ],
+        [
+          4,
+          0,
+          -7
+        ],
+        [
+          4,
+          0,
+          -6
+        ],
+        [
+          4,
+          0,
+          -5
+        ],
+        [
+          4,
+          0,
+          -4
+        ],
+        [
+          4,
+          0,
+          -3
+        ],
+        [
+          5,
+          0,
+          -3
+        ],
+        [
+          5,
+          1,
+          -3
+        ],
+        [
+          5,
+          1,
           -4
         ],
         [
           5,
-          -3,
-          -4
+          1,
+          -5
         ],
         [
           5,
-          -3,
-          -3
+          1,
+          -6
         ],
         [
           5,
-          -3,
-          -2
+          2,
+          -6
         ],
         [
           5,
-          -3,
-          -1
-        ],
-        [
-          5,
-          -3,
-          0
-        ],
-        [
-          5,
-          -3,
-          1
-        ],
-        [
-          5,
-          -3,
-          2
-        ],
-        [
-          5,
-          -3,
-          3
-        ],
-        [
-          6,
-          -3,
-          3
-        ],
-        [
-          7,
-          -3,
-          3
-        ],
-        [
-          8,
-          -3,
-          3
-        ],
-        [
-          8,
-          -3,
-          4
-        ],
-        [
-          7,
-          -3,
-          4
+          2,
+          -5
         ]
       ],
       "hard_ok": true,
       "checks": {
         "hard": {
+          "balance_hard": [
+            true,
+            "support margin 15.704 mm (hard floor -50.000 mm)"
+          ],
           "cad_penetration": [
             true,
             "max CAD penetration 0.398 mm for modules (13, 14) (limit 6.000 mm)"
           ],
           "ground": [
             true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 4.056 N\u00b7m at joint 15 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 2.398 mm (hard limit 25.000 mm)"
           ],
           "rest_cell_overlap": [
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
+          ],
           "torque_stall": [
             true,
-            "peak static torque 7.205 N\u00b7m (eased demand 7.580) (cap 5.800, stall 10.600)"
+            "peak static torque 3.768 N\u00b7m (eased demand 3.931) (cap 5.800, stall 10.600)"
           ]
         },
         "measurements": {
           "arc": "up",
-          "balance_margin_mm": -23.777777777777843,
+          "balance_margin_mm": 15.703703703703802,
           "first_contact_angle_deg": 12.0,
-          "holding_peak_nm": 7.764533347556751,
-          "inertia_kgm2": 0.3627228800000002,
-          "max_ground_depth_mm": 2.842170943040401e-14,
-          "max_penetration_mm": 0.39841851304015563,
-          "max_pivot_dip_mm": 2.3984185130396938,
+          "holding_peak_nm": 4.0555160665059695,
+          "inertia_kgm2": 0.1128142133333333,
+          "max_ground_depth_mm": 3.552713678800501e-14,
+          "max_penetration_mm": 0.3984185130400988,
+          "max_pivot_dip_mm": 2.3984185130400846,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
           "moving_side": "out",
-          "peak_angle_deg": 40.0,
-          "peak_demand_nm": 7.579908445391199,
+          "peak_angle_deg": 28.0,
+          "peak_demand_nm": 3.930664351972482,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": true,
-          "static_peak_nm": 7.2053577786582075
+          "static_peak_nm": 3.76841852876463,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
-            0.952777777777777,
-            "support margin -23.778 mm (preferred -20.000 mm)"
+            1.0,
+            "support margin 15.704 mm (preferred 0.000 mm)"
           ],
           "ground": [
             1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "holding_load": [
-            0.26749685400408013,
-            "peak holding load 7.765 N\u00b7m at joint 15"
+            0.6174041446692482,
+            "peak holding load 4.056 N\u00b7m at joint 15 (hard limit 6.000 N\u00b7m)"
           ],
           "moving_side": [
-            0.3508771929824587,
-            "side moment ratio 0.947; selected out"
+            0.5714285714285686,
+            "side moment ratio 0.914; selected out"
           ],
           "near_contact": [
             1.0,
@@ -7193,21 +7320,297 @@
           ],
           "pivot_dip": [
             1.0,
-            "pivoting hinge half dips 2.398 mm"
+            "pivoting hinge half dips 2.398 mm (hard limit 25.000 mm)"
           ],
           "torque": [
-            0.6291857405435002,
-            "peak demand including inertia 7.580 N\u00b7m"
+            1.0,
+            "peak demand including inertia 3.931 N\u00b7m"
+          ]
+        }
+      }
+    },
+    {
+      "step": 13,
+      "joint": 20,
+      "delta": -1,
+      "side": "out",
+      "moving_side_snake_pipeline": "child",
+      "duration_s": 2.0,
+      "state_before": 1,
+      "state_after": 0,
+      "angle_after_deg": 0.0,
+      "states_after": [
+        0,
+        1,
+        -1,
+        0,
+        1,
+        0,
+        -1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        -1,
+        -1,
+        0,
+        0,
+        0,
+        0,
+        -1,
+        0,
+        1,
+        0,
+        0,
+        -1,
+        -1
+      ],
+      "base_after": 20,
+      "cells_after": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          -1,
+          0,
+          0
+        ],
+        [
+          -1,
+          0,
+          -1
+        ],
+        [
+          0,
+          0,
+          -1
+        ],
+        [
+          1,
+          0,
+          -1
+        ],
+        [
+          1,
+          0,
+          -2
+        ],
+        [
+          1,
+          0,
+          -3
+        ],
+        [
+          2,
+          0,
+          -3
+        ],
+        [
+          3,
+          0,
+          -3
+        ],
+        [
+          3,
+          0,
+          -4
+        ],
+        [
+          3,
+          0,
+          -5
+        ],
+        [
+          3,
+          0,
+          -6
+        ],
+        [
+          3,
+          0,
+          -7
+        ],
+        [
+          3,
+          0,
+          -8
+        ],
+        [
+          4,
+          0,
+          -8
+        ],
+        [
+          4,
+          0,
+          -7
+        ],
+        [
+          4,
+          0,
+          -6
+        ],
+        [
+          4,
+          0,
+          -5
+        ],
+        [
+          4,
+          0,
+          -4
+        ],
+        [
+          4,
+          0,
+          -3
+        ],
+        [
+          5,
+          0,
+          -3
+        ],
+        [
+          6,
+          0,
+          -3
+        ],
+        [
+          6,
+          -1,
+          -3
+        ],
+        [
+          6,
+          -2,
+          -3
+        ],
+        [
+          6,
+          -3,
+          -3
+        ],
+        [
+          7,
+          -3,
+          -3
+        ],
+        [
+          7,
+          -2,
+          -3
+        ]
+      ],
+      "hard_ok": true,
+      "checks": {
+        "hard": {
+          "balance_hard": [
+            true,
+            "support margin 4.378 mm (hard floor -50.000 mm)"
+          ],
+          "cad_penetration": [
+            true,
+            "max CAD penetration 0.398 mm for modules (20, 21) (limit 6.000 mm)"
+          ],
+          "ground": [
+            true,
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 2.700 N\u00b7m at joint 14 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 0.000 mm (hard limit 25.000 mm)"
+          ],
+          "rest_cell_overlap": [
+            true,
+            "0 duplicate occupied lattice cells at rest"
+          ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "torque_stall": [
+            true,
+            "peak static torque 1.976 N\u00b7m (eased demand 1.847) (cap 5.800, stall 10.600)"
+          ]
+        },
+        "measurements": {
+          "arc": "mixed",
+          "balance_margin_mm": 4.377853247725134,
+          "first_contact_angle_deg": 12.0,
+          "holding_peak_nm": 2.7004971883847038,
+          "inertia_kgm2": 0.05640710666666669,
+          "max_ground_depth_mm": 0.0,
+          "max_penetration_mm": 0.3984185130401201,
+          "max_pivot_dip_mm": 0.0,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
+          "moving_side": "out",
+          "peak_angle_deg": 116.00000000000001,
+          "peak_demand_nm": 1.847281836985921,
+          "rest_unique_cells": 27,
+          "samples": 61,
+          "side_ambiguous": false,
+          "static_peak_nm": 1.9755186747563909,
+          "tether_rest_depth_mm": 0.0
+        },
+        "soft": {
+          "balance": [
+            1.0,
+            "support margin 4.378 mm (preferred 0.000 mm)"
+          ],
+          "ground": [
+            1.0,
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_load": [
+            0.7452361143033298,
+            "peak holding load 2.700 N\u00b7m at joint 14 (hard limit 6.000 N\u00b7m)"
+          ],
+          "moving_side": [
+            1.0,
+            "side moment ratio 0.145; selected out"
+          ],
+          "near_contact": [
+            1.0,
+            "max CAD penetration 0.398 mm for modules (20, 21) (limit 6.000 mm)"
+          ],
+          "pivot_dip": [
+            1.0,
+            "pivoting hinge half dips 0.000 mm (hard limit 25.000 mm)"
+          ],
+          "torque": [
+            1.0,
+            "peak demand including inertia 1.847 N\u00b7m"
           ]
         }
       }
     },
     {
       "step": 14,
-      "joint": 9,
+      "joint": 19,
       "delta": 1,
-      "side": "in",
-      "moving_side_snake_pipeline": "parent",
+      "side": "out",
+      "moving_side_snake_pipeline": "child",
       "duration_s": 2.0,
       "state_before": -1,
       "state_after": 0,
@@ -7381,68 +7784,99 @@
       "hard_ok": true,
       "checks": {
         "hard": {
+          "balance_hard": [
+            true,
+            "support margin 36.325 mm (hard floor -50.000 mm)"
+          ],
           "cad_penetration": [
             true,
-            "max CAD penetration 0.398 mm for modules (9, 10) (limit 6.000 mm)"
+            "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
           ],
           "ground": [
             true,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
+          ],
+          "holding_hard": [
+            true,
+            "peak holding load 2.693 N\u00b7m at joint 14 (hard limit 6.000 N\u00b7m)"
+          ],
+          "pivot_dip_hard": [
+            true,
+            "pivoting hinge half dips 0.000 mm (hard limit 25.000 mm)"
           ],
           "rest_cell_overlap": [
             true,
             "0 duplicate occupied lattice cells at rest"
           ],
+          "tether_cell": [
+            true,
+            "cell (1, 0, 0) outside module 0's mount face is clear at rest"
+          ],
+          "tether_down": [
+            true,
+            "wire bundle does not point into the resting surface"
+          ],
+          "tether_ground": [
+            true,
+            "tether keep-out enters the table 0.000 mm at rest (limit 15.000 mm)"
+          ],
+          "tether_table": [
+            true,
+            "tether keep-out table incursion 0.000 mm (limit 15.000 mm)"
+          ],
           "torque_stall": [
             true,
-            "peak static torque 2.573 N\u00b7m (eased demand 2.496) (cap 5.800, stall 10.600)"
+            "peak static torque 1.609 N\u00b7m (eased demand 1.587) (cap 5.800, stall 10.600)"
           ]
         },
         "measurements": {
           "arc": "mixed",
           "balance_margin_mm": 36.324656711025476,
           "first_contact_angle_deg": 12.0,
-          "holding_peak_nm": 4.453439440859626,
-          "inertia_kgm2": 0.06911632266666663,
+          "holding_peak_nm": 2.6927773363337284,
+          "inertia_kgm2": 0.03665227999999999,
           "max_ground_depth_mm": 0.0,
-          "max_penetration_mm": 0.39841851304015563,
+          "max_penetration_mm": 0.3984185130402125,
           "max_pivot_dip_mm": 0.0,
-          "moving_side": "in",
-          "peak_angle_deg": 88.0,
-          "peak_demand_nm": 2.4958336261571836,
+          "max_tether_depth_mm": 0.0,
+          "max_tether_ground_mm": 0.0,
+          "moving_side": "out",
+          "peak_angle_deg": 76.0,
+          "peak_demand_nm": 1.5871628904676083,
           "rest_unique_cells": 27,
           "samples": 61,
           "side_ambiguous": false,
-          "static_peak_nm": 2.5732426414128553
+          "static_peak_nm": 1.608717021881624,
+          "tether_rest_depth_mm": 0.0
         },
         "soft": {
           "balance": [
             1.0,
-            "support margin 36.325 mm (preferred -20.000 mm)"
+            "support margin 36.325 mm (preferred 0.000 mm)"
           ],
           "ground": [
             1.0,
-            "max non-pivot table incursion 0.000 mm (limit 40.000 mm)"
+            "max non-pivot table incursion 0.000 mm (limit 15.000 mm)"
           ],
           "holding_load": [
-            0.5798642036924881,
-            "peak holding load 4.453 N\u00b7m at joint 13"
+            0.7459644022326671,
+            "peak holding load 2.693 N\u00b7m at joint 14 (hard limit 6.000 N\u00b7m)"
           ],
           "moving_side": [
             1.0,
-            "side moment ratio 0.042; selected in"
+            "side moment ratio 0.114; selected out"
           ],
           "near_contact": [
             1.0,
-            "max CAD penetration 0.398 mm for modules (9, 10) (limit 6.000 mm)"
+            "max CAD penetration 0.398 mm for modules (19, 20) (limit 6.000 mm)"
           ],
           "pivot_dip": [
             1.0,
-            "pivoting hinge half dips 0.000 mm"
+            "pivoting hinge half dips 0.000 mm (hard limit 25.000 mm)"
           ],
           "torque": [
             1.0,
-            "peak demand including inertia 2.496 N\u00b7m"
+            "peak demand including inertia 1.587 N\u00b7m"
           ]
         }
       }
@@ -7456,26 +7890,26 @@
       "hard_ok": true,
       "violations": [],
       "scores": {
-        "balance": 0.9527777777777773,
+        "balance": 0.8546296296296296,
         "ground": 1.0,
-        "holding_load": 0.26749685400408013,
-        "moving_side": 0.3508771929824579,
+        "holding_load": 0.44456214943285316,
+        "moving_side": 0.5714285714285797,
         "near_contact": 1.0,
-        "pivot_dip": 0.43232679279279257,
-        "torque": 0.27938205802112925
+        "pivot_dip": 0.0,
+        "torque": 0.5226018504797433
       },
       "notes": [
         "final forward recheck"
       ],
       "moves_compact": [
         [
-          0,
+          3,
           -1,
           "in",
           2.0
         ],
         [
-          2,
+          1,
           -1,
           "in",
           2.0
@@ -7484,12 +7918,6 @@
           24,
           -1,
           "out",
-          2.0
-        ],
-        [
-          1,
-          1,
-          "in",
           2.0
         ],
         [
@@ -7505,7 +7933,7 @@
           2.0
         ],
         [
-          4,
+          2,
           1,
           "in",
           2.0
@@ -7513,6 +7941,12 @@
         [
           13,
           -1,
+          "in",
+          2.0
+        ],
+        [
+          4,
+          1,
           "in",
           2.0
         ],
@@ -7535,15 +7969,9 @@
           2.0
         ],
         [
-          20,
+          19,
           -1,
           "out",
-          2.0
-        ],
-        [
-          9,
-          -1,
-          "in",
           2.0
         ],
         [
@@ -7553,9 +7981,15 @@
           2.0
         ],
         [
-          9,
+          20,
+          -1,
+          "out",
+          2.0
+        ],
+        [
+          19,
           1,
-          "in",
+          "out",
           2.0
         ]
       ]
@@ -7567,18 +8001,147 @@
       "hard_ok": true,
       "violations": [],
       "scores": {
-        "balance": 0.9527777777777763,
+        "balance": 0.8546296296296287,
         "ground": 1.0,
-        "holding_load": 0.26749685400408,
-        "moving_side": 0.3508771929824594,
+        "holding_load": 0.44456214943285305,
+        "moving_side": 0.5714285714285708,
         "near_contact": 1.0,
-        "pivot_dip": 0.43232679279279257,
-        "torque": 0.2793820580211289
+        "pivot_dip": 0.0,
+        "torque": 0.5226018504797433
       },
       "notes": [
         "final forward recheck"
       ],
       "moves_compact": [
+        [
+          0,
+          -1,
+          "in",
+          2.0
+        ],
+        [
+          2,
+          -1,
+          "in",
+          2.0
+        ],
+        [
+          24,
+          -1,
+          "out",
+          2.0
+        ],
+        [
+          1,
+          1,
+          "in",
+          2.0
+        ],
+        [
+          25,
+          -1,
+          "out",
+          2.0
+        ],
+        [
+          6,
+          -1,
+          "in",
+          2.0
+        ],
+        [
+          13,
+          -1,
+          "in",
+          2.0
+        ],
+        [
+          4,
+          1,
+          "in",
+          2.0
+        ],
+        [
+          8,
+          1,
+          "in",
+          2.0
+        ],
+        [
+          20,
+          1,
+          "out",
+          2.0
+        ],
+        [
+          21,
+          1,
+          "out",
+          2.0
+        ],
+        [
+          19,
+          -1,
+          "out",
+          2.0
+        ],
+        [
+          14,
+          -1,
+          "out",
+          2.0
+        ],
+        [
+          20,
+          -1,
+          "out",
+          2.0
+        ],
+        [
+          19,
+          1,
+          "out",
+          2.0
+        ]
+      ]
+    },
+    {
+      "plan_index": 3,
+      "moves": 15,
+      "complete": true,
+      "hard_ok": true,
+      "violations": [],
+      "scores": {
+        "balance": 0.85462962962963,
+        "ground": 1.0,
+        "holding_load": 0.44456214943285316,
+        "moving_side": 0.5714285714285678,
+        "near_contact": 1.0,
+        "pivot_dip": 0.0,
+        "torque": 0.522601850479743
+      },
+      "notes": [
+        "final forward recheck"
+      ],
+      "moves_compact": [
+        [
+          1,
+          1,
+          "in",
+          2.0
+        ],
+        [
+          24,
+          -1,
+          "out",
+          2.0
+        ],
+        [
+          6,
+          -1,
+          "in",
+          2.0
+        ],
         [
           0,
           1,
@@ -7592,25 +8155,13 @@
           2.0
         ],
         [
-          24,
-          -1,
-          "out",
-          2.0
-        ],
-        [
-          1,
-          1,
-          "in",
-          2.0
-        ],
-        [
           25,
           -1,
           "out",
           2.0
         ],
         [
-          6,
+          13,
           -1,
           "in",
           2.0
@@ -7618,12 +8169,6 @@
         [
           4,
           1,
-          "in",
-          2.0
-        ],
-        [
-          13,
-          -1,
           "in",
           2.0
         ],
@@ -7646,15 +8191,9 @@
           2.0
         ],
         [
-          20,
+          19,
           -1,
           "out",
-          2.0
-        ],
-        [
-          9,
-          -1,
-          "in",
           2.0
         ],
         [
@@ -7664,34 +8203,46 @@
           2.0
         ],
         [
-          9,
+          20,
+          -1,
+          "out",
+          2.0
+        ],
+        [
+          19,
           1,
-          "in",
+          "out",
           2.0
         ]
       ]
     },
     {
-      "plan_index": 3,
-      "moves": 14,
+      "plan_index": 4,
+      "moves": 16,
       "complete": true,
       "hard_ok": true,
       "violations": [],
       "scores": {
-        "balance": 1.0,
-        "ground": 0.23962226498603595,
-        "holding_load": 0.35018812124494675,
-        "moving_side": 0.8429118773946349,
+        "balance": 0.85462962962963,
+        "ground": 1.0,
+        "holding_load": 0.44456214943285316,
+        "moving_side": 0.5714285714285731,
         "near_contact": 1.0,
-        "pivot_dip": 0.43232679279279257,
-        "torque": 0.0
+        "pivot_dip": 0.0,
+        "torque": 0.5226018504797433
       },
       "notes": [
         "final forward recheck"
       ],
       "moves_compact": [
         [
-          1,
+          3,
+          -1,
+          "in",
+          2.0
+        ],
+        [
+          0,
           1,
           "in",
           2.0
@@ -7703,14 +8254,14 @@
           2.0
         ],
         [
-          6,
+          1,
           -1,
           "in",
           2.0
         ],
         [
           2,
-          -1,
+          1,
           "in",
           2.0
         ],
@@ -7721,14 +8272,20 @@
           2.0
         ],
         [
-          4,
-          1,
+          6,
+          -1,
           "in",
           2.0
         ],
         [
           13,
           -1,
+          "in",
+          2.0
+        ],
+        [
+          4,
+          1,
           "in",
           2.0
         ],
@@ -7751,27 +8308,27 @@
           2.0
         ],
         [
+          19,
+          -1,
+          "out",
+          2.0
+        ],
+        [
+          14,
+          -1,
+          "out",
+          2.0
+        ],
+        [
           20,
           -1,
           "out",
           2.0
         ],
         [
-          5,
+          19,
           1,
-          "in",
-          2.0
-        ],
-        [
-          14,
-          -1,
-          "in",
-          2.0
-        ],
-        [
-          5,
-          -1,
-          "in",
+          "out",
           2.0
         ]
       ]
@@ -8012,7 +8569,10 @@
       "fold_budget_s": 30.0,
       "node_budget": 200000,
       "detour_budget": 8,
-      "side_ambiguity_ratio": 0.85
+      "side_ambiguity_ratio": 0.85,
+      "holding_hard_nm": 1000000000.0,
+      "pivot_dip_hard_mm": 1000000000.0,
+      "balance_hard_mm": -1000000000.0
     },
     "platform": {
       "sweep_step_deg": 4.0,
@@ -8027,7 +8587,10 @@
       "fold_budget_s": 30.0,
       "node_budget": 200000,
       "detour_budget": 8,
-      "side_ambiguity_ratio": 0.85
+      "side_ambiguity_ratio": 0.85,
+      "holding_hard_nm": 1000000000.0,
+      "pivot_dip_hard_mm": 1000000000.0,
+      "balance_hard_mm": -1000000000.0
     },
     "strict": {
       "sweep_step_deg": 2.0,
@@ -8042,31 +8605,52 @@
       "fold_budget_s": 120.0,
       "node_budget": 1000000,
       "detour_budget": 12,
-      "side_ambiguity_ratio": 0.85
+      "side_ambiguity_ratio": 0.85,
+      "holding_hard_nm": 1000000000.0,
+      "pivot_dip_hard_mm": 1000000000.0,
+      "balance_hard_mm": -1000000000.0
+    },
+    "gentle": {
+      "sweep_step_deg": 4.0,
+      "hard_penetration_mm": 6.0,
+      "soft_penetration_mm": 1.0,
+      "pivot_dip_exempt_mm": 3.0,
+      "ground_soft_mm": 3.0,
+      "ground_hard_mm": 15.0,
+      "torque_cap_nm": 5.8,
+      "torque_stall_nm": 10.6,
+      "balance_margin_mm": 0.0,
+      "fold_budget_s": 60.0,
+      "node_budget": 300000,
+      "detour_budget": 12,
+      "side_ambiguity_ratio": 0.85,
+      "holding_hard_nm": 6.0,
+      "pivot_dip_hard_mm": 25.0,
+      "balance_hard_mm": -50.0
     }
   },
   "reports": {
     "loose": {
       "profile": "loose",
-      "config_hash": "7487b5c67bd18dfb",
+      "config_hash": "5f0e4201ed8ad46f",
       "candidates_summary": {
-        "candidates": 4,
-        "complete_passing": 4,
-        "complete_violating": 0,
+        "candidates": 8,
+        "complete_passing": 5,
+        "complete_violating": 2,
         "hard_ok": true,
-        "partial": 0
+        "partial": 1
       },
       "this_path": {
         "hard_ok": true,
         "violations": [],
         "scores": {
-          "balance": 0.952777777777777,
+          "balance": 0.85462962962963,
           "ground": 1.0,
-          "holding_load": 0.26749685400408013,
-          "moving_side": 0.3508771929824587,
+          "holding_load": 0.44456214943285316,
+          "moving_side": 0.5714285714285686,
           "near_contact": 1.0,
-          "pivot_dip": 0.43232679279279257,
-          "torque": 0.2793820580211289
+          "pivot_dip": 0.0,
+          "torque": 0.5226018504797433
         },
         "notes": [
           "final forward recheck"
@@ -8075,13 +8659,13 @@
     },
     "strict": {
       "profile": "strict",
-      "config_hash": "ccfb6e2b5dbdd610",
+      "config_hash": "61d7238d55892be5",
       "candidates_summary": {
-        "candidates": 4,
+        "candidates": 8,
         "complete_passing": 0,
-        "complete_violating": 4,
+        "complete_violating": 7,
         "hard_ok": false,
-        "partial": 0
+        "partial": 1
       },
       "this_path": {
         "hard_ok": false,
@@ -8091,24 +8675,24 @@
           "move 2 cad_penetration: max CAD penetration 0.398 mm for modules (6, 7) (limit 0.000 mm)",
           "move 3 cad_penetration: max CAD penetration 0.398 mm for modules (2, 3) (limit 0.000 mm)",
           "move 4 cad_penetration: max CAD penetration 0.398 mm for modules (25, 26) (limit 0.000 mm)",
-          "move 5 cad_penetration: max CAD penetration 0.398 mm for modules (4, 5) (limit 0.000 mm)",
-          "move 6 cad_penetration: max CAD penetration 0.398 mm for modules (12, 13) (limit 0.000 mm)",
+          "move 5 cad_penetration: max CAD penetration 0.398 mm for modules (12, 13) (limit 0.000 mm)",
+          "move 6 cad_penetration: max CAD penetration 0.398 mm for modules (3, 4) (limit 0.000 mm)",
           "move 7 cad_penetration: max CAD penetration 0.398 mm for modules (7, 8) (limit 0.000 mm)",
           "move 8 cad_penetration: max CAD penetration 0.398 mm for modules (20, 21) (limit 0.000 mm)",
           "move 9 cad_penetration: max CAD penetration 0.398 mm for modules (20, 21) (limit 0.000 mm)",
-          "move 10 cad_penetration: max CAD penetration 0.398 mm for modules (20, 21) (limit 0.000 mm)",
-          "move 11 cad_penetration: max CAD penetration 0.398 mm for modules (8, 9) (limit 0.000 mm)",
-          "move 12 cad_penetration: max CAD penetration 0.398 mm for modules (13, 14) (limit 0.000 mm)",
-          "move 13 cad_penetration: max CAD penetration 0.398 mm for modules (9, 10) (limit 0.000 mm)"
+          "move 10 cad_penetration: max CAD penetration 0.398 mm for modules (19, 20) (limit 0.000 mm)",
+          "move 11 cad_penetration: max CAD penetration 0.398 mm for modules (13, 14) (limit 0.000 mm)",
+          "move 12 cad_penetration: max CAD penetration 0.398 mm for modules (20, 21) (limit 0.000 mm)",
+          "move 13 cad_penetration: max CAD penetration 0.398 mm for modules (19, 20) (limit 0.000 mm)"
         ],
         "scores": {
-          "balance": 0.577777777777777,
+          "balance": 0.72962962962963,
           "ground": 1.0,
-          "holding_load": 0.26749685400408013,
-          "moving_side": 0.3508771929824587,
+          "holding_load": 0.44456214943285316,
+          "moving_side": 0.5714285714285686,
           "near_contact": 0.0,
-          "pivot_dip": 0.4254279609929076,
-          "torque": 0.2793820580211289
+          "pivot_dip": 0.42542796099290797,
+          "torque": 0.5226018504797433
         },
         "notes": [
           "final forward recheck",
@@ -8118,16 +8702,16 @@
     }
   },
   "provenance": {
-    "source_record": "/Users/justinrui/Documents/GitHub/Hack-The-North/cubot-v2/out/explore-20260919/letters-b/runs/y-v2/y/record.json",
+    "source_record": "/Users/jerryli/Downloads/Hack-The-North/cubot-v2/out/explore-common25/by-shape/y/runs/y/y/record.json",
     "plan_index": 0,
     "record_source": "explore",
-    "created": "2026-09-19T12:07:57.777769+00:00",
-    "git_sha": "c8e7224127efcc1aa2414d37d91c8f08643a82e9",
-    "config_hash": "7487b5c67bd18dfb",
+    "created": "2026-09-20T00:40:42.374083+00:00",
+    "git_sha": "f5840eff547a2f3f4d6c518e72d113feca338323",
+    "config_hash": "5f0e4201ed8ad46f",
     "source_hash": "ee05721ceccccd4ee866c43f29b5b6f05c5cba6038f7c4c15d4902b1ebaa0f77",
-    "profile": "loose",
+    "profile": "gentle",
     "seed": 0,
-    "mask_variant": "y-v2",
+    "mask_variant": null,
     "exporter": "tools/export_handoff.py"
   }
 }

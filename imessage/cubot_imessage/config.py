@@ -15,6 +15,7 @@ DEFAULT_HANDOFF = os.path.join(REPO_ROOT, "cubot-v2", "handoff")
 DEFAULT_DATA = os.path.join(REPO_ROOT, "imessage", "data")
 DEFAULT_HEAD = os.path.join(DEFAULT_DATA, "intent_head.npz")
 DEFAULT_CORPUS = os.path.join(DEFAULT_DATA, "utterances.jsonl")
+DEFAULT_HW_ROOT = "/Users/jerryli/Downloads/cubot"
 
 
 def _env(name: str, default: str = "") -> str:
@@ -87,11 +88,24 @@ class Settings:
     openai_api_key: str = ""
     openai_model: str = "gpt-4o-mini"
     openai_fallback: bool = True
+    hw_root: str = DEFAULT_HW_ROOT
+    serial_port: str = ""
+    gear: float = 4.0
+    power: int = 0
+    mirror_mujoco: bool = True
 
     @classmethod
     def load(cls, use_dotenv: bool = True) -> "Settings":
         if use_dotenv:
             load_dotenv()
+        try:
+            power = int(_env("CUBOT_POWER", "0") or "0")
+        except ValueError:
+            power = 0
+        try:
+            gear = float(_env("CUBOT_GEAR", "4") or "4")
+        except ValueError:
+            gear = 4.0
         return cls(
             api_key=_env("LINQ_API_KEY"),
             base_url=_env("LINQ_BASE_URL", DEFAULT_BASE_URL).rstrip("/"),
@@ -116,6 +130,11 @@ class Settings:
             openai_api_key=_env("OPENAI_API_KEY"),
             openai_model=_env("OPENAI_MODEL", "gpt-4o-mini"),
             openai_fallback=_env_bool("OPENAI_FALLBACK", True),
+            hw_root=_env("CUBOT_HW_ROOT", DEFAULT_HW_ROOT),
+            serial_port=_env("CUBOT_SERIAL_PORT"),
+            gear=gear,
+            power=power,
+            mirror_mujoco=_env_bool("CUBOT_MUJOCO_MIRROR", True),
         )
 
     def describe(self) -> list[tuple[str, str]]:
@@ -138,6 +157,10 @@ class Settings:
             ("corpus", self.corpus_path),
             ("listen", f"{self.host}:{self.port}"),
             ("executor", self.executor),
+            ("hw root", self.hw_root),
+            ("serial port", self.serial_port or "(autodetect)"),
+            ("gear / power", f"{self.gear}:1 / preset {self.power}"),
+            ("mujoco mirror", "on" if self.mirror_mujoco else "off"),
             ("auto-reply", "on" if self.auto_reply else "off"),
             ("react on receive", "👍 / 🤔 after classify" if self.react_on_receive else "off"),
             ("OpenAI fallback", ("on · " + (self.openai_model if self.openai_api_key

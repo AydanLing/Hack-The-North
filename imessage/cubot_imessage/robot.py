@@ -143,8 +143,6 @@ def _plan_from_doc(doc: dict, path_json: str) -> FoldPlan:
     warnings: list[str] = []
     if not status.get("loose_hard_ok", True):
         warnings.append(f"{len(violations)} loose hard-check violation(s): expected to fail physically")
-    if summary.get("ends_flat_on_table") is False:
-        warnings.append("predicted to finish standing on edge, not lying flat")
     return FoldPlan(
         shape=str(doc.get("name", "")),
         number=int(doc.get("demo_number", 0) or 0),
@@ -363,7 +361,10 @@ class MujocoExecutor:
 
 def build_executor(kind: str, spool_path: str = "", log=print,
                    viewer_base: str = "", viewer_html: str = "",
-                   scene_xml: str = "") -> Executor:
+                   scene_xml: str = "",
+                   hw_root: str = "", serial_port: str = "",
+                   gear: float = 4.0, power: int = 0,
+                   mirror_mujoco: bool | None = None) -> Executor:
     kind = (kind or "dryrun").lower()
     if kind == "none":
         return NullExecutor()
@@ -373,9 +374,15 @@ def build_executor(kind: str, spool_path: str = "", log=print,
         return ViewerExecutor(viewer_base=viewer_base, viewer_html=viewer_html, log=log)
     if kind == "mujoco":
         return MujocoExecutor(scene_xml=scene_xml, log=log)
+    if kind == "hardware":
+        from .hardware import HardwareExecutor  # noqa: PLC0415 — keeps dryrun imports light
+        return HardwareExecutor(hw_root=hw_root, serial_port=serial_port,
+                                gear=gear, power=power, scene_xml=scene_xml,
+                                mirror_mujoco=mirror_mujoco, log=log)
     if kind == "dryrun":
         return DryRunExecutor(log=log)
-    raise ValueError(f"unknown executor {kind!r} (dryrun | spool | viewer | mujoco | none)")
+    raise ValueError(
+        f"unknown executor {kind!r} (dryrun | spool | viewer | mujoco | hardware | none)")
 
 
 def load_any(path: str) -> FoldPlan:

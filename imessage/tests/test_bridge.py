@@ -484,7 +484,8 @@ def test_plan_loads_moves_and_warnings(handoff):
     plan = ShapeLibrary(handoff).plan("t")
     assert len(plan.moves) == 1 and plan.moves[0].side == "out"
     assert plan.moves[0].moving_side == "child"
-    assert any("standing" in w for w in plan.warnings)
+    assert plan.ends_flat_on_table is False
+    assert not any("standing" in w for w in plan.warnings)
 
 
 def test_replay_reaches_goal_when_recorded(handoff):

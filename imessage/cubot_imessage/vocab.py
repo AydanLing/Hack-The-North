@@ -233,15 +233,13 @@ class Vocabulary:
         return out
 
     def is_flagged(self, shape: str) -> tuple[bool, str]:
-        """Shapes the handoff itself warns about: failed hard checks, or finishing on edge."""
+        """Shapes the handoff itself warns about (failed hard checks)."""
         row = self.rows.get(str(shape).lower(), {})
         notes = []
         if row.get("loose_hard_ok") is False:
             violations = row.get("loose_violations")
             count = violations if isinstance(violations, int) else len(violations or [])
             notes.append(f"{count} hard-check violation(s) — expected to fail physically")
-        if row.get("ends_flat_on_table") is False:
-            notes.append("predicted to finish standing on edge, not flat")
         return bool(notes), "; ".join(notes)
 
     # -- the decision ------------------------------------------------------------------------

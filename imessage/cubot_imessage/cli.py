@@ -5,6 +5,7 @@
     cubot-imessage classify "show htn love"     the language path only, with scores
     cubot-imessage simulate "make a heart"      the whole handler, no HTTP and no Linq
     cubot-imessage plan heart                   the fold path a shape resolves to
+    cubot-imessage play --shape spiral --executor hardware
     cubot-imessage serve                        run the webhook server
     cubot-imessage send --to +1555... "hi"      outbound iMessage (prints unless --send is passed)
     cubot-imessage subscribe --url https://...  register the webhook (prints unless --send is passed)
@@ -35,7 +36,12 @@ def _bridge(settings: Settings, execute: bool = True, log=print) -> Bridge:
         client = LinqClient(settings.api_key, settings.base_url, settings.timeout_s,
                             settings.from_number)
     viewer_base = settings.viewer_base or f"http://127.0.0.1:{settings.port}/sim"
-    executor = build_executor(settings.executor, viewer_base=viewer_base, log=log)
+    executor = build_executor(
+        settings.executor, viewer_base=viewer_base, log=log,
+        hw_root=settings.hw_root, serial_port=settings.serial_port,
+        gear=settings.gear, power=settings.power,
+        mirror_mujoco=settings.mirror_mujoco,
+    )
     return Bridge(settings, executor=executor, client=client, log=log)
 
 
@@ -211,6 +217,37 @@ def cmd_plan(args, settings: Settings) -> int:
     return 0
 
 
+def cmd_play(args, settings: Settings) -> int:
+    """Load a shape's FoldPlan and submit it to the chosen executor (live hardware smoke)."""
+    if args.executor:
+        settings.executor = args.executor
+    vocab = Vocabulary(settings.handoff_dir)
+    library = ShapeLibrary(settings.handoff_dir)
+    shape = vocab.shape_for_icon(args.shape) or args.shape
+    try:
+        plan = library.plan(shape)
+    except KeyError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 1
+    print(plan.summary_line())
+    executor = build_executor(
+        settings.executor, log=print,
+        hw_root=settings.hw_root, serial_port=settings.serial_port,
+        gear=settings.gear, power=settings.power,
+        mirror_mujoco=settings.mirror_mujoco,
+    )
+    print(f"executor {executor.name}"
+          + (" + mujoco mirror" if settings.executor == "hardware"
+             and settings.mirror_mujoco else ""))
+    try:
+        result = executor.submit(plan, {"via": "cli-play", "shape": shape})
+    except Exception as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 1
+    print(json.dumps(result, indent=2))
+    return 0 if result.get("accepted", True) else 1
+
+
 def cmd_serve(args, settings: Settings) -> int:
     from .server import serve                    # noqa: PLC0415 — keeps `--help` from importing http
     if args.port:
@@ -303,10 +340,18 @@ def build_parser() -> argparse.ArgumentParser:
     pl.add_argument("--json", action="store_true")
     pl.set_defaults(func=cmd_plan)
 
+    py = sub.add_parser("play", help="submit a shape's fold path to an executor (hardware smoke)")
+    py.add_argument("--shape", required=True, help="shape name or icon (e.g. spiral, checkmark)")
+    py.add_argument("--executor",
+                    choices=("dryrun", "spool", "viewer", "mujoco", "hardware", "none"),
+                    help="override BRIDGE_EXECUTOR for this run")
+    py.set_defaults(func=cmd_play)
+
     sv = sub.add_parser("serve", help="run the webhook server")
     sv.add_argument("--host")
     sv.add_argument("--port", type=int)
-    sv.add_argument("--executor", choices=("dryrun", "spool", "viewer", "mujoco", "none"))
+    sv.add_argument("--executor",
+                    choices=("dryrun", "spool", "viewer", "mujoco", "hardware", "none"))
     sv.add_argument("--spool", help="JSONL queue file (implies --executor spool)")
     sv.add_argument("--no-reply", action="store_true", help="never send an iMessage back")
     sv.set_defaults(func=cmd_serve)

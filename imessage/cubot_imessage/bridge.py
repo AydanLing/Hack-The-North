@@ -269,6 +269,17 @@ class Bridge:
             except Exception as e:
                 out.error = f"executor {self.executor.name} refused the plan: {e}"
                 out.reply = f"I worked out the {plan.shape} fold but couldn't start it. Tell my operator."
+            else:
+                # Hardware executor may still run MuJoCo with the bus unplugged —
+                # keep the accept reply, but tell the sender the robot is offline.
+                executed = out.executed or {}
+                if executed.get("hardware_offline") or executed.get("sim_only"):
+                    out.error = executed.get("error") or "robot offline"
+                    out.reply = (
+                        out.reply.rstrip()
+                        + "\n(The physical robot isn't plugged in right now — "
+                          "playing the fold in simulation instead.)"
+                    )
         out.elapsed_ms = (time.perf_counter() - t0) * 1000.0
         return out
 
