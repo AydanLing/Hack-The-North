@@ -114,6 +114,8 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=None, help="fold at most this many items")
     parser.add_argument("--retry-violating", action="store_true",
                         help="re-fold every threadable non-passing row under --out into <out>/verify/")
+    parser.add_argument("--verify-subdir", default="verify",
+                        help="with --retry-violating, the subdirectory of --out that receives the re-folds")
     parser.add_argument("--only-unpassed-concepts", action="store_true",
                         help="with --retry-violating, skip variants of concepts that already have a PASS")
     parser.add_argument("--dry-run", action="store_true", help="list what would be folded")
@@ -121,7 +123,7 @@ def main() -> int:
 
     if args.retry_violating:
         items = retry_items(args.out, only_unpassed_concepts=args.only_unpassed_concepts)
-        out_root = args.out / "verify"
+        out_root = args.out / args.verify_subdir
     else:
         if not args.queue:
             parser.error("--queue is required unless --retry-violating is given")

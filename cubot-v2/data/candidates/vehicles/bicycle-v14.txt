@@ -1,0 +1,6 @@
+// design_search: from bicycle-r2c.txt, distance 11, 2 threadings
+....##.##
+..#######
+###...###
+#.#...#.#
+###...###
