@@ -82,8 +82,11 @@ def main() -> int:
     ap.add_argument("--queue", type=Path, default=None,
                    help="write an explore_batch queue covering every mask written")
     ap.add_argument("--budget", type=int, default=0,
-                   help="with --queue: total masks to emit, best-scoring first "
-                        "across all fold counts (0 = use --per-k)")
+                   help="with --queue: total masks to emit (0 = all)")
+    ap.add_argument("--order", choices=("folds", "score"), default="folds",
+                   help="queue order: 'folds' does the cheapest folds first "
+                        "(compact shapes need collision detours, so score-first "
+                        "front-loads the thrashiest paths); default folds")
     args = ap.parse_args()
 
     machine = load_machine(args.machine)
@@ -123,24 +126,31 @@ def main() -> int:
         args.out.mkdir(parents=True, exist_ok=True)
 
     if args.queue:
-        # One flat, score-ordered campaign. Fold count breaks ties, so the
-        # cheapest shape wins whenever two look equally good.
-        pool = [(sc, k, rows) for k, hits in by_k.items() for sc, rows, _ in hits]
-        pool.sort(key=lambda e: (-e[0], e[1]))
+        # Name by fold count plus rank *within* that fold count, so a mask keeps
+        # its name when the queue is reordered and a resumed campaign still
+        # recognises what it already folded.
+        pool = []
+        for k, hits in by_k.items():
+            for rank, (sc, rows, _states) in enumerate(hits):
+                pool.append((sc, k, rank, rows))
+        if args.order == "folds":
+            pool.sort(key=lambda e: (e[1], -e[0]))
+        else:
+            pool.sort(key=lambda e: (-e[0], e[1]))
         limit = args.budget or len(pool)
         args.out.mkdir(parents=True, exist_ok=True)
         args.queue.parent.mkdir(parents=True, exist_ok=True)
         import json as _json
         written = 0
         with args.queue.open("w") as qf:
-            for sc, k, rows in pool[:limit]:
-                name = f"k{k}-{written:04d}"
+            for sc, k, rank, rows in pool[:limit]:
+                name = f"k{k}-{rank:04d}"
                 mask = args.out / f"{name}.txt"
                 mask.write_text("\n".join(rows) + "\n")
                 qf.write(_json.dumps({"name": name, "mask": str(mask),
                                       "category": "n17-forward"}) + "\n")
                 written += 1
-        print(f"\nqueued {written} masks -> {args.queue}")
+        print(f"\nqueued {written} masks ({args.order}-first) -> {args.queue}")
         return 0
 
     for k in sorted(by_k):

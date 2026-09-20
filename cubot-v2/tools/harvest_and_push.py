@@ -33,7 +33,7 @@ if str(ROOT) not in sys.path:
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from audit_path_quality import audit_path  # noqa: E402
-from match_glyphs import TEMPLATES, best_iou, cells_of, dims, mask_of, parse_rows  # noqa: E402
+from match_glyphs import TEMPLATES, cells_of, parse_rows, scaled_iou  # noqa: E402
 
 
 def run(cmd: list[str], cwd: Path = ROOT) -> subprocess.CompletedProcess:
@@ -41,11 +41,11 @@ def run(cmd: list[str], cwd: Path = ROOT) -> subprocess.CompletedProcess:
 
 
 def name_shape(rows: list[str], prepared: dict) -> tuple[str, float]:
-    """Best-matching concept for a footprint, with its overlap score."""
+    """Best-matching concept for a footprint, with its resemblance score."""
     fp = cells_of(rows)
     best_name, best = "", 0.0
-    for concept, (mask, dim) in prepared.items():
-        iou = best_iou(fp, mask, dim)
+    for concept, template in prepared.items():
+        iou = scaled_iou(fp, template)
         if iou > best:
             best_name, best = concept, iou
     return best_name, best
@@ -58,7 +58,7 @@ def main() -> int:
                     help="campaign --out dir (holds <category>/results.jsonl)")
     ap.add_argument("--handoff", type=Path, default=ROOT / "handoff-17")
     ap.add_argument("--machine", default="config/machine-17.toml")
-    ap.add_argument("--min-iou", type=float, default=0.60)
+    ap.add_argument("--min-iou", type=float, default=0.65)
     ap.add_argument("--max-ratio", type=float, default=1.5)
     ap.add_argument("--push", action="store_true", help="commit and push when anything is added")
     args = ap.parse_args()
@@ -71,11 +71,7 @@ def main() -> int:
     passing = [r for r in rows if r.get("complete") and r.get("hard_ok")]
     print(f"{len(rows)} folded, {len(passing)} certified")
 
-    prepared = {}
-    for concept in TEMPLATES:
-        t = cells_of(parse_rows(TEMPLATES[concept]))
-        t = {(x + 2, y + 2) for x, y in t}
-        prepared[concept] = (mask_of(t), dims(t))
+    prepared = {c: cells_of(parse_rows(TEMPLATES[c])) for c in TEMPLATES}
 
     # What the handoff already has, so re-runs are no-ops.
     index_path = args.handoff / "index.json"

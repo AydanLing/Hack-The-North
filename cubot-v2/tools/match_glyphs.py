@@ -169,6 +169,133 @@ TEMPLATES: dict[str, str] = {
 #.....#
 .#####.
 """,
+    # The chain is a 17-cell snake, so it draws outlines rather than solid
+    # glyphs. These are stroke-form letters and digits: one cell thick, which is
+    # the only way a single closed path can render them.
+    "A": """
+.###.
+#...#
+#####
+#...#
+#...#
+""",
+    "B": """
+####.
+#...#
+####.
+#...#
+####.
+""",
+    "D": """
+####.
+#...#
+#...#
+#...#
+####.
+""",
+    "G": """
+#####
+#....
+#..##
+#...#
+#####
+""",
+    "J": """
+..###
+....#
+....#
+#...#
+.###.
+""",
+    "N": """
+#...#
+##..#
+#.#.#
+#..##
+#...#
+""",
+    "P": """
+####.
+#...#
+####.
+#....
+#....
+""",
+    "V": """
+#...#
+#...#
+#...#
+.#.#.
+..#..
+""",
+    "Y": """
+#...#
+.#.#.
+..#..
+..#..
+..#..
+""",
+    "0": """
+.###.
+#...#
+#...#
+#...#
+.###.
+""",
+    "2": """
+####.
+....#
+.###.
+#....
+#####
+""",
+    "3": """
+####.
+....#
+.###.
+....#
+####.
+""",
+    "4": """
+#..#.
+#..#.
+#####
+...#.
+...#.
+""",
+    "7": """
+#####
+....#
+...#.
+..#..
+.#...
+""",
+    "step": """
+..###
+..#..
+###..
+#....
+""",
+    "hook": """
+#####
+....#
+....#
+.####
+""",
+    "spiral": """
+#####
+....#
+.##.#
+.#..#
+.####
+""",
+    "bracket": """
+###
+#..
+#..
+#..
+###
+""",
 }
 
 CANVAS = 24
@@ -213,6 +340,64 @@ def dims(cells: set[tuple[int, int]]) -> tuple[int, int]:
     xs = [p[0] for p in cells]
     ys = [p[1] for p in cells]
     return max(xs) + 1, max(ys) + 1
+
+
+GRID = 12
+
+
+def rescale(cells: set[tuple[int, int]], n: int = GRID) -> set[tuple[int, int]]:
+    """Resample a footprint onto an n x n grid, so size stops mattering.
+
+    A chain of 17 modules draws strokes: its "Z" is 8 wide and 3 tall, while an
+    ideal Z template is drawn square.  Comparing those directly scores a correct
+    shape as a mismatch, because the penalty is aspect ratio rather than form.
+    Normalising both to the same grid asks the question we actually care about --
+    is this the same figure -- and leaves scale out of it.
+    """
+    xs = [p[0] for p in cells]
+    ys = [p[1] for p in cells]
+    w = max(xs) - min(xs) + 1
+    h = max(ys) - min(ys) + 1
+    out = set()
+    for x, y in cells:
+        fx = (x - min(xs)) / w
+        fy = (y - min(ys)) / h
+        # Paint the whole cell's extent so thin strokes survive upsampling.
+        for gx in range(int(fx * n), max(int(fx * n) + 1, int((x - min(xs) + 1) / w * n))):
+            for gy in range(int(fy * n), max(int(fy * n) + 1, int((y - min(ys) + 1) / h * n))):
+                if 0 <= gx < n and 0 <= gy < n:
+                    out.add((gx, gy))
+    return out
+
+
+def aspect(cells: set[tuple[int, int]]) -> float:
+    xs = [p[0] for p in cells]
+    ys = [p[1] for p in cells]
+    return (max(xs) - min(xs) + 1) / (max(ys) - min(ys) + 1)
+
+
+def scaled_iou(footprint: set[tuple[int, int]], template: set[tuple[int, int]]) -> float:
+    """Scale-tolerant IoU over the 8 dihedral variants, discounted by distortion.
+
+    Normalising to a common grid alone is too forgiving: a straight 1x17 line
+    stretches into a solid block and then matches almost anything.  So each
+    variant's overlap is discounted by how much the aspect ratio had to be
+    distorted to get there, which keeps a squashed-but-real Z scoring well while
+    rejecting degenerate lines.
+    """
+    t = rescale(template)
+    ta = aspect(template)
+    best = 0.0
+    for variant in transforms(footprint):
+        v = rescale(variant)
+        inter = len(v & t)
+        if not inter:
+            continue
+        iou = inter / len(v | t)
+        va = aspect(variant)
+        distortion = max(va / ta, ta / va)
+        best = max(best, iou / distortion ** 0.5)
+    return best
 
 
 def best_iou(footprint: set[tuple[int, int]], tmpl_mask: int, tmpl_dims: tuple[int, int],
