@@ -82,8 +82,9 @@ def explore_one(
     k: int,
     max_candidates: int,
     seed: int,
+    machine_path: Path | None = None,
 ) -> dict:
-    machine = load_machine()
+    machine = load_machine(machine_path)
     rows = read_mask(mask_path)
     variant = variant_label(mask_path)
     target = PixelTarget(
@@ -120,7 +121,7 @@ def explore_one(
     }
     started = time.monotonic()
 
-    report = screen(cells, 27)
+    report = screen(cells, machine.modules)
     row["screen_ok"] = report.ok
     row["screen_stage"] = report.stage
     row["screen_reason"] = report.reason
@@ -209,6 +210,8 @@ def main() -> int:
     parser.add_argument("--max-candidates", type=int, default=4)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--gate-only", action="store_true", help="screen + thread only; never fold")
+    parser.add_argument("--machine", type=Path, default=None,
+                        help="machine TOML (default: $CUBOT_MACHINE or config/machine.toml); masks need machine.modules cells")
     args = parser.parse_args()
 
     out_root = args.out
@@ -219,10 +222,10 @@ def main() -> int:
     exit_code = 2
     for mask_path in args.masks:
         if args.gate_only:
-            machine = load_machine()
+            machine = load_machine(args.machine)
             rows = read_mask(mask_path)
             cells = tuple(PixelTarget(parse_grid(rows), args.name, "").cells)
-            report = screen(cells, 27)
+            report = screen(cells, machine.modules)
             if not report.ok:
                 print(f"{args.name}/{variant_label(mask_path)}: STRUCTURAL FAIL at {report.stage} — {report.reason}")
                 continue
@@ -240,6 +243,7 @@ def main() -> int:
             k=args.k,
             max_candidates=args.max_candidates,
             seed=args.seed,
+            machine_path=args.machine,
         )
         with results_path.open("a") as handle:
             handle.write(json.dumps(row) + "\n")
