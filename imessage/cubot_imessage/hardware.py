@@ -385,3 +385,146 @@ class HardwareExecutor:
         with self._lock:
             self._close()
             self._release_mutex()
+
+    # -- operator / keep-alive ------------------------------------------------
+
+    def _bus_alive(self) -> bool:
+        if self._bus is None or not self._axes:
+            return False
+        try:
+            self._bus.read_state(self._axes[0].sid)
+            return True
+        except Exception:
+            return False
+
+    def ensure_ready(self) -> dict[str, Any]:
+        """Open (or reopen) the bus and leave it held. Safe to call repeatedly."""
+        with self._lock:
+            if self._bus is not None and not self._bus_alive():
+                self.log("[hardware] bus handle dead — reopening")
+                self._close()
+            try:
+                self._open()
+            except Exception as e:
+                return {"ok": False, "online": False, "error": str(e)}
+            return {
+                "ok": True,
+                "online": True,
+                "axes": len(self._axes),
+                "power": self.power,
+                "port": getattr(getattr(self._bus, "port", None), "port", None)
+                        or self.serial_port or "",
+            }
+
+    def read_states(self) -> dict[str, Any]:
+        """Snapshot present position / from_home for every held axis. No motion."""
+        with self._lock:
+            if self._bus is None or not self._bus_alive():
+                try:
+                    self._open()
+                except Exception as e:
+                    return {"ok": False, "online": False, "error": str(e), "servos": []}
+            assert self._sts is not None
+            servos = []
+            for ax in self._axes:
+                try:
+                    st = self._bus.read_state(ax.sid)
+                    ax.update(st["position"])
+                    pos = int(st["position"])
+                    servos.append({
+                        "sid": ax.sid,
+                        "present_position": pos,
+                        "degrees": round(self._sts.steps_to_deg(pos % 4096), 2),
+                        "from_home": int(ax.from_home()),
+                        "voltage": st.get("voltage"),
+                    })
+                except Exception as e:
+                    servos.append({"sid": ax.sid, "error": str(e)})
+            return {
+                "ok": True,
+                "online": True,
+                "power": self.power,
+                "servos": servos,
+            }
+
+    def soft_zero(self) -> dict[str, Any]:
+        """Redefine software home at the current pose (no motion) and persist JSON."""
+        import json
+        from pathlib import Path
+        from .homes import homes_path  # noqa: PLC0415
+
+        with self._lock:
+            if self._bus is None or not self._bus_alive():
+                try:
+                    self._open()
+                except Exception as e:
+                    return {"ok": False, "online": False, "error": str(e)}
+            assert self._sts is not None and self._rc is not None
+            homes_rows: dict[str, Any] = {}
+            ids: list[int] = []
+            for ax in self._axes:
+                st = self._bus.read_state(ax.sid)
+                ax.update(st["position"])
+                ax.set_zero()
+                ids.append(ax.sid)
+                homes_rows[str(ax.sid)] = {
+                    "present_position": int(st["position"]),
+                    "degrees_reported": round(
+                        self._sts.steps_to_deg(st["position"] % 4096), 2),
+                    "cont_at_home": int(ax.cont),
+                    "home": int(ax.home),
+                }
+            # Also capture sid 27 if present on the bus (not in the fold chain).
+            try:
+                extra = self._bus.scan([27])
+            except Exception:
+                extra = []
+            for sid in extra:
+                if sid in ids:
+                    continue
+                try:
+                    ax = self._rc.Axis(self._bus, sid,
+                                       self._rc.Geometry(self.gear, self.limit_deg))
+                    st = self._bus.read_state(sid)
+                    ax.update(st["position"])
+                    ax.set_zero()
+                    ids.append(sid)
+                    homes_rows[str(sid)] = {
+                        "present_position": int(st["position"]),
+                        "degrees_reported": round(
+                            self._sts.steps_to_deg(st["position"] % 4096), 2),
+                        "cont_at_home": int(ax.cont),
+                        "home": int(ax.home),
+                    }
+                except Exception as e:
+                    self.log(f"[hardware] soft-zero sid={sid} skipped: {e}")
+            out_path = Path(homes_path())
+            doc = {
+                "schema": "cubot.software_homes.v1",
+                "description": (
+                    "Encoder snapshot of the straight-chain pose. The fold pipeline still "
+                    "commands state 0 / 0 deg / go(home) — never raw present_position as zero. "
+                    "On connect, Axis.home is aligned to this snapshot so from_home()==0 on "
+                    "the straight line. Recapture only with the chain physically straight."
+                ),
+                "pipeline_contract": {
+                    "handoff_state_0": "software home (straight line)",
+                    "command": "axis.go(axis.home) or home + state*steps",
+                },
+                "captured_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+                "port": self.serial_port or "",
+                "servo_ids": ids,
+                "homes": homes_rows,
+            }
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(out_path, "w", encoding="utf-8") as f:
+                json.dump(doc, f, indent=2)
+                f.write("\n")
+            self.log(f"[hardware] soft-zeroed {len(ids)} axes → {out_path} (no motion)")
+            return {
+                "ok": True,
+                "online": True,
+                "path": str(out_path),
+                "servo_ids": ids,
+                "homes": homes_rows,
+            }
