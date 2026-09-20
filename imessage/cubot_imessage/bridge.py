@@ -32,6 +32,31 @@ THINKING_EMOJI = "🤔"
 HELP_WORDS = {"help", "?", "shapes", "shape list", "what can you do", "what can you make",
               "what shapes", "commands", "menu", "list", "options"}
 
+# Exact / near-exact booth prompts for gear-safe tip demos. Checked before MiniLM so
+# "easy c" never gets stolen by letter_c → the mid-chain 7 N·m C.
+DEMO_SHAPE_PHRASES: dict[str, str] = {
+    "easy u": "easy-u", "tip u": "easy-u", "soft u": "easy-u", "demo u": "easy-u",
+    "gentle u": "easy-u", "easy-u": "easy-u",
+    "easy l": "easy-l", "tip l": "easy-l", "soft l": "easy-l", "demo l": "easy-l",
+    "gentle l": "easy-l", "easy-l": "easy-l",
+}
+
+
+def _demo_shape_from_text(text: str) -> Optional[str]:
+    """Return a handoff shape name when the text is an explicit low-torque demo prompt."""
+    key = " ".join(text.lower().strip("!?. ").replace("_", " ").replace("-", " ").split())
+    # Re-hyphenate known compact forms after normalize.
+    compact = key.replace(" ", "")
+    if key in DEMO_SHAPE_PHRASES:
+        return DEMO_SHAPE_PHRASES[key]
+    # also accept "easy-c" style after stripping to words joined
+    dashed = key.replace(" ", "-")
+    if dashed in DEMO_SHAPE_PHRASES:
+        return DEMO_SHAPE_PHRASES[dashed]
+    if compact in DEMO_SHAPE_PHRASES:
+        return DEMO_SHAPE_PHRASES[compact]
+    return None
+
 
 @dataclass
 class Outcome:
@@ -296,6 +321,23 @@ class Bridge:
             out.reply = self.help_reply()
             out.elapsed_ms = (time.perf_counter() - t0) * 1000.0
             return out
+
+        demo_shape = _demo_shape_from_text(text)
+        if demo_shape and demo_shape in self.library.names:
+            intent = IntentResult(
+                text=text, label=demo_shape, confidence=0.99, margin=0.99,
+                accepted=True,
+                caption=f"Folding gear-safe demo {demo_shape.replace('-', ' ')}",
+                who=None, latency_ms=0.0, ranked=[(demo_shape, 0.99)],
+            )
+            res = self.vocab.resolve(demo_shape, accepted=True, nearest=None,
+                                     nearest_label_map=self.playable_labels)
+            if res.ok:
+                out.via = "demo"
+                out.intent = intent
+                out.resolution = res
+                self.log(f"[demo] {text!r} -> {demo_shape} (tip-only low-torque)")
+                return self._finish_plan(out, inbound, text, intent, res, execute, t0)
 
         try:
             intent = self.classifier.classify(text)

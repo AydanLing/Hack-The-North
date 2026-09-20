@@ -66,6 +66,11 @@ CUBOT_ALIASES: dict[str, str] = {
     "television": "tv", "telly": "tv", "happy-face": "smiley", "chat-bubble": "speech-bubble",
     "moon": "crescent-moon", "wineglass": "wine-glass", "rubbish": "trash", "bin": "trash",
     "mobile": "phone", "cellphone": "phone",
+    # Gear-safe letter demos (handoff 137–138). Silhouette-verified; ≤4 cubes/move.
+    "easy-u": "easy-u", "tip-u": "easy-u", "soft-u": "easy-u", "demo-u": "easy-u",
+    "gentle-u": "easy-u",
+    "easy-l": "easy-l", "tip-l": "easy-l", "soft-l": "easy-l", "demo-l": "easy-l",
+    "gentle-l": "easy-l",
     **{f"letter-{c}": c for c in "abcdefghijklmnopqrstuvwxyz"},
     # cubot writes digits both ways depending on the run: "d0" in the exploration export, "0" in
     # parametric's registry. Accept either and canonicalise on the "d" form.

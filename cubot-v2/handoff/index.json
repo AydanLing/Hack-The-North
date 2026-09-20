@@ -7625,6 +7625,58 @@
         "cube frame",
         "cubeframe"
       ]
+    },
+    {
+      "number": 137,
+      "name": "easy-u",
+      "dir": "shapes/137-easy-u",
+      "moves": 2,
+      "complete": true,
+      "accept_profile": "gentle",
+      "tier": 0,
+      "loose_hard_ok": true,
+      "platform_hard_ok": true,
+      "strict_hard_ok": false,
+      "loose_violations": 0,
+      "human_pick": "demo-low-torque",
+      "ends_flat_on_table": false,
+      "aliases": [
+        "tip-u",
+        "soft-u",
+        "demo-u",
+        "gentle-u"
+      ],
+      "peak_demand_nm": 0.6594147683546756,
+      "holding_peak_nm": 0.2974349042351689,
+      "max_moving_modules": 3,
+      "created": "2026-09-20T06:12:17.652948+00:00",
+      "plan_notes": "Low-torque U: curl 3 tip cubes on each end the same way. Top-down silhouette is a clear U. peak\u22480.66 N\u00b7m."
+    },
+    {
+      "number": 138,
+      "name": "easy-l",
+      "dir": "shapes/138-easy-l",
+      "moves": 1,
+      "complete": true,
+      "accept_profile": "gentle",
+      "tier": 0,
+      "loose_hard_ok": true,
+      "platform_hard_ok": true,
+      "strict_hard_ok": false,
+      "loose_violations": 0,
+      "human_pick": "demo-low-torque",
+      "ends_flat_on_table": false,
+      "aliases": [
+        "tip-l",
+        "soft-l",
+        "demo-l",
+        "gentle-l"
+      ],
+      "peak_demand_nm": 1.1574246032621296,
+      "holding_peak_nm": 0.0,
+      "max_moving_modules": 4,
+      "created": "2026-09-20T06:12:17.655676+00:00",
+      "plan_notes": "Low-torque L: one 4-cube tip fold (j22 out). Side silhouette is a clear L. peak\u22481.16 N\u00b7m."
     }
   ]
 }

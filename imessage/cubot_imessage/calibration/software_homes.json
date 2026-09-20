@@ -1,11 +1,11 @@
 {
   "schema": "cubot.software_homes.v1",
-  "description": "Encoder snapshot of the straight-chain pose. This does NOT change what the fold pipeline commands: state 0 / 0 deg / go(home) is still zero. On connect, soft-home is aligned so from_home()==0 at this physical pose; motion goals stay home + delta. Recapture only with the chain physically straight.",
+  "description": "Encoder snapshot of the straight-chain pose. The fold pipeline still commands state 0 / 0 deg / go(home) \u2014 never raw present_position as zero. On connect, Axis.home is aligned to this snapshot so from_home()==0 on the straight line. Recapture only with the chain physically straight.",
   "pipeline_contract": {
     "handoff_state_0": "software home (straight line)",
-    "command": "axis.go(axis.home) or home + state*steps \u2014 never raw present_position as 'zero'"
+    "command": "axis.go(axis.home) or home + state*steps"
   },
-  "captured_at": "2026-09-20T00:09:31-0400",
+  "captured_at": "2026-09-20T01:52:52-0400",
   "port": "/dev/cu.usbmodem5B610351481",
   "servo_ids": [
     1,
@@ -38,191 +38,164 @@
   ],
   "homes": {
     "1": {
-      "present_position": 0,
-      "raw_mod": 2554,
-      "degrees_reported": 0.0,
-      "cont_at_home": 13938,
-      "home": 13938
+      "present_position": 2045,
+      "degrees_reported": 179.74,
+      "cont_at_home": 0,
+      "home": 0
     },
     "2": {
-      "present_position": 0,
-      "raw_mod": 1730,
-      "degrees_reported": 0.0,
-      "cont_at_home": 4662,
-      "home": 4662
+      "present_position": 2049,
+      "degrees_reported": 180.09,
+      "cont_at_home": 0,
+      "home": 0
     },
     "3": {
-      "present_position": 0,
-      "raw_mod": 3886,
-      "degrees_reported": 0.0,
-      "cont_at_home": 6785,
-      "home": 6785
+      "present_position": 1306,
+      "degrees_reported": 114.79,
+      "cont_at_home": 0,
+      "home": 0
     },
     "4": {
-      "present_position": 0,
-      "raw_mod": 109,
-      "degrees_reported": 0.0,
-      "cont_at_home": -9059,
-      "home": -9059
+      "present_position": 2048,
+      "degrees_reported": 180.0,
+      "cont_at_home": 0,
+      "home": 0
     },
     "5": {
-      "present_position": 0,
-      "raw_mod": 3082,
-      "degrees_reported": 0.0,
-      "cont_at_home": 1621,
-      "home": 1621
+      "present_position": 2185,
+      "degrees_reported": 192.04,
+      "cont_at_home": 0,
+      "home": 0
     },
     "6": {
-      "present_position": 0,
-      "raw_mod": 3467,
-      "degrees_reported": 0.0,
-      "cont_at_home": 1503,
-      "home": 1503
+      "present_position": 4071,
+      "degrees_reported": 357.8,
+      "cont_at_home": 0,
+      "home": 0
     },
     "7": {
-      "present_position": 4,
-      "raw_mod": 3723,
-      "degrees_reported": 0.35,
-      "cont_at_home": 1548,
-      "home": 1548
+      "present_position": 2077,
+      "degrees_reported": 182.55,
+      "cont_at_home": 0,
+      "home": 0
     },
     "8": {
-      "present_position": 4095,
-      "raw_mod": 1167,
-      "degrees_reported": 359.91,
-      "cont_at_home": -1083,
-      "home": -1083
+      "present_position": 2040,
+      "degrees_reported": 179.3,
+      "cont_at_home": 0,
+      "home": 0
     },
     "9": {
-      "present_position": 4095,
-      "raw_mod": 835,
-      "degrees_reported": 359.91,
-      "cont_at_home": -749,
-      "home": -749
+      "present_position": 2049,
+      "degrees_reported": 180.09,
+      "cont_at_home": 0,
+      "home": 0
     },
     "10": {
-      "present_position": 0,
-      "raw_mod": 825,
-      "degrees_reported": 0.0,
-      "cont_at_home": -739,
-      "home": -739
+      "present_position": 2050,
+      "degrees_reported": 180.18,
+      "cont_at_home": 0,
+      "home": 0
     },
     "11": {
-      "present_position": 0,
-      "raw_mod": 3680,
-      "degrees_reported": 0.0,
-      "cont_at_home": 5919,
-      "home": 5919
+      "present_position": 1814,
+      "degrees_reported": 159.43,
+      "cont_at_home": 0,
+      "home": 0
     },
     "12": {
-      "present_position": 0,
-      "raw_mod": 1666,
-      "degrees_reported": 0.0,
-      "cont_at_home": -1567,
-      "home": -1567
+      "present_position": 2048,
+      "degrees_reported": 180.0,
+      "cont_at_home": 0,
+      "home": 0
     },
     "13": {
-      "present_position": 0,
-      "raw_mod": 2314,
-      "degrees_reported": 0.0,
-      "cont_at_home": 352,
-      "home": 352
+      "present_position": 1775,
+      "degrees_reported": 156.01,
+      "cont_at_home": 0,
+      "home": 0
     },
     "14": {
-      "present_position": 2903,
-      "raw_mod": 2988,
-      "degrees_reported": 255.15,
-      "cont_at_home": 97,
-      "home": 97
+      "present_position": 2051,
+      "degrees_reported": 180.26,
+      "cont_at_home": 0,
+      "home": 0
     },
     "15": {
-      "present_position": 0,
-      "raw_mod": 4065,
-      "degrees_reported": 0.0,
-      "cont_at_home": -6077,
-      "home": -6077
+      "present_position": 2048,
+      "degrees_reported": 180.0,
+      "cont_at_home": 0,
+      "home": 0
     },
     "16": {
-      "present_position": 0,
-      "raw_mod": 3434,
-      "degrees_reported": 0.0,
-      "cont_at_home": 1606,
-      "home": 1606
+      "present_position": 2048,
+      "degrees_reported": 180.0,
+      "cont_at_home": 0,
+      "home": 0
     },
     "17": {
-      "present_position": 4095,
-      "raw_mod": 3892,
-      "degrees_reported": 359.91,
-      "cont_at_home": 1680,
-      "home": 1680
+      "present_position": 2047,
+      "degrees_reported": 179.91,
+      "cont_at_home": 0,
+      "home": 0
     },
     "18": {
-      "present_position": 0,
-      "raw_mod": 363,
-      "degrees_reported": 0.0,
-      "cont_at_home": -418,
-      "home": -418
+      "present_position": 2049,
+      "degrees_reported": 180.09,
+      "cont_at_home": 0,
+      "home": 0
     },
     "19": {
-      "present_position": 0,
-      "raw_mod": 3240,
-      "degrees_reported": 0.0,
-      "cont_at_home": 1495,
-      "home": 1495
+      "present_position": 2047,
+      "degrees_reported": 179.91,
+      "cont_at_home": 0,
+      "home": 0
     },
     "20": {
-      "present_position": 0,
-      "raw_mod": 2775,
-      "degrees_reported": 0.0,
-      "cont_at_home": -352,
-      "home": -352
+      "present_position": 2047,
+      "degrees_reported": 179.91,
+      "cont_at_home": 0,
+      "home": 0
     },
     "21": {
-      "present_position": 0,
-      "raw_mod": 1859,
-      "degrees_reported": 0.0,
+      "present_position": 2048,
+      "degrees_reported": 180.0,
       "cont_at_home": 0,
       "home": 0
     },
     "22": {
-      "present_position": 3095,
-      "raw_mod": 3180,
-      "degrees_reported": 272.02,
+      "present_position": 2046,
+      "degrees_reported": 179.82,
       "cont_at_home": 0,
       "home": 0
     },
     "23": {
-      "present_position": 0,
-      "raw_mod": 1425,
-      "degrees_reported": 0.0,
+      "present_position": 2047,
+      "degrees_reported": 179.91,
       "cont_at_home": 0,
       "home": 0
     },
     "24": {
-      "present_position": 2565,
-      "raw_mod": 2650,
-      "degrees_reported": 225.44,
+      "present_position": 2050,
+      "degrees_reported": 180.18,
       "cont_at_home": 0,
       "home": 0
     },
     "25": {
-      "present_position": 0,
-      "raw_mod": 1445,
-      "degrees_reported": 0.0,
+      "present_position": 2046,
+      "degrees_reported": 179.82,
       "cont_at_home": 0,
       "home": 0
     },
     "26": {
-      "present_position": 0,
-      "raw_mod": 2311,
-      "degrees_reported": 0.0,
+      "present_position": 2048,
+      "degrees_reported": 180.0,
       "cont_at_home": 0,
       "home": 0
     },
     "27": {
-      "present_position": 3607,
-      "raw_mod": 3692,
-      "degrees_reported": 317.02,
+      "present_position": 2047,
+      "degrees_reported": 179.91,
       "cont_at_home": 0,
       "home": 0
     }
