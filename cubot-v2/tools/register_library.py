@@ -53,6 +53,8 @@ def main() -> int:
     parser.add_argument("--library", type=Path, default=parametric.LIBRARY_ROOT)
     parser.add_argument("--category", default="misc", help="category for names missing from the concepts file")
     parser.add_argument("--replace", action="store_true", help="overwrite entries already in the library")
+    parser.add_argument("--skip-registered", action="store_true",
+                        help="skip (with a note) names already hand-registered in parametric._PATTERNS instead of aborting")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
@@ -82,6 +84,9 @@ def main() -> int:
         if sum(row.count("#") for row in rows) != 27:
             raise SystemExit(f"{name}: record target is not a 27-cell mask")
         if name in hand_names:
+            if args.skip_registered:
+                print(f"  {name}: already hand-registered in parametric._PATTERNS; skipped")
+                continue
             raise SystemExit(f"{name}: already registered by hand in parametric._PATTERNS; edit that entry instead")
         if name in library_names and not args.replace:
             raise SystemExit(f"{name}: already in the library (use --replace)")

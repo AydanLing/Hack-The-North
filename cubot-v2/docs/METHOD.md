@@ -162,6 +162,61 @@ written as `handoff/shapes/NN-<name>/` with `path.json`, `moves.csv`,
 manifest/`--shape` entries (useful for a scratch export). Duplicate names are
 refused rather than silently renumbered.
 
+## At scale — the library run (2026-09-19)
+
+The same pipeline, run for ~280 everyday-icon concepts at once
+(`docs/LIBRARY-20260919.md`), needed four additions. None of them changes the
+gate, the fold or the human pick; they ration the expensive step and keep the
+blind test honest.
+
+```
+data/library-concepts.json                       0. concepts: name, category, aliases, priority
+docs/library-20260919/worker-brief.md            1. draw   (one worker per category; brief is committed)
+tools/design_search.py                              repair: exhaustive chain walk inside a '#'/'?'/'+' ideal
+tools/blind_judge.py sheets --threadable-only    2. gate + render tiles *as drawn* on numbered blind sheets
+tools/blind_judge.py judge --backend import|api  3. blind naming by judges who never saw the concept list
+tools/blind_judge.py queue --per-concept 2       4. fold queue: only variants the judge named
+tools/explore_batch.py --workers 3               5. fold queue, resume-safe; --retry-violating at 240 s
+tools/explore_summary.py --prefer NAME=VARIANT   6. summarize (prefer a better-reading variant)
+tools/register_library.py --manifest ... --only  7. register picks as data/library/<category>/<name>.txt
+tools/export_handoff.py --manifest               8. hand off, unchanged
+```
+
+- **Repair by exhaustive walk.** `design_search.py` walks the 27-module chain
+  under the real roll tables (`cubot.lattice.DIRS/POST`) inside the cells of an
+  ideal sketch (`#` required, `?` optional, `+` preferred), from every start
+  cell and base, and confirms each footprint through the gate. It answers
+  "which drawings near this one can the chain be" in seconds and proves the
+  negative (0 footprints) instead of sampling. Keep regions to ~20–30 optional
+  cells and `--nodes 500000`; a 40-cell free region runs for an hour. Three
+  workers independently rebuilt this walk before it was in the repo.
+- **Judge before folding.** Folding costs ~3 min per mask; a blind name costs
+  nothing. `blind_judge.py sheets` renders the threadable masks straight from
+  their rows (`cubot.viz.render_silhouette` projects onto the two longest
+  axes and *transposes tall drawings* — the first library judge pass was
+  invalid for that reason) onto shuffled, numbered sheets; fresh-context
+  reviewers (or the Claude vision judge, `--backend api`) name every tile;
+  `label_matches` against the concept's aliases decides what is queued.
+  The judge filters and orders; the human pick still decides.
+- **Queue the folds.** `explore_batch.py` runs `explore_one` under a
+  3-process pool, appends to `<out>/<category>/results.jsonl` exactly like the
+  single-shape driver, skips rows that already exist, and `--retry-violating`
+  re-folds every threadable non-passing row into `<out>/verify/` at 240 s.
+- **File-backed registry.** Winners become
+  `data/library/<category>/<name>.txt` (mask rows plus `// aliases:` and
+  `// variant:` headers), loaded by `cubot.generate.parametric` after the
+  hand-maintained entries; `ICON_NAMES` keeps its order contract and the
+  registry test threads every entry.
+
+What the library run taught about the drawing step, beyond the round-1 rules:
+exactly symmetric silhouettes almost always fail parity or the roll (the
+winner is the one-cell-off-centre neighbour); a 1-wide stalk must land on the
+*end* cell of a wider block, never its middle; the two chain ends are the only
+two 1-wide tips a drawing gets, so rays, legs, prongs, spikes and crossings
+are out; and the blind judge names far fewer masks than their authors expect
+(57 of 241 concepts after round 1, 81 after a feedback round), so plan for
+the judge's labels to drive a second drawing round.
+
 ## When to use something else
 
 | Situation | Use |
