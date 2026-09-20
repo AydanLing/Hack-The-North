@@ -85,7 +85,7 @@ def harvest(
     icons: Sequence[str] = DEMO_NAMES,
     seed: int = 0,
     duration_s: float = 30.0 * 60.0,
-    profile: str = "loose",
+    profile: str = "easy",
     strict_profile: str = "strict",
     k: int = 5,
     beam_width: int = 1200,

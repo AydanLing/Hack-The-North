@@ -540,7 +540,7 @@ def replay(
     """
 
     machine = machine or load_machine()
-    profile = profile or load_profile("loose")
+    profile = profile or load_profile("easy")
     if start.roll != machine.roll:
         machine = replace(machine, roll=start.roll)
     pose = start
@@ -584,7 +584,7 @@ def replay_direct_goal(
     """
 
     machine = machine or load_machine()
-    profile = profile or load_profile("loose")
+    profile = profile or load_profile("easy")
     cursor = start
     moves: list[Move] = []
     joint_order = sorted(
@@ -718,7 +718,7 @@ def fold(
 
     started = time.monotonic()
     machine = machine or load_machine()
-    profile = profile or load_profile("loose")
+    profile = profile or load_profile("easy")
     if start.roll != goal.roll:
         raise ValueError("start and goal roll words differ")
     if start.roll != machine.roll:

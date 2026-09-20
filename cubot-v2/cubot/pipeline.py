@@ -245,7 +245,7 @@ def run_pipeline(
     out_dir: str | Path,
     *,
     machine: Machine | None = None,
-    profile: str | Profile = "loose",
+    profile: str | Profile = "easy",
     strict_profile: str | Profile = "strict",
     seed: int = 0,
     k: int = 5,

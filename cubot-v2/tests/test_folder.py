@@ -284,7 +284,7 @@ def test_heart_certificate_replays_exact_moves_and_assist_note() -> None:
 
 
 def test_real_heart_certificate_passes_loose_checks_and_reports_balance() -> None:
-    candidate = replay_heart()
+    candidate = replay_heart(profile=load_profile("loose"))
     assert candidate.complete and candidate.hard_ok
     assert candidate.violations == []
     assert "balance" in candidate.scores

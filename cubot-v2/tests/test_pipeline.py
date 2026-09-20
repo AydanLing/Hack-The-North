@@ -66,11 +66,11 @@ def test_pipeline_writes_checked_records_and_both_profiles(tmp_path: Path) -> No
     loose = json.loads(run.loose_report_path.read_text())
     strict = json.loads(run.strict_report_path.read_text())
     checked = json.loads(run.raw_plan_path.read_text())
-    assert loose["profile"] == "loose"
+    assert loose["profile"] == "easy"
     assert strict["profile"] == "strict"
     assert loose["summary"]["complete_passing"] >= 1
     assert checked["schema"] == "cubot.checked-plan.v1"
-    assert set(checked["profile_reports"]) == {"loose", "strict"}
+    assert set(checked["profile_reports"]) == {"easy", "strict"}
 
 
 def test_harvest_is_seeded_and_resumes_completed_icons(tmp_path: Path) -> None:

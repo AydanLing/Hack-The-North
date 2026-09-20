@@ -1,0 +1,27 @@
+# Hardware-safe planning profile: the printed 4:1 gears skip well below the
+# 10.6 N·m electrical stall, so torque limits here are ~28% of stall.  The
+# planner hard-rejects any move whose static peak exceeds ``torque_stall_nm``
+# and any pose that makes a non-moving joint hold more than ``holding_hard_nm``
+# (a holding joint skips exactly like a moving one).  For scale: the shipped
+# gear-safe demos peak at 0.7-1.2 N·m and a straight 7-module cantilever at
+# worst lever arm costs 2.9 N·m — anything heavier must stay on the table.
+# Geometry gates match ``gentle``; the search budget is larger because the
+# tight torque gate forces detour-heavy routes (curl before lifting).
+[profile]
+sweep_step_deg = 4.0
+hard_penetration_mm = 6.0
+soft_penetration_mm = 1.0
+pivot_dip_exempt_mm = 3.0
+ground_soft_mm = 3.0
+ground_hard_mm = 15.0
+# Soft target: full torque score only below 1.5 N·m; hard reject above 3.0.
+torque_cap_nm = 1.5
+torque_stall_nm = 3.0
+balance_margin_mm = 0.0
+fold_budget_s = 120.0
+node_budget = 500000
+detour_budget = 16
+side_ambiguity_ratio = 0.85
+holding_hard_nm = 3.0
+pivot_dip_hard_mm = 25.0
+balance_hard_mm = -50.0

@@ -99,6 +99,7 @@ def test_general_folder_rediscovers_a_distinct_loose_heart_within_60_seconds() -
     result = fold(
         certificate.start,
         certificate.goal,
+        profile=load_profile("loose"),
         time_budget_s=60.0,
         node_budget=200_000,
         detour_budget=0,
@@ -234,8 +235,8 @@ def test_pipeline_writes_self_contained_checked_plan_json(tmp_path: Path) -> Non
     assert len(raw["start"]["states"]) == machine.joints
     assert len(raw["goal"]["states"]) == machine.joints
     assert len(raw["moves"]) == 16
-    assert {"loose", "strict"} == set(raw["profile_reports"])
-    assert raw["profile_reports"]["loose"]["hard_ok"] is True
+    assert {"easy", "strict"} == set(raw["profile_reports"])
+    assert raw["profile_reports"]["easy"]["hard_ok"] is True
     assert raw["profile_reports"]["strict"]["hard_ok"] is True
     assert all(
         {"joint", "delta", "side", "duration_s", "checks"} <= move.keys()
@@ -245,7 +246,7 @@ def test_pipeline_writes_self_contained_checked_plan_json(tmp_path: Path) -> Non
     meta = raw["meta"]
     assert meta["roll"] == machine.roll
     assert meta["pitch_mm"] == machine.pitch_mm
-    assert meta["profile"] == "loose"
+    assert meta["profile"] == "easy"
     assert meta["seed"] == 23
     assert meta["config_hash"]
     assert meta["source_hash"]

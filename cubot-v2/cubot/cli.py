@@ -433,7 +433,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     command = commands.add_parser("fold", help="search a checked fold order")
     command.add_argument("goal", help="icon name or pose JSON")
-    command.add_argument("--profile", default="loose")
+    command.add_argument("--profile", default="easy")
     command.add_argument("--roll")
     command.add_argument("--base", type=int, default=0)
     command.add_argument("--seed", type=int, default=0)
@@ -449,7 +449,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     command = commands.add_parser("check", help="replay and recheck an explicit plan")
     command.add_argument("plan", help="heart or checked-plan/record JSON")
-    command.add_argument("--profile", default="loose")
+    command.add_argument("--profile", default="easy")
     command.add_argument("--candidate", type=int, default=0)
     command.set_defaults(handler=_cmd_check)
 
@@ -467,7 +467,7 @@ def build_parser() -> argparse.ArgumentParser:
     command = commands.add_parser("pipeline", help="run one complete offline icon pipeline")
     command.add_argument("icon", choices=ICON_NAMES)
     command.add_argument("--out", type=Path, default=Path("runs"))
-    command.add_argument("--profile", default="loose")
+    command.add_argument("--profile", default="easy")
     command.add_argument("--strict-profile", default="strict")
     command.add_argument(
         "--strict-report",
@@ -491,7 +491,7 @@ def build_parser() -> argparse.ArgumentParser:
     command.add_argument("--out", type=Path, default=Path("harvest"))
     command.add_argument("--icons", nargs="*", choices=ICON_NAMES)
     command.add_argument("--duration", type=float, default=1800.0)
-    command.add_argument("--profile", default="loose")
+    command.add_argument("--profile", default="easy")
     command.add_argument("--strict-profile", default="strict")
     command.add_argument("--seed", type=int, default=0)
     command.add_argument("-k", type=int, default=5)

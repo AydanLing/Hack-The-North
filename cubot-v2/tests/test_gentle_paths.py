@@ -117,3 +117,27 @@ def test_balance_hard_rejects_large_overhang(monkeypatch) -> None:
     loose = load_profile("loose")
     monkeypatch.setattr(geometry, "balance_margin", lambda *a, **k: -80.0)
     assert geometry.score_balance(pose, machine, loose).hard["balance_hard"][0] is True
+
+
+def test_easy_profile_caps_are_a_small_fraction_of_gearbox_stall() -> None:
+    from cubot.config import load_machine
+
+    easy = load_profile("easy")
+    stall = load_machine().stall_torque_nm
+    assert easy.torque_stall_nm <= 0.3 * stall
+    assert easy.torque_cap_nm <= 0.15 * stall
+    assert easy.holding_hard_nm <= 0.3 * stall
+    assert easy.torque_cap_nm < easy.torque_stall_nm
+
+
+def test_easy_hard_rejects_moves_loose_would_accept() -> None:
+    from dataclasses import replace
+
+    easy = load_profile("easy")
+    loose = load_profile("loose")
+    heavy = _moment(holding_peak_nm=1.0)  # static peak 4.0 N·m, demand 4.5 N·m
+    assert score(heavy, loose).hard["torque_stall"][0] is True
+    assert score(heavy, easy).hard["torque_stall"][0] is False
+    assert score(replace(heavy, holding_peak_nm=4.0), easy).hard["holding_hard"][0] is False
+    light = replace(heavy, static_peak_nm=1.0, peak_demand_nm=1.2)
+    assert score(light, easy).hard_ok is True
