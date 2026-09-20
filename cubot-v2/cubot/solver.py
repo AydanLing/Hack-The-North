@@ -39,8 +39,10 @@ class Threading:
             raise ValueError("threading states must be physical positions in {-1, 0, +1}")
 
     def as_pose(self, roll: str, *, lying: int | None = None) -> Pose:
-        if len(self.states) != 26:
-            raise ValueError("only a 27-module threading can be converted to Pose")
+        if len(self.states) != len(roll):
+            raise ValueError(
+                f"threading has {len(self.states)} joints but roll has {len(roll)} digits"
+            )
         return Pose(states=self.states, roll=roll, base=self.base, lying=lying)
 
 
@@ -67,7 +69,7 @@ class SolveResult:
     def poses(self) -> tuple[Pose, ...]:
         """Machine-size solutions as public :class:`~cubot.records.Pose`s."""
 
-        if not self.solutions or len(self.solutions[0].states) != 26:
+        if not self.solutions or len(self.solutions[0].states) != len(self.roll):
             return ()
         return tuple(solution.as_pose(self.roll) for solution in self.solutions)
 

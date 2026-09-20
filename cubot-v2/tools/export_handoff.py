@@ -231,7 +231,7 @@ def export_shape(name: str, number: int, run_dir: Path, out_dir: Path, machine, 
     ends_flat = ends_flat_on_table(replayed)
     if [list(c) for c in goal_cells] != [list(c) for c in record["cells"]]:
         raise ValueError(f"{name}: goal FK cells differ from the record's cells")
-    if len(set(goal_cells)) != 27:
+    if len(set(goal_cells)) != machine.modules:
         raise ValueError(f"{name}: goal is not self-avoiding")
 
     # Find this exact move sequence in each profile report so the strict verdict
@@ -326,9 +326,9 @@ def export_shape(name: str, number: int, run_dir: Path, out_dir: Path, machine, 
             "roll": start.roll,
             "module_solid": "../../module_solid.json",
         },
-        "conventions": "See ../../README.md (section 'Conventions'). Short form: 26 joints for 27 modules; joint i is "
+        "conventions": "See ../../README.md (section 'Conventions'). Short form: (N-1) joints for N modules; joint i is "
         "the hinge inside module i (0-based) on its (1,1,1) body diagonal; states -1/0/+1 = -120/0/+120 deg; a "
-        "move is one detent; side 'out' = tail modules (i+1..26 plus the moving half of i) swing, side 'in' = base "
+        "move is one detent; side 'out' = tail modules (i+1..N-1 plus the moving half of i) swing, side 'in' = base "
         "modules (0..i-1 plus the still half of i) swing while the tail stays put.",
         "start": _pose_json(start),
         "goal": {
@@ -522,9 +522,12 @@ def main() -> int:
     parser.add_argument("--shape", action="append", default=[], metavar="NAME=RUN_DIR",
                         help="append one shape from a pipeline run directory holding record.json")
     parser.add_argument("--no-demo", action="store_true", help="export only --manifest/--shape entries")
+    parser.add_argument("--machine", type=Path, default=None,
+                        help="machine.toml to export against (default: config/machine.toml)")
     args = parser.parse_args()
 
-    machine = load_machine()
+    machine_path = args.machine if args.machine is not None else ROOT / "config" / "machine.toml"
+    machine = load_machine(machine_path)
     profiles = {}
     for name in PROFILE_NAMES:
         if not (ROOT / "config" / "profiles" / f"{name}.toml").is_file():
@@ -534,7 +537,7 @@ def main() -> int:
 
     args.out.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(ROOT / "data" / "solids" / "module.json", args.out / "module_solid.json")
-    machine_raw = tomllib.loads((ROOT / "config" / "machine.toml").read_text())["machine"]
+    machine_raw = tomllib.loads(machine_path.read_text())["machine"]
     (args.out / "machine.json").write_text(json.dumps({
         "schema": "cubot.handoff.machine.v1",
         **machine_raw,

@@ -128,7 +128,7 @@ def _box(value: str) -> int | tuple[int, int]:
 def _family_matches(family: Family) -> Iterable[tuple[Pose, Sequence[tuple[int, int, int]]]]:
     axes = tuple(axis for axis in range(3) if axis != family.plane_axis)
     for states, flat_cells in zip(family.states, family.cells, strict=True):
-        if len(states) != 26:
+        if len(states) != len(family.roll):
             continue
         cells: list[tuple[int, int, int]] = []
         for first, second in flat_cells:

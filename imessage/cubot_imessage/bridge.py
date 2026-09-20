@@ -122,7 +122,16 @@ class Bridge:
         self.classifier = classifier or Classifier.from_settings(settings)
         self.vocab = vocabulary or Vocabulary(settings.handoff_dir)
         self.library = library or ShapeLibrary(settings.handoff_dir)
-        self.executor = executor or build_executor(settings.executor, log=log)
+        self.executor = executor or build_executor(
+            settings.executor, log=log,
+            hw_root=getattr(settings, "hw_root", ""),
+            serial_port=getattr(settings, "serial_port", ""),
+            gear=getattr(settings, "gear", 4.0),
+            power=getattr(settings, "power", 3),
+            mirror_mujoco=getattr(settings, "mirror_mujoco", True),
+            scene_xml=getattr(settings, "scene_xml", ""),
+            n_modules=getattr(settings, "n_modules", None),
+        )
         self.client = client
         self._playable_labels: Optional[dict[str, str]] = None
         self.react_on_receive = bool(getattr(settings, "react_on_receive", True))
@@ -192,7 +201,7 @@ class Bridge:
         return ", ".join(names[:limit]) + f" and {len(names) - limit} more"
 
     def help_reply(self) -> str:
-        return (f"I'm CuBot — 27 cubes on a chain. Text me a shape and I'll fold into it.\n"
+        return (f"I'm CuBot — 17 cubes on a chain. Text me a shape and I'll fold into it.\n"
                 f"I know {len(self.vocab.playable_concepts)} shapes: {self.shape_list()}.\n"
                 f"Plain English works: \"show Hack the North some love\", \"point at the judges\".")
 

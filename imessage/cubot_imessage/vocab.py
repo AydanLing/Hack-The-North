@@ -178,7 +178,7 @@ class Vocabulary:
     def load(self) -> "Vocabulary":
         if not os.path.isfile(self.index_path):
             raise FileNotFoundError(
-                f"no handoff index at {self.index_path}. Point CUBOT_HANDOFF_DIR at cubot-v2/handoff, "
+                f"no handoff index at {self.index_path}. Point CUBOT_HANDOFF_DIR at cubot-v2/handoff-17, "
                 f"or regenerate it with `uv run python tools/export_handoff.py`."
             )
         with open(self.index_path, encoding="utf-8") as f:

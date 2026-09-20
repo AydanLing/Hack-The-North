@@ -14,7 +14,7 @@ Timing and torque come from Jerry's snake_pipeline hardware contract, not demo f
 * Module mass stays whatever the MJCF was built with (0.250 kg in ``cubot_urdf``; path.json
   records 0.223 — same order; we do not reskin the mesh mid-demo).
 
-    mjpython -m cubot_imessage.mujoco_replay --path cubot-v2/handoff/shapes/01-heart/path.json
+    mjpython -m cubot_imessage.mujoco_replay --path cubot-v2/handoff-17/shapes/01-heart/path.json
 """
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ from typing import Optional, Sequence
 DETENT_RAD = {-1: -math.radians(120.0), 0: 0.0, 1: math.radians(120.0)}
 DEFAULT_SCENE = os.path.join(
     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-    "cubot_urdf", "scene.xml",
+    "cubot_urdf", "n17", "scene.xml",
 )
 
 # ---- snake_pipeline / HARDWARE.md / robot_config.json ---------------------------------
@@ -101,17 +101,29 @@ def _machine_limits(doc: dict) -> tuple[float, float, float]:
 
 
 def _servo_ids(model) -> tuple[list[int], list[int]]:
+    """Discover servo01..servoNN actuators present in the MJCF (N-generic)."""
     import mujoco
     addrs, acts = [], []
-    for i in range(1, 27):
+    i = 1
+    while True:
         name = f"servo{i:02d}"
         jid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_JOINT, name)
         aid = mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_ACTUATOR, name)
         if jid < 0 or aid < 0:
-            raise RuntimeError(f"{name} missing from the MJCF (joint={jid}, actuator={aid})")
+            break
         addrs.append(int(model.jnt_qposadr[jid]))
         acts.append(int(aid))
+        i += 1
+    if not addrs:
+        raise RuntimeError("no servo01.. actuators found in the MJCF")
     return addrs, acts
+
+
+def _pad_states(states: Sequence[int], n: int) -> list[int]:
+    out = [int(s) for s in states]
+    if len(out) < n:
+        out.extend([0] * (n - len(out)))
+    return out[:n]
 
 
 def _states_from_qpos(data, addrs: Sequence[int]) -> list[int]:
@@ -213,9 +225,10 @@ def replay(path_json: str, scene_xml: str = DEFAULT_SCENE, speed: float = 1.0,
     data = mujoco.MjData(model)
     _apply_hardware_actuators(model, stall_nm, mass_kg)
     addrs, acts = _servo_ids(model)
+    n_servos = len(acts)
 
     mujoco.mj_resetData(model, data)
-    _set_all_ctrl(data, acts, [0] * 26)
+    _set_all_ctrl(data, acts, _pad_states([0] * n_servos, n_servos))
     mujoco.mj_forward(model, data)
 
     # Precompute wall times so the banner is honest.
@@ -257,7 +270,9 @@ def replay(path_json: str, scene_xml: str = DEFAULT_SCENE, speed: float = 1.0,
                   f"side={move.get('side', '?')}  "
                   f"plan {planned:.1f}s → wall {duration:.1f}s", flush=True)
 
-            current = _states_from_qpos(data, addrs)
+            current = _pad_states(_states_from_qpos(data, addrs), n_servos)
+            if joint < 0 or joint >= n_servos:
+                raise ValueError(f"joint {joint} out of range 0..{n_servos - 1}")
             current[joint] = before
             _set_all_ctrl(data, acts, current)
             # Motion portion of the wall time; settle is applied after.

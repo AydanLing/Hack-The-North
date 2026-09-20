@@ -1,0 +1,16 @@
+[machine]
+modules = 11
+side_mm = 80.0
+gap_mm = 2.0
+chamfer_mm = 8.0
+# Modules 1..11 from the wire-end (module 1); cut after cube 11.
+roll = "1200130013"
+mass_kg = 0.223
+stall_torque_nm = 10.6
+move_time_s = 2.0
+joint_angle_deg = 120.0
+joint_min_position = -1
+joint_max_position = 1
+tether_length_mm = 82.0
+tether_width_mm = 40.0
+tether_facets = 4

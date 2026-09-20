@@ -71,7 +71,7 @@ from scipy.spatial import ConvexHull, HalfspaceIntersection
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 # ----------------------------------------------------------------------------- parameters
-N_MODULES   = 27
+N_MODULES   = int(os.environ.get("CUBOT_N_MODULES", "27"))
 CUBE        = 0.080          # m, cube edge
 CHAMFER     = 0.008          # m, chamfer leg on the six equatorial edges (design value; printed = 0.00785)
 GAP         = 0.0022         # m, face-to-face gap between neighbouring modules
@@ -79,7 +79,11 @@ PITCH       = CUBE + GAP     # m, centre-to-centre = 0.0822
 SPACER      = (0.0022, 0.050, 0.050)   # m, (thickness along X, width Y, width Z) of the interface spacer
 MODULE_MASS = 0.250          # kg per module
 HALF_MASS   = MODULE_MASS / 2
-ROLL_WORD   = "12001300133101230333233210"     # presets/shipped.json; digit k = mount roll of module k+2 vs k+1
+# Full shipped roll (26 digits). Truncated to N_MODULES-1 when building a shorter chain
+# from the wire-end (module 1) toward the tip.
+ROLL_WORD_FULL = "12001300133101230333233210"
+ROLL_WORD   = os.environ.get("CUBOT_ROLL", ROLL_WORD_FULL[: N_MODULES - 1])
+OUT_DIR     = os.environ.get("CUBOT_URDF_OUT", HERE)
 
 # The wires out of module 1's bottom face: a rigid, massless keep-out cylinder on m01_still (see WIRES above).
 WIRE_DIAMETER = 0.020        # m
@@ -109,12 +113,15 @@ COL_WIRES = "0.86 0.15 0.15 1"                                                  
 
 
 def roll_word():
-    """Prefer the live shipped.json; fall back to the literal, and refuse a mismatch."""
-    p = os.path.join(HERE, "..", "CuBot", "presets", "shipped.json")
-    if os.path.exists(p):
-        w = "".join(str(d) for d in json.load(open(p))["roll"])
-        assert w == ROLL_WORD, f"shipped.json roll {w} != ROLL_WORD {ROLL_WORD}: update ROLL_WORD"
-    assert len(ROLL_WORD) == N_MODULES - 1 and set(ROLL_WORD) <= set("0123")
+    """Prefer the live shipped.json when building the full 27-chain; else use ROLL_WORD."""
+    if N_MODULES == 27:
+        p = os.path.join(HERE, "..", "CuBot", "presets", "shipped.json")
+        if os.path.exists(p):
+            w = "".join(str(d) for d in json.load(open(p))["roll"])
+            assert w == ROLL_WORD_FULL, f"shipped.json roll {w} != ROLL_WORD_FULL {ROLL_WORD_FULL}: update ROLL_WORD_FULL"
+    assert len(ROLL_WORD) == N_MODULES - 1 and set(ROLL_WORD) <= set("0123"), (
+        f"roll {ROLL_WORD!r} len={len(ROLL_WORD)} but N_MODULES-1={N_MODULES-1}"
+    )
     return [int(d) for d in ROLL_WORD]
 
 
@@ -389,14 +396,29 @@ def main():
     print(f"wires : {WIRE_DIAMETER*1000:.0f} mm dia x {WIRE_LENGTH*1000:.0f} mm keep-out cylinder on m01_still, "
           f"z {(WIRE_CENTRE_Z - WIRE_LENGTH/2)*1000:.0f}..{(WIRE_CENTRE_Z + WIRE_LENGTH/2)*1000:.0f} mm; "
           f"MJCF lay-down rolled {LAY_ROLL * 90} deg about +X")
-    with open(os.path.join(HERE, "cubot_shipped.urdf"), "w") as f:
+    out = OUT_DIR
+    os.makedirs(out, exist_ok=True)
+    mesh_dir = os.path.join(out, "meshes")
+    os.makedirs(mesh_dir, exist_ok=True)
+    # Reuse shared half meshes from the primary tree when writing a short-chain out dir.
+    for name in ("moving", "still"):
+        src = os.path.join(HERE, "meshes", f"{name}.stl")
+        dst = os.path.join(mesh_dir, f"{name}.stl")
+        if os.path.abspath(src) != os.path.abspath(dst) and os.path.isfile(src):
+            import shutil
+            shutil.copy2(src, dst)
+        elif not os.path.isfile(dst):
+            V = polytope_vertices(+1 if name == "moving" else -1)
+            tris = hull_triangles(V)
+            write_stl(dst, tris)
+    with open(os.path.join(out, "cubot_shipped.urdf"), "w") as f:
         f.write(build_urdf(roll, props))
-    with open(os.path.join(HERE, "cubot_shipped.xml"), "w") as f:
+    with open(os.path.join(out, "cubot_shipped.xml"), "w") as f:
         f.write(build_mjcf(roll, props))
-    with open(os.path.join(HERE, "scene.xml"), "w") as f:
+    with open(os.path.join(out, "scene.xml"), "w") as f:
         f.write(SCENE)
-    print(f"wrote cubot_shipped.urdf, cubot_shipped.xml, scene.xml, meshes/still.stl, meshes/moving.stl "
-          f"(roll {''.join(map(str, roll))}, pitch {PITCH*1000:.1f} mm)")
+    print(f"wrote {out}/cubot_shipped.urdf, cubot_shipped.xml, scene.xml  "
+          f"(N={N_MODULES}, roll {''.join(map(str, roll))}, pitch {PITCH*1000:.1f} mm)")
 
 
 if __name__ == "__main__":

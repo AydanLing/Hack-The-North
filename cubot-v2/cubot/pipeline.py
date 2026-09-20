@@ -71,7 +71,7 @@ def _family_entries(family: Family) -> Iterable[tuple[Pose, tuple[tuple[int, int
 
     axes = tuple(axis for axis in range(3) if axis != family.plane_axis)
     for states, cells_2d in zip(family.states, family.cells, strict=True):
-        if len(states) != 26:
+        if len(states) != len(family.roll):
             continue
         cells: list[tuple[int, int, int]] = []
         for first, second in cells_2d:

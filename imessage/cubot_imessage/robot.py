@@ -285,7 +285,7 @@ class MujocoExecutor:
 
     def __init__(self, scene_xml: str = "", python_exe: str = "", speed: float = 1.0, log=print):
         from .config import REPO_ROOT
-        self.scene_xml = scene_xml or os.path.join(REPO_ROOT, "cubot_urdf", "scene.xml")
+        self.scene_xml = scene_xml or os.path.join(REPO_ROOT, "cubot_urdf", "n17", "scene.xml")
         self.python_exe = python_exe or self._pick_python()
         self.speed = speed
         self.log = log
@@ -368,7 +368,8 @@ def build_executor(kind: str, spool_path: str = "", log=print,
                    scene_xml: str = "",
                    hw_root: str = "", serial_port: str = "",
                    gear: float = 4.0, power: int = 3,
-                   mirror_mujoco: bool | None = None) -> Executor:
+                   mirror_mujoco: bool | None = None,
+                   n_modules: int | None = None) -> Executor:
     kind = (kind or "dryrun").lower()
     if kind == "none":
         return NullExecutor()
@@ -382,7 +383,7 @@ def build_executor(kind: str, spool_path: str = "", log=print,
         from .hardware import HardwareExecutor  # noqa: PLC0415 — keeps dryrun imports light
         return HardwareExecutor(hw_root=hw_root, serial_port=serial_port,
                                 gear=gear, power=power, scene_xml=scene_xml,
-                                mirror_mujoco=mirror_mujoco, log=log)
+                                mirror_mujoco=mirror_mujoco, n_modules=n_modules, log=log)
     if kind == "dryrun":
         return DryRunExecutor(log=log)
     raise ValueError(
@@ -396,20 +397,34 @@ def load_any(path: str) -> FoldPlan:
 
 
 def replay_states(plan: FoldPlan) -> list[int]:
-    """Re-derive the 26 joint states by applying the deltas in order — a cheap consistency check
+    """Re-derive joint states by applying the deltas in order — a cheap consistency check
     against `goal_states_mod3_27` (handoff/tools/replay.py does the full kinematic version)."""
-    states = [0] * 26
+    n = max((m.joint for m in plan.moves), default=-1) + 1
+    if plan.goal_states_mod3_27:
+        # goal list is often joints+pad; fold joints are everything but a possible trailing pad.
+        n = max(n, len(plan.goal_states_mod3_27) - 1)
+    states = [0] * max(n, 0)
     for m in plan.moves:
+        if m.joint >= len(states):
+            states.extend([0] * (m.joint + 1 - len(states)))
         states[m.joint] += m.delta
     return states
 
 
 def states_match_goal(plan: FoldPlan) -> bool:
-    """True when replaying the deltas reaches the recorded goal (states mod 3, 27 servo entries)."""
+    """True when replaying the deltas reaches the recorded goal (mod-3 joint list, optional tip pad)."""
     if not plan.goal_states_mod3_27:
         return True
-    derived = [s % 3 for s in replay_states(plan)] + [0]
-    return derived == [s % 3 for s in plan.goal_states_mod3_27]
+    goal = [s % 3 for s in plan.goal_states_mod3_27]
+    derived = [s % 3 for s in replay_states(plan)]
+    if derived == goal:
+        return True
+    # Older 27-cube exports padded one trailing unused tip entry.
+    if len(goal) == len(derived) + 1 and derived + [0] == goal:
+        return True
+    if len(goal) == len(derived) - 1 and derived[:-1] == goal:
+        return True
+    return False
 
 
 def _int_or_none(value: Any) -> Optional[int]:

@@ -74,8 +74,8 @@ def escapes_a4(roll: str) -> bool:
 
 
 def _validate_machine(machine: Machine) -> None:
-    if machine.modules != 27:
-        raise ValueError("CuBot V2 requires exactly 27 modules")
+    if machine.modules < 2:
+        raise ValueError("modules must be >= 2")
     if len(machine.roll) != machine.joints or any(c not in "0123" for c in machine.roll):
         raise ValueError("roll length/digits do not match the machine")
     if not escapes_a4(machine.roll):

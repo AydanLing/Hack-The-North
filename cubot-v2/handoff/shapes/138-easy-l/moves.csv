@@ -1,2 +1,0 @@
-step,joint,delta,side,duration_s,state_before,state_after,angle_after_deg,hard_ok,peak_demand_nm,holding_peak_nm,moving_modules
-1,22,1,out,2.0,0,1,120.0,True,1.1574,0.0000,4

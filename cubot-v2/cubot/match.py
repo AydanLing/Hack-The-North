@@ -363,7 +363,7 @@ def _beam_match(
     results: list[MatchResult] = []
     seen: set[frozenset[Cell]] = set()
     for _, _, base, _, cells, states in sorted(beam, key=lambda item: item[:2]):
-        if len(states) != 26:
+        if len(states) != len(roll):
             continue
         signature = frozenset(cells)
         if signature in seen:

@@ -1,0 +1,17 @@
+[machine]
+modules = 17
+side_mm = 80.0
+gap_mm = 2.0
+chamfer_mm = 8.0
+# First 16 digits of the shipped 26-digit roll — modules 1..17 from the
+# wire-end (module 1) toward the tip; modules 18..27 of the full chain are cut.
+roll = "1200130013310123"
+mass_kg = 0.223
+stall_torque_nm = 10.6
+move_time_s = 2.0
+joint_angle_deg = 120.0
+joint_min_position = -1
+joint_max_position = 1
+tether_length_mm = 82.0
+tether_width_mm = 40.0
+tether_facets = 4

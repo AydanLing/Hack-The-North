@@ -187,8 +187,9 @@ def explore_one(
     seed: int,
     profile: str = "gentle",
     yaw_expand: bool = True,
+    machine_path: Path | None = None,
 ) -> dict:
-    machine = load_machine()
+    machine = load_machine(machine_path)
     rows = read_mask(mask_path)
     variant = variant_label(mask_path)
     target = PixelTarget(
@@ -224,10 +225,11 @@ def explore_one(
         "record_json": None,
         "fold_statuses": [],
         "elapsed_s": 0.0,
+        "modules": machine.modules,
     }
     started = time.monotonic()
 
-    report = screen(cells, 27)
+    report = screen(cells, machine.modules)
     row["screen_ok"] = report.ok
     row["screen_stage"] = report.stage
     row["screen_reason"] = report.reason
@@ -318,6 +320,12 @@ def main() -> int:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--profile", default="gentle", help="fold acceptance profile (default: gentle)")
     parser.add_argument(
+        "--machine",
+        type=Path,
+        default=None,
+        help="machine.toml override (e.g. config/machine-17.toml for a 17-cube chain)",
+    )
+    parser.add_argument(
         "--yaw-expand",
         action=argparse.BooleanOptionalAction,
         default=True,
@@ -330,14 +338,15 @@ def main() -> int:
     out_root.mkdir(parents=True, exist_ok=True)
     family = args.family if args.family and args.family.is_file() else None
     results_path = out_root / "results.jsonl"
+    machine_path = args.machine
 
     exit_code = 2
     for mask_path in args.masks:
         if args.gate_only:
-            machine = load_machine()
+            machine = load_machine(machine_path)
             rows = read_mask(mask_path)
             cells = tuple(PixelTarget(parse_grid(rows), args.name, "").cells)
-            report = screen(cells, 27)
+            report = screen(cells, machine.modules)
             if not report.ok:
                 print(f"{args.name}/{variant_label(mask_path)}: STRUCTURAL FAIL at {report.stage} — {report.reason}")
                 continue
@@ -357,6 +366,7 @@ def main() -> int:
             seed=args.seed,
             profile=args.profile,
             yaw_expand=args.yaw_expand,
+            machine_path=machine_path,
         )
         with results_path.open("a") as handle:
             handle.write(json.dumps(row) + "\n")

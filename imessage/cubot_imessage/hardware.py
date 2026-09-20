@@ -14,12 +14,22 @@ from typing import Any
 from .mujoco_replay import STEPS_PER_STATE, hardware_wall_s
 
 DEFAULT_HW_ROOT = "/Users/jerryli/Downloads/cubot"
-EXPECTED_SIDS = list(range(1, 27))  # servo id i+1 ↔ handoff joint i
 DETENT_OUT_DEG = 120.0
 POLL_S = 0.04
 # Chase speed index into rc.SPEEDS; power preset still caps via Axis._capped.
 DEFAULT_SPEED_IDX = 3  # 800 steps/s before power cap
 PID_PATH = os.path.join(os.path.expanduser("~"), ".cache", "cubot-hardware.pid")
+
+
+def expected_sids(n_modules: int | None = None) -> list[int]:
+    """Servo ids for fold joints: modules N → joints N-1 → sids 1..N-1."""
+    from .config import DEFAULT_N_MODULES
+    n = int(n_modules if n_modules is not None else DEFAULT_N_MODULES)
+    return list(range(1, n))  # servo id i+1 ↔ handoff joint i
+
+
+# Back-compat for imports / doctor text.
+EXPECTED_SIDS = expected_sids()
 
 
 def _ensure_hw_path(hw_root: str) -> str:
@@ -52,7 +62,7 @@ def _env_bool(name: str, default: bool) -> bool:
 
 
 class HardwareExecutor:
-    """Replay a FoldPlan on the real STS3215 chain (ids 1..26).
+    """Replay a FoldPlan on the real STS3215 chain (ids 1..N-1 for an N-cube robot).
 
     Soft-zeros at the current encoder pose (caller must leave the robot straight),
     then applies each handoff detent as ``state[j] * 120°`` output via ``Axis.go``.
@@ -72,6 +82,7 @@ class HardwareExecutor:
         limit_deg: float = DETENT_OUT_DEG,
         mirror_mujoco: bool | None = None,
         scene_xml: str = "",
+        n_modules: int | None = None,
         log=print,
     ):
         self.hw_root = hw_root or os.environ.get("CUBOT_HW_ROOT", DEFAULT_HW_ROOT)
@@ -88,6 +99,14 @@ class HardwareExecutor:
             mirror_mujoco = _env_bool("CUBOT_MUJOCO_MIRROR", True)
         self.mirror_mujoco = bool(mirror_mujoco)
         self.scene_xml = scene_xml
+        from .config import DEFAULT_N_MODULES
+        try:
+            env_n = (os.environ.get("CUBOT_N_MODULES") or "").strip()
+            self.n_modules = int(env_n) if env_n else int(n_modules or DEFAULT_N_MODULES)
+        except ValueError:
+            self.n_modules = int(n_modules or DEFAULT_N_MODULES)
+        self.sids = expected_sids(self.n_modules)
+        self.n_joints = len(self.sids)
         self.log = log
         self.submitted: list = []
         self._lock = threading.Lock()
@@ -107,19 +126,19 @@ class HardwareExecutor:
         port = self.serial_port or sts.autodetect_port()
         self.log(f"[hardware] opening bus on {port} (gear={self.gear}, power={self.power})")
         bus = sts.Bus(port)
-        found = bus.scan(EXPECTED_SIDS)
-        missing = [s for s in EXPECTED_SIDS if s not in found]
+        found = bus.scan(self.sids)
+        missing = [s for s in self.sids if s not in found]
         if missing:
             try:
                 bus.close()
             except Exception:
                 pass
             raise RuntimeError(
-                f"robot offline / incomplete bus: need servos {EXPECTED_SIDS[0]}..{EXPECTED_SIDS[-1]}, "
+                f"robot offline / incomplete bus: need servos {self.sids[0]}..{self.sids[-1]}, "
                 f"missing {missing} (found {found})"
             )
         geo = rc.Geometry(gear=self.gear, limit_deg=self.limit_deg)
-        axes = [rc.Axis(bus, sid, geo) for sid in EXPECTED_SIDS]
+        axes = [rc.Axis(bus, sid, geo) for sid in self.sids]
         for ax in axes:
             # Seed continuous track from the live encoder.
             st = bus.read_state(ax.sid)
@@ -221,12 +240,12 @@ class HardwareExecutor:
     def _run_plan(self, plan) -> dict[str, Any]:
         assert self._rc is not None and self._axes
         speed = self._rc.SPEEDS[min(DEFAULT_SPEED_IDX, len(self._rc.SPEEDS) - 1)]
-        state = [0] * 26
+        state = [0] * self.n_joints
         arrived_all = True
         for m in plan.moves:
             j = int(m.joint)
-            if j < 0 or j >= 26:
-                raise ValueError(f"joint {j} out of range 0..25")
+            if j < 0 or j >= self.n_joints:
+                raise ValueError(f"joint {j} out of range 0..{self.n_joints - 1}")
             nxt = state[j] + int(m.delta)
             if nxt not in (-1, 0, 1):
                 self.log(f"[hardware] clamp j{j} state {state[j]}{m.delta:+d} → "
@@ -474,10 +493,14 @@ class HardwareExecutor:
                     "cont_at_home": int(ax.cont),
                     "home": int(ax.home),
                 }
-            # Also capture sid 27 if present on the bus (not in the fold chain).
-            try:
-                extra = self._bus.scan([27])
-            except Exception:
+            # Also capture tip / spare sids past the fold chain when present.
+            tip = self.n_modules
+            if tip not in self.sids:
+                try:
+                    extra = self._bus.scan([tip])
+                except Exception:
+                    extra = []
+            else:
                 extra = []
             for sid in extra:
                 if sid in ids:
