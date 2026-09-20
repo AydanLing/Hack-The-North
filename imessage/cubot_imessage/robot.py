@@ -286,22 +286,50 @@ class MujocoExecutor:
     def __init__(self, scene_xml: str = "", python_exe: str = "", speed: float = 1.0, log=print):
         from .config import REPO_ROOT
         self.scene_xml = scene_xml or os.path.join(REPO_ROOT, "cubot_urdf", "n17", "scene.xml")
-        self.python_exe = python_exe or self._pick_python()
+        self.python_exe = python_exe or self._pick_python(log=log)
         self.speed = speed
         self.log = log
         self.submitted: list[FoldPlan] = []
 
+    # Interpreters to try when mjpython is not next to us and not on PATH. Under
+    # launchd the agent inherits a minimal PATH, so `which` alone silently falls
+    # back to a plain python that opens no window at all.
+    _MJPYTHON_FALLBACKS = (
+        "/opt/homebrew/Caskroom/miniconda/base/bin/mjpython",
+        "/opt/homebrew/bin/mjpython",
+        "/usr/local/bin/mjpython",
+    )
+
     @staticmethod
-    def _pick_python() -> str:
-        """Prefer the sibling mjpython next to the current interpreter."""
+    def _pick_python(log=None) -> str:
+        """Find mjpython: sibling, then PATH, then known install locations."""
+        def usable(p: str) -> bool:
+            return bool(p) and os.path.isfile(p) and os.access(p, os.X_OK)
+
+        override = (os.environ.get("CUBOT_MJPYTHON") or "").strip()
+        if override:
+            if usable(override):
+                return override
+            if log:
+                log(f"[mujoco] CUBOT_MJPYTHON={override!r} is not executable; searching instead")
+
         here = os.path.dirname(os.path.abspath(sys.executable))
         for name in ("mjpython", "mjpython.exe"):
             candidate = os.path.join(here, name)
-            if os.path.isfile(candidate) and os.access(candidate, os.X_OK):
+            if usable(candidate):
                 return candidate
+
         import shutil
         found = shutil.which("mjpython")
-        return found or sys.executable
+        if found:
+            return found
+        for candidate in MujocoExecutor._MJPYTHON_FALLBACKS:
+            if usable(candidate):
+                return candidate
+        if log:
+            log("[mujoco] no mjpython found — on macOS the viewer needs it to own the "
+                "main thread, so no window will open. Set CUBOT_MJPYTHON to its path.")
+        return sys.executable
 
     def _stop_previous(self) -> None:
         import signal
@@ -337,7 +365,7 @@ class MujocoExecutor:
         env["PYTHONUNBUFFERED"] = "1"
         # launchd / minimal PATH lacks /usr/sbin; mjpython imports mujoco which shells out to `sysctl`.
         env["PATH"] = (
-            "/tmp/cubot-venv/bin:/opt/homebrew/bin:/usr/local/bin:"
+            os.path.dirname(self.python_exe) + ":/opt/homebrew/bin:/usr/local/bin:"
             "/usr/bin:/bin:/usr/sbin:/sbin:" + env.get("PATH", "")
         )
 
