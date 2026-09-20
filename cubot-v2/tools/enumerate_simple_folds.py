@@ -79,6 +79,11 @@ def main() -> int:
     ap.add_argument("--per-k", type=int, default=12, help="how many to show per fold count")
     ap.add_argument("--out", type=Path, default=None,
                    help="write masks as <out>/k<K>-NN.txt")
+    ap.add_argument("--queue", type=Path, default=None,
+                   help="write an explore_batch queue covering every mask written")
+    ap.add_argument("--budget", type=int, default=0,
+                   help="with --queue: total masks to emit, best-scoring first "
+                        "across all fold counts (0 = use --per-k)")
     args = ap.parse_args()
 
     machine = load_machine(args.machine)
@@ -116,6 +121,27 @@ def main() -> int:
 
     if args.out:
         args.out.mkdir(parents=True, exist_ok=True)
+
+    if args.queue:
+        # One flat, score-ordered campaign. Fold count breaks ties, so the
+        # cheapest shape wins whenever two look equally good.
+        pool = [(sc, k, rows) for k, hits in by_k.items() for sc, rows, _ in hits]
+        pool.sort(key=lambda e: (-e[0], e[1]))
+        limit = args.budget or len(pool)
+        args.out.mkdir(parents=True, exist_ok=True)
+        args.queue.parent.mkdir(parents=True, exist_ok=True)
+        import json as _json
+        written = 0
+        with args.queue.open("w") as qf:
+            for sc, k, rows in pool[:limit]:
+                name = f"k{k}-{written:04d}"
+                mask = args.out / f"{name}.txt"
+                mask.write_text("\n".join(rows) + "\n")
+                qf.write(_json.dumps({"name": name, "mask": str(mask),
+                                      "category": "n17-forward"}) + "\n")
+                written += 1
+        print(f"\nqueued {written} masks -> {args.queue}")
+        return 0
 
     for k in sorted(by_k):
         if not by_k[k]:
